@@ -2,9 +2,6 @@ import mongoose, { Mongoose } from 'mongoose';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable');
-}
 interface MongooseCache {
   conn: Mongoose | null;
   promise: Promise<Mongoose> | null;
@@ -21,20 +18,21 @@ if (!cached) {
 }
 
 async function dbConnect(): Promise<Mongoose> {
-
   if (!MONGODB_URI) {
-    console.warn(" MONGODB_URI not defined — skipping DB connection (likely build phase).");
-    return {} as Mongoose; // Return an empty Mongoose object or handle this case appropriately
+    // Avoid throwing at module-evaluation time so Next/Turbopack can build.
+    // The connection will be skipped in environments without the variable.
+    console.warn('MONGODB_URI not defined — skipping DB connection (likely build phase).');
+    return {} as Mongoose;
   }
+
   if (cached.conn) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    // We start the connection and store the promise.
     cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: 'TuitionEd', 
-      bufferCommands: false
+      dbName: 'TuitionEd',
+      bufferCommands: false,
     });
   }
 
@@ -44,7 +42,8 @@ async function dbConnect(): Promise<Mongoose> {
     cached.promise = null;
     throw e;
   }
-    return cached.conn!;
+
+  return cached.conn!;
 }
 
 export default dbConnect;
