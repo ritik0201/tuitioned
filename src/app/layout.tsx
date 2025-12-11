@@ -4,7 +4,7 @@ import { AppProviders } from "@/provider/AppProviders";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Toaster } from 'sonner';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import Script from "next/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
@@ -33,11 +33,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+interface RootLayoutProps {
   children: React.ReactNode;
-}>) {
+}
+
+export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <head>
@@ -61,7 +61,12 @@ export default function RootLayout({
           <Toaster richColors />
           <Footer />
         </AppProviders>
-        <SpeedInsights />
+        {/* Manually inject Speed Insights script to use custom proxied paths */}
+        <Script
+          src="/js/script.js" // Points to the custom source path in next.config.js
+          data-endpoint="/api/send-vitals" // Tells the script where to send data
+          strategy="lazyOnload"
+        />
       </body>
     </html>
   );
