@@ -11,9 +11,10 @@ export async function POST(request: NextRequest) {
       email,
       mobile,
       qualification,
-      experience,
+      experiance,
       listOfSubjects,
       profileImage,
+      cvUrl,
     } = await request.json();
 
     if (!fullName || !email) {
@@ -31,9 +32,10 @@ export async function POST(request: NextRequest) {
         email,
         mobile,
         qualification,
-        experience,
+        experiance,
         listOfSubjects,
         profileImage,
+        cvUrl,
         isVerified: false,
         role: "teacher",
       });
@@ -42,9 +44,10 @@ export async function POST(request: NextRequest) {
       user.role = "teacher";
       user.fullName = fullName; // Also update their name
       user.qualification = qualification;
-      user.experience = experience;
+      user.experiance = experiance;
       user.listOfSubjects = listOfSubjects;
       user.profileImage = profileImage;
+      user.cvUrl = cvUrl;
     }
     user.otp = otp;
     user.otpExpires = otpExpires;

@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       dateOfBirth: teacher.dateOfBirth || null,
       address: teacher.address || { street: '', city: '', state: '' },
       qualification: teacher.qualification || '',
-      experience: teacher.experience || '',
+      experience: teacher.experiance || '',
       listOfSubjects: teacher.listOfSubjects || [],
     };
 

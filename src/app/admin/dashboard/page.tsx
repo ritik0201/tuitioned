@@ -150,7 +150,7 @@ export default function AdminDashboardPage() {
               <Bell /> Recent Demo Requests
             </Typography>
             <List>
-              {data.recentDemos.map((demo, index) => (
+              {data.recentDemos.filter(demo => demo.studentId).map((demo, index) => (
                 <React.Fragment key={demo._id}>
                   <Link href={`/admin/democlass-student/${demo.studentId._id}`}>
                     <ListItem>

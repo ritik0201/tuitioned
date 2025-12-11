@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import './phone-input.css';
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 
@@ -22,6 +25,10 @@ export default function FreeTrialPage() {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
+  };
+
+  const handlePhoneChange = (value: string | undefined) => {
+    setFormData(prev => ({ ...prev, mobile: value || '' }));
   };
 
   useEffect(() => {
@@ -134,15 +141,14 @@ export default function FreeTrialPage() {
                   className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
                   disabled={otpSent}
                 />
-                <input
-                  name="mobile"
-                  type="tel"
+                <PhoneInput
                   placeholder="Mobile Number"
                   required
-                  value={formData.mobile || ""}
-                  onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
+                  value={formData.mobile}
+                  onChange={handlePhoneChange}
+                  international
                   disabled={otpSent}
+                  className="phone-input-container"
                 />
               </>
             )}

@@ -12,48 +12,48 @@ import TimelineConnector from '@mui/lab/TimelineConnector';
 import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineOppositeContent from '@mui/lab/TimelineOppositeContent';
 import TimelineDot from '@mui/lab/TimelineDot';
-import FastfoodIcon from '@mui/icons-material/Fastfood';
-import LaptopMacIcon from '@mui/icons-material/LaptopMac';
-import HotelIcon from '@mui/icons-material/Hotel';
-import RepeatIcon from '@mui/icons-material/Repeat';
 import { TimelineSeparator } from "@mui/lab";
 import Typography from '@mui/material/Typography';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import SearchIcon from '@mui/icons-material/Search';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
+import SchoolIcon from '@mui/icons-material/School';
 
 const teamMembers: TeamMember[] = [
   {
     id: "1",
-    name: "John Doe",
-    role: "Software Engineer",
+    name: "Rina Roy",
+    role: "Grade 5 Student",
     image:
-      "https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3387&q=80",
+      "/sa1.png",
   },
   {
     id: "2",
-    name: "Robert Johnson",
-    role: "Product Manager",
+    name: "Tina Dubey",
+    role: "Grade 3 Student",
     image:
-      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+      "/sa2.png",
   },
   {
     id: "3",
-    name: "Jane Smith",
-    role: "Data Scientist",
+    name: "Sunny",
+    role: "Grade 1 Student",
     image:
-      "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8YXZhdGFyfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
+      "/sa3.png",
   },
   {
     id: "4",
-    name: "Emily Davis",
-    role: "UX Designer",
+    name: "Tannu Roy",
+    role: "Grade 8 Student",
     image:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGF2YXRhcnxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
+      "/sa4.png",
   },
   {
     id: "5",
-    name: "Tyler Durden",
-    role: "Soap Developer",
+    name: "Ruchi",
+    role: "Grade 3 Student",
     image:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=3540&q=80",
+      "/sa5.png",
   },
 ];
 
@@ -202,70 +202,83 @@ export default function Home() {
           {/* Timeline */}
           <div>
             <Timeline position="alternate">
+              {/* Step 1: Sign Up */}
               <TimelineItem>
                 <TimelineOppositeContent sx={{ m: 'auto 0' }} align="right" variant="body2" color="text.secondary">
-                  9:30 am
-                </TimelineOppositeContent>
-                <TimelineSeparator>
-                  <TimelineConnector />
-                  <TimelineDot>
-                    <FastfoodIcon />
-                  </TimelineDot>
-                  <TimelineConnector />
-                </TimelineSeparator>
-                <TimelineContent sx={{ py: '12px', px: 2 }}>
-                  <Typography variant="h6" component="span">
-                    Eat
-                  </Typography>
-                  <Typography>Because you need strength</Typography>
-                </TimelineContent>
-              </TimelineItem>
-              <TimelineItem>
-                <TimelineOppositeContent sx={{ m: 'auto 0' }} variant="body2" color="text.secondary">
-                  10:00 am
+                  Step 1
                 </TimelineOppositeContent>
                 <TimelineSeparator>
                   <TimelineConnector />
                   <TimelineDot color="primary">
-                    <LaptopMacIcon />
+                    <HowToRegIcon />
                   </TimelineDot>
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: '12px', px: 2 }}>
                   <Typography variant="h6" component="span">
-                    Code
+                    Sign Up
                   </Typography>
-                  <Typography>Because it&apos;s awesome!</Typography>
+                  <Typography>Create your account to get started.</Typography>
                 </TimelineContent>
               </TimelineItem>
+
+              {/* Step 2: Explore Tutors */}
               <TimelineItem>
+                <TimelineOppositeContent sx={{ m: 'auto 0' }} variant="body2" color="text.secondary">
+                  Step 2
+                </TimelineOppositeContent>
                 <TimelineSeparator>
                   <TimelineConnector />
-                  <TimelineDot color="primary" variant="outlined">
-                    <HotelIcon />
+                  <TimelineDot color="primary">
+                    <SearchIcon />
                   </TimelineDot>
-                  <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                  <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: '12px', px: 2 }}>
                   <Typography variant="h6" component="span">
-                    Sleep
+                    Explore Tutors
                   </Typography>
-                  <Typography>Because you need rest</Typography>
+                  <Typography>Find the perfect mentor for your needs.</Typography>
                 </TimelineContent>
               </TimelineItem>
+
+              {/* Step 3: Book a Free Trial */}
               <TimelineItem>
+                <TimelineOppositeContent sx={{ m: 'auto 0' }} align="right" variant="body2" color="text.secondary">
+                  Step 3
+                </TimelineOppositeContent>
                 <TimelineSeparator>
-                  <TimelineConnector sx={{ bgcolor: 'secondary.main' }} />
+                  <TimelineConnector />
+                  <TimelineDot color="primary">
+                    <BookOnlineIcon />
+                  </TimelineDot>
+                  <TimelineConnector />
+                </TimelineSeparator>
+                <TimelineContent sx={{ py: '12px', px: 2 }}>
+                  <Typography variant="h6" component="span">
+                    Book a Free Trial
+                  </Typography>
+                  <Typography>Schedule a demo session at your convenience.</Typography>
+                </TimelineContent>
+              </TimelineItem>
+
+              {/* Step 4: Start Learning */}
+              <TimelineItem>
+                <TimelineOppositeContent sx={{ m: 'auto 0' }} variant="body2" color="text.secondary">
+                  Step 4
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineConnector />
                   <TimelineDot color="secondary">
-                    <RepeatIcon />
+                    <SchoolIcon />
                   </TimelineDot>
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: '12px', px: 2 }}>
                   <Typography variant="h6" component="span">
-                    Repeat
+                    Start Learning
                   </Typography>
-                  <Typography>Because this is the life you love!</Typography>
+                  <Typography>Attend your trial and begin your journey!</Typography>
                 </TimelineContent>
               </TimelineItem>
             </Timeline>

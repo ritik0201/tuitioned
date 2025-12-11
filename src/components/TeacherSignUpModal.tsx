@@ -10,9 +10,12 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { X } from 'lucide-react';
 import CircularProgress from '@mui/material/CircularProgress'; 
-import { Autocomplete, Chip, Stack } from '@mui/material';
-import { Camera, School } from 'lucide-react';
+import { Alert, Autocomplete, Chip, Stack } from '@mui/material';
+import { Camera, FileText, School } from 'lucide-react';
 
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import '../app/get-a-free-tail/phone-input.css';
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
@@ -42,12 +45,14 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   const [qualification, setQualification] = useState('');
   const [experiance, setExperiance] = useState('');
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [listOfSubjects, setListOfSubjects] = useState<string[]>([]);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cvFileInputRef = useRef<HTMLInputElement>(null);
 
   const textFieldStyles = {
     '& .MuiInputBase-input': { color: '#fff' },
@@ -57,6 +62,10 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       '&:hover fieldset': { borderColor: '#fff' },
       '&.Mui-focused fieldset': { borderColor: '#fff' },
     },
+  };
+
+  const handlePhoneChange = (value: string | undefined) => {
+    setMobile(value || '');
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,10 +88,29 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
     }
   };
 
-  const handleImageUpload = async () => {
-    if (!profileImageFile) return '';
+  const handleCvFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setError("CV file size should not exceed 5MB.");
+        return;
+      }
+      if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
+        setError("Please upload a PDF or Word document for your CV.");
+        return;
+      }
+      setCvFile(file);
+      setError(''); // Clear previous errors
+    }
+  };
 
-    // IMPORTANT: Replace with your Cloudinary details
+  const handleRemoveCv = () => {
+    setCvFile(null);
+    if (cvFileInputRef.current) {
+      cvFileInputRef.current.value = '';
+    }
+  };
+  const handleFileUpload = async (file: File, resourceType: 'image' | 'raw' | 'auto' = 'auto') => {
     const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
@@ -93,22 +121,25 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
     }
 
     const formData = new FormData();
-    formData.append('file', profileImageFile);
+    formData.append('file', file);
     formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
     try {
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      const uploadPath = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
+      const response = await fetch(uploadPath, {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        throw new Error(errorData?.error?.message || 'Image upload failed. Check Cloudinary credentials.');
+        throw new Error(errorData?.error?.message || 'Upload failed. Check Cloudinary preset and account settings.');
       }
 
       const data = await response.json();
-      return data.secure_url; // This is the image link
+      // Helpful debug: check resource_type and secure_url
+      console.debug('Cloudinary upload response:', { resource_type: data.resource_type, secure_url: data.secure_url });
+      return data.secure_url;
     } catch (uploadError: any) {
       console.error('Cloudinary Upload Error:', uploadError);
       setError(`Upload Error: ${uploadError.message}`);
@@ -121,6 +152,12 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
     setError('');
 
     if (!profileImageFile) {
+      setError('Profile photo is required.');
+      setLoading(false);
+      return;
+    }
+
+    if (!cvFile) {
       setError('Profile photo is required.');
       setLoading(false);
       return;
@@ -144,22 +181,31 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       }
 
       // Upload image to Cloudinary and get the URL
-      let profileImageUrl = '';
-      if (profileImageFile) {
-        const uploadedUrl = await handleImageUpload();
-        if (!uploadedUrl) {
-          // Error is already set in handleImageUpload
-          setLoading(false);
-          return;
-        }
-        profileImageUrl = uploadedUrl;
+      const profileImageUrl = await handleFileUpload(profileImageFile, 'image');
+      if (!profileImageUrl) {
+        // Error is already set in handleFileUpload
+        setLoading(false);
+        return;
+      }
+
+      // Upload CV to Cloudinary and get the URL
+      if (!cvFile) {
+        setError('CV is required.');
+        setLoading(false);
+        return;
+      }
+      const cvUrl = await handleFileUpload(cvFile, 'raw');
+      if (!cvUrl) {
+        // Error is already set in handleFileUpload
+        setLoading(false);
+        return;
       }
 
       const res = await fetch('/api/auth/teacher-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName, email, mobile, qualification, experiance, listOfSubjects, profileImage: profileImageUrl
+          fullName, email, mobile, qualification, experiance, listOfSubjects, profileImage: profileImageUrl, cvUrl: cvUrl
         }),
       });
       const data = await res.json();
@@ -217,14 +263,20 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
           <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}><X /></IconButton>
           {step === 'details' && (
             <Box component="form" sx={{ mt: 4 }}>
-              <Typography variant="h6" component="h3">Become a Teacher</Typography>
-              {error && <Typography color="error" variant="body2">{error}</Typography>}
+              <Typography variant="h6" component="h3" mb={1}>Become a Teacher</Typography>
+              {error && <Alert severity="error" sx={{ mb: 2, bgcolor: 'error.dark', color: 'white' }}>{error}</Alert>}
               <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 4, mt: 2.5 }}>
                 {/* Left side for inputs */}
                 <Stack spacing={2.5} sx={{ flex: 1 }}>
                   <TextField label="Full Name" variant="outlined" fullWidth required value={fullName} onChange={(e) => setFullName(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Email ID" variant="outlined" fullWidth required type="email" value={email} onChange={(e) => setEmail(e.target.value)} sx={textFieldStyles} />
-                  <TextField label="Mobile Number" variant="outlined" fullWidth type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} sx={textFieldStyles} />
+                  <PhoneInput
+                    placeholder="Mobile Number"
+                    value={mobile}
+                    onChange={handlePhoneChange}
+                    international
+                    className="phone-input-container"
+                  />
                   <TextField label="Highest Qualification" variant="outlined" fullWidth value={qualification} onChange={(e) => setQualification(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Years of Experience" variant="outlined" fullWidth value={experiance} onChange={(e) => setExperiance(e.target.value)} sx={textFieldStyles} />
                   <Autocomplete
@@ -246,7 +298,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   />
                 </Stack>
                 {/* Right side for image */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', pt: 2 }}>
+                <Stack spacing={2} sx={{ alignItems: 'center', pt: 2 }}>
                   <input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} style={{ display: 'none' }} id="profile-image-input" />
                   <label htmlFor="profile-image-input">
                     <Box
@@ -267,7 +319,30 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   ) : (
                     <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1 }}>Upload Profile Photo</Typography>
                   )}
-                </Box>
+
+                  {/* CV Upload */}
+                  <input type="file" accept=".pdf,.doc,.docx" onChange={handleCvFileChange} ref={cvFileInputRef} style={{ display: 'none' }} id="cv-file-input" />
+                  <label htmlFor="cv-file-input">
+                    <Box
+                      sx={{
+                        width: 140, height: 140, borderRadius: 2, border: '2px dashed rgba(255, 255, 255, 0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textAlign: 'center', p: 1,
+                        '&:hover': { borderColor: 'primary.main' }
+                      }}
+                    >
+                      {cvFile ? (
+                        <>
+                          <FileText color="rgba(255, 255, 255, 0.9)" size={32} />
+                          <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1, wordBreak: 'break-all' }}>{cvFile.name}</Typography>
+                        </>
+                      ) : (
+                        <FileText color="rgba(255, 255, 255, 0.7)" />
+                      )}
+                    </Box>
+                  </label>
+                  {cvFile ? (
+                    <Button size="small" onClick={handleRemoveCv} sx={{ mt: 1, textTransform: 'none', color: 'text.secondary' }}>Remove CV</Button>
+                  ) : (<Typography variant="caption" sx={{ color: 'text.secondary', mt: 1 }}>Upload CV</Typography>)}
+                </Stack>
               </Box>
               <Button variant="contained" onClick={handleVerify} disabled={loading} fullWidth sx={{ mt: 3, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Get OTP'}

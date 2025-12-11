@@ -11,6 +11,9 @@ import IconButton from '@mui/material/IconButton';
 import { UserPlus, X } from 'lucide-react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Stack } from '@mui/material';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import '../app/get-a-free-tail/phone-input.css';
 
 interface SignUpModalProps {
     open: boolean;
@@ -60,6 +63,10 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                 borderColor: '#fff',
             },
         },
+    };
+
+    const handlePhoneChange = (value: string | undefined) => {
+        setMobile(value || '');
     };
 
     const handleVerify = async () => {
@@ -140,7 +147,13 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                             {error && <Typography color="error" variant="body2">{error}</Typography>}
                             <TextField label="Full Name" variant="outlined" fullWidth required value={fullName} onChange={(e) => setFullName(e.target.value)} sx={textFieldStyles} />
                             <TextField label="Email ID" variant="outlined" fullWidth required type="email" value={email} onChange={(e) => setEmail(e.target.value)} sx={textFieldStyles} />
-                            <TextField label="Mobile Number" variant="outlined" fullWidth type="tel" value={mobile} onChange={(e) => setMobile(e.target.value)} sx={textFieldStyles} />
+                            <PhoneInput
+                                placeholder="Mobile Number"
+                                value={mobile}
+                                onChange={handlePhoneChange}
+                                international
+                                className="phone-input-container"
+                            />
                             <Button
                                 variant="contained"
                                 onClick={handleVerify}

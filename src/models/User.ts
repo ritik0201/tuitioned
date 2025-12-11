@@ -20,9 +20,10 @@ export interface IUser extends Document {
   isAcceptingMessages?: boolean;
   // messages?: [string];
   qualification?: string;
-  experience?: string;
+  experiance?: string;
   listOfSubjects?: string[];
   profileImage?: string;
+  cvUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,7 +40,7 @@ const UserSchema: Schema<IUser> = new Schema({
     country: String,
   },
   qualification: { type: String },
-  experience: { type: String },
+  experiance: { type: String },
   listOfSubjects: { type: [String] },
   role: {
     type: String,
@@ -51,6 +52,7 @@ const UserSchema: Schema<IUser> = new Schema({
   otpExpires: { type: Date },
   isVerified: { type: Boolean, default: false },
   profileImage: { type: String },
+  cvUrl: { type: String },
   isAcceptingMessages: { type: Boolean, default: true },
   // messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
 }, { timestamps: true });
