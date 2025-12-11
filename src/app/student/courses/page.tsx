@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { CircularProgress, Alert, Box } from "@mui/material";
 
 interface ICourse {
@@ -138,30 +139,30 @@ export default function MyCoursesPage() {
         {/* Sidebar */}
         <div className="w-4/12 bg-gray-800 rounded-2xl p-8 shadow-lg self-start sticky top-24 min-h-screen border-blue-500 border-2">
           <h3 className="text-2xl font-bold text-white mb-6">Your Progress</h3>
-          <div className="bg-gray-900 p-6 rounded-xl mb-6 text-center">
-            <img
-              src="/courses.jpg"
-              alt="Student Illustration"
-              className="w-32 mx-auto mb-4"
-            />
-            <h4 className="font-semibold text-xl text-blue-400">Keep up the great work!</h4>
-            <p className="text-sm text-blue-300 mt-1">Here's a summary of your learning journey.</p>
-          </div>
+          <Image
+            src="/courses.jpg"
+            alt="Student Illustration"
+            className="w-32 mx-auto mb-4"
+            width={128}
+            height={128}
+          />
+          <h4 className="font-semibold text-xl text-blue-400">Keep up the great work!</h4>
+          <p className="text-sm text-blue-300 mt-1 mb-6">Here's a summary of your learning journey.</p>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-gray-900 p-4 rounded-lg text-center">
-              <p className="text-3xl font-bold text-indigo-600">{courses.length}</p>
-              <p className="text-sm text-gray-600 mt-1">Total Courses</p>
+              <p className="text-3xl font-bold text-indigo-400">{courses.length}</p>
+              <p className="text-sm text-gray-400 mt-1">Total Courses</p>
             </div>
             <div className="bg-gray-900 p-4 rounded-lg text-center">
-              <p className="text-3xl font-bold text-green-600">
+              <p className="text-3xl font-bold text-green-400">
                 {courses.filter(c => c.paymentStatus === 'completed').length}
               </p>
-              <p className="text-sm text-gray-600 mt-1">Completed</p>
+              <p className="text-sm text-gray-400 mt-1">Completed</p>
             </div>
           </div>
 
-          <div>
+          <div className="mt-auto">
             <a
               href="/get-a-free-tail"
               className="block w-full text-center py-3 rounded-lg font-semibold transition-all duration-300 bg-[#0EA5E9] hover:bg-[#0284c7] text-white border-white border-2"

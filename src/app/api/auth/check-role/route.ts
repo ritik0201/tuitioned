@@ -1,25 +1,31 @@
-import dbConnect from "@/lib/dbConnect";
-import User from "@/models/User";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import dbConnect from '@/lib/dbConnect';
+import User from '@/models/User';
 
 export async function POST(request: Request) {
+  await dbConnect();
+
   try {
-    await dbConnect();
     const { email } = await request.json();
 
     if (!email) {
-      return NextResponse.json({ message: "Email is required" }, { status: 400 });
+      return NextResponse.json({ message: 'Email is required.' }, { status: 400 });
     }
 
-    const user = await User.findOne({ email }).select('role');
+    const user = await User.findOne({ email }).select('role').lean();
 
     if (!user) {
-      return NextResponse.json({ role: null }, { status: 200 });
+      return NextResponse.json({ message: 'User not found.' }, { status: 404 });
     }
 
+    // User exists, return their role
     return NextResponse.json({ role: user.role }, { status: 200 });
-  } catch (error) {
-    console.error("CHECK_ROLE_ERROR:", error); // Add detailed logging
-    return NextResponse.json({ message: "An unexpected error occurred." }, { status: 500 });
+
+  } catch (error: any) {
+    console.error('Check-role API Error:', error);
+    return NextResponse.json(
+      { message: error.message || 'Server Error' },
+      { status: 500 }
+    );
   }
 }

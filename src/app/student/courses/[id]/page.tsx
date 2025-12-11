@@ -825,7 +825,7 @@ export default function CourseDetailPage() {
             variant="contained"
             size="large"
             disabled={isProcessing}
-            sx={{ flexGrow: 1 }}
+            sx={{ flexGrow: 1, minWidth: '220px' }}
           >
             {isProcessing ? (
               <CircularProgress size={24} color="inherit" />

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import {
@@ -38,6 +38,7 @@ const Navbar = () => {
     const { activeModal, openModal, closeModal, switchModal } = useUI();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [isClient, setIsClient] = useState(false);
     const isUserMenuOpen = Boolean(anchorEl);
 
     const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -52,6 +53,10 @@ const Navbar = () => {
         handleUserMenuClose();
         signOut({ callbackUrl: '/' });
     };
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const getInitials = (name: string = "") => {
         return name
@@ -134,14 +139,16 @@ const Navbar = () => {
                 </div>
             </nav>
             {/* Mobile Menu Dropdown */}
-            <div
-                className={`md:hidden absolute top-full left-0 w-full bg-background border-b shadow-lg transition-all duration-300 ease-in-out
-          ${isMobileMenuOpen
-                        ? 'opacity-100 translate-y-0 visible'
-                        : 'opacity-0 -translate-y-4 invisible'
-                    }`}
-            >
-                <div className="px-4 pt-2 pb-4 space-y-4">
+            {isClient && (
+                <div
+                    className={`md:hidden absolute top-full left-0 w-full bg-background/80 backdrop-blur-lg border-b shadow-lg transition-all duration-300 ease-in-out
+              ${isMobileMenuOpen
+                            ? 'opacity-100 translate-y-0 visible'
+                            : 'opacity-0 -translate-y-4 invisible'
+                        }`}
+                >
+                    <div className="px-4 pt-2 pb-4 space-y-4">
+
                     <div className="flex flex-col space-y-2">
                         {navLinks.map((link) => (
                             <Link key={link.href} href={link.href} className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:text-primary hover:bg-muted" onClick={() => setIsMobileMenuOpen(false)}>
@@ -202,8 +209,9 @@ const Navbar = () => {
                             </Button>
                         )}
                     </div>
+                    </div>
                 </div>
-            </div>
+            )}
             <LoginModal open={activeModal === 'login'} onClose={closeModal} onSwitchToSignUp={() => switchModal('signup')} />
             <SignUpModal open={activeModal === 'signup'} onClose={closeModal} />
             <TeacherAuthModal open={activeModal === 'teacherAuth'} onClose={closeModal} />

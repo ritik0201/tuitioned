@@ -85,7 +85,7 @@ export default function StudentDashboardPage() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">        <Card className="bg-gray-800 border-blue-500 border-2 hover:border-blue-400 transition-colors">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">        <Card className="bg-gray-800 border-blue-500 border-2 hover:border-blue-400 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
@@ -110,15 +110,6 @@ export default function StudentDashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{demoClasses.filter(d => d.status === 'confirmed').length}</div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gray-800 border-blue-500 border-2 hover:border-blue-400 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Demos</CardTitle>
-            <Hourglass className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{demoClasses.filter(d => d.status === 'pending').length}</div>
           </CardContent>
         </Card>
       </div>
@@ -186,7 +177,7 @@ export default function StudentDashboardPage() {
             </Box>
           ) : demoClasses.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {demoClasses.map((demo) => (
+              {demoClasses.slice(0, 3).map((demo) => (
                 <Card key={demo._id} className="flex flex-col bg-gray-800 border-blue-500 border-2">
                   <CardHeader>
                     <div className="flex justify-between items-start">

@@ -46,6 +46,27 @@ export default function FreeTrialPage() {
     setLoading(true);
     setError("");
     try {
+      // If user is not logged in, check their email and role before sending OTP
+      if (!session) {
+        const roleCheckRes = await fetch('/api/auth/check-role', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: formData.email }),
+        });
+
+        if (roleCheckRes.ok) {
+          const { role } = await roleCheckRes.json();
+          if (role === 'teacher' || role === 'admin') {
+            throw new Error(`This email is registered as a ${role}. Please use a student account to book a demo.`);
+          }
+        } else if (roleCheckRes.status !== 404) { // 404 is OK (user not found), but other errors are not
+          const errorData = await roleCheckRes.json();
+          throw new Error(errorData.message || 'Failed to verify user role.');
+        }
+        // If 404, it's a new user, so we can proceed.
+      }
+
+
       const apiEndpoint = session ? "/api/auth/login" : "/api/auth/signup";
       const payload = session 
         ? { email: formData.email } 
