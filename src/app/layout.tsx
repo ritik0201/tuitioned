@@ -4,12 +4,13 @@ import { AppProviders } from "@/provider/AppProviders";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Toaster } from 'sonner';
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
   title: {
-    default: "TuitionEd",
-    template: `%s | TuitionEd`,
+    default: "TuitionEd - Online Tutoring",
+    template: `%s | TuitionEd - Online Tutoring`,
   },
   description: "Expert Online Tutoring for personal and academic growth.",
   icons: {
@@ -56,6 +57,7 @@ export default function RootLayout({
       <body>
         <AppProviders>
           <Navbar />
+          <SpeedInsights />
           <div className="pt-16">{children}</div>
           <Toaster richColors />
           <Footer />
