@@ -90,17 +90,17 @@ export default function CourseDetailPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false); // New state for message modal
-  const [classesToAdd, setClassesToAdd] = useState(1);
+  const [classesToAdd, setClassesToAdd] = useState(6);
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setClassesToAdd(1); // Reset on close
+    setClassesToAdd(6); // Reset on close
   };
 
   const handleIncrease = () => setClassesToAdd((prev) => prev + 1);
-  const handleDecrease = () => setClassesToAdd((prev) => Math.max(1, prev - 1));
+  const handleDecrease = () => setClassesToAdd((prev) => Math.max(6, prev - 1));
 
   useEffect(() => {
     if (!courseId) return;
@@ -149,7 +149,7 @@ export default function CourseDetailPage() {
     if (retry === 'true' && classes) {
       const numClasses = parseInt(classes, 10);
       if (!isNaN(numClasses) && numClasses > 0) {
-        setClassesToAdd(numClasses);
+        setClassesToAdd(Math.max(6, numClasses));
         handleOpenModal();
       }
     }

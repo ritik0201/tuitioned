@@ -141,7 +141,7 @@ const Navbar = () => {
             {/* Mobile Menu Dropdown */}
             {isClient && (
                 <div
-                    className={`md:hidden absolute top-full left-0 w-full bg-background/80 backdrop-blur-lg border-b shadow-lg transition-all duration-300 ease-in-out
+                    className={`md:hidden absolute top-full left-0 w-full bg-[#0b1220] backdrop-blur-none shadow-lg transition-all duration-300 ease-in-out
               ${isMobileMenuOpen
                             ? 'opacity-100 translate-y-0 visible'
                             : 'opacity-0 -translate-y-4 invisible'
