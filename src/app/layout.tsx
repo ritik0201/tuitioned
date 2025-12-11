@@ -57,11 +57,11 @@ export default function RootLayout({
       <body>
         <AppProviders>
           <Navbar />
-          <SpeedInsights />
           <div className="pt-16">{children}</div>
           <Toaster richColors />
           <Footer />
         </AppProviders>
+        <SpeedInsights />
       </body>
     </html>
   );
