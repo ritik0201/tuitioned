@@ -45,14 +45,13 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   const [qualification, setQualification] = useState('');
   const [experiance, setExperiance] = useState('');
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvUrl, setCvUrl] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [listOfSubjects, setListOfSubjects] = useState<string[]>([]);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const cvFileInputRef = useRef<HTMLInputElement>(null);
 
   const textFieldStyles = {
     '& .MuiInputBase-input': { color: '#fff' },
@@ -88,28 +87,6 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
     }
   };
 
-  const handleCvFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        setError("CV file size should not exceed 5MB.");
-        return;
-      }
-      if (!['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].includes(file.type)) {
-        setError("Please upload a PDF or Word document for your CV.");
-        return;
-      }
-      setCvFile(file);
-      setError(''); // Clear previous errors
-    }
-  };
-
-  const handleRemoveCv = () => {
-    setCvFile(null);
-    if (cvFileInputRef.current) {
-      cvFileInputRef.current.value = '';
-    }
-  };
   const handleFileUpload = async (file: File, resourceType: 'image' | 'raw' | 'auto' = 'auto') => {
     const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const CLOUDINARY_UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
@@ -157,8 +134,8 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       return;
     }
 
-    if (!cvFile) {
-      setError('Profile photo is required.');
+    if (!cvUrl.trim() || !cvUrl.includes('drive.google.com')) {
+      setError('A valid Google Drive link for your CV is required.');
       setLoading(false);
       return;
     }
@@ -170,32 +147,23 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         body: JSON.stringify({ email }),
       });
 
-      if (!roleCheckRes.ok) {
+      // A 404 is expected for a new user, so we only fail on other error codes.
+      if (!roleCheckRes.ok && roleCheckRes.status !== 404) {
+        const errorData = await roleCheckRes.json();
         throw new Error('Failed to check user status.');
       }
 
-      const { role } = await roleCheckRes.json();
-
-      if (role === 'teacher') {
-        throw new Error('You are already registered as a teacher. Please log in instead.');
+      // Only check the role if the user was found (status is not 404)
+      if (roleCheckRes.status === 200) {
+        const { role } = await roleCheckRes.json();
+        if (role === 'teacher') {
+          throw new Error('You are already registered as a teacher. Please log in instead.');
+        }
       }
-
+      
       // Upload image to Cloudinary and get the URL
       const profileImageUrl = await handleFileUpload(profileImageFile, 'image');
       if (!profileImageUrl) {
-        // Error is already set in handleFileUpload
-        setLoading(false);
-        return;
-      }
-
-      // Upload CV to Cloudinary and get the URL
-      if (!cvFile) {
-        setError('CV is required.');
-        setLoading(false);
-        return;
-      }
-      const cvUrl = await handleFileUpload(cvFile, 'raw');
-      if (!cvUrl) {
         // Error is already set in handleFileUpload
         setLoading(false);
         return;
@@ -205,7 +173,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName, email, mobile, qualification, experiance, listOfSubjects, profileImage: profileImageUrl, cvUrl: cvUrl
+          fullName, email, mobile, qualification, experiance, listOfSubjects, profileImage: profileImageUrl, cvUrl
         }),
       });
       const data = await res.json();
@@ -279,6 +247,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   />
                   <TextField label="Highest Qualification" variant="outlined" fullWidth value={qualification} onChange={(e) => setQualification(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Years of Experience" variant="outlined" fullWidth value={experiance} onChange={(e) => setExperiance(e.target.value)} sx={textFieldStyles} />
+                  <TextField label="Google Drive CV Link" placeholder="Paste your CV link here" variant="outlined" fullWidth required value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
                   <Autocomplete
                     multiple
                     freeSolo
@@ -319,29 +288,6 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   ) : (
                     <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1 }}>Upload Profile Photo</Typography>
                   )}
-
-                  {/* CV Upload */}
-                  <input type="file" accept=".pdf,.doc,.docx" onChange={handleCvFileChange} ref={cvFileInputRef} style={{ display: 'none' }} id="cv-file-input" />
-                  <label htmlFor="cv-file-input">
-                    <Box
-                      sx={{
-                        width: 140, height: 140, borderRadius: 2, border: '2px dashed rgba(255, 255, 255, 0.5)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', textAlign: 'center', p: 1,
-                        '&:hover': { borderColor: 'primary.main' }
-                      }}
-                    >
-                      {cvFile ? (
-                        <>
-                          <FileText color="rgba(255, 255, 255, 0.9)" size={32} />
-                          <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1, wordBreak: 'break-all' }}>{cvFile.name}</Typography>
-                        </>
-                      ) : (
-                        <FileText color="rgba(255, 255, 255, 0.7)" />
-                      )}
-                    </Box>
-                  </label>
-                  {cvFile ? (
-                    <Button size="small" onClick={handleRemoveCv} sx={{ mt: 1, textTransform: 'none', color: 'text.secondary' }}>Remove CV</Button>
-                  ) : (<Typography variant="caption" sx={{ color: 'text.secondary', mt: 1 }}>Upload CV</Typography>)}
                 </Stack>
               </Box>
               <Button variant="contained" onClick={handleVerify} disabled={loading} fullWidth sx={{ mt: 3, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}>
