@@ -3,9 +3,9 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 
 export async function POST(request: Request) {
-  await dbConnect();
-
   try {
+    await dbConnect();
+
     const { email } = await request.json();
 
     if (!email) {
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   } catch (error: any) {
     console.error('Check-role API Error:', error);
-    return NextResponse.json(
+    return NextResponse.json( // This will now catch dbConnect errors too
       { message: error.message || 'Server Error' },
       { status: 500 }
     );
