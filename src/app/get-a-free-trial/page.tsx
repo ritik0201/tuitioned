@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input';
+import PhoneInput, { isPossiblePhoneNumber, getCountryCallingCode } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './phone-input.css';
 import Link from "next/link";
@@ -168,6 +168,7 @@ export default function FreeTrialPage() {
                   value={formData.mobile}
                   onChange={handlePhoneChange}
                   international
+                  countryCallingCodeEditable={false}
                   disabled={otpSent}
                   className="phone-input-container"
                 />
@@ -255,7 +256,7 @@ export default function FreeTrialPage() {
             <input
               name="topic"
               type="text"
-              placeholder="Specific Demo Topic (Optional)"
+              placeholder="Specific Demo Topic"
               value={formData.topic || ""}
               onChange={handleChange}
               className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
@@ -367,7 +368,7 @@ export default function FreeTrialPage() {
           {/* Right side */}
           <div className="p-6 sm:p-8">
             <h2 className="text-3xl font-bold text-center text-white">
-              Book Your Free Demo Class
+              Book Your Free Trial Class
             </h2>
 
             {/* Stepper */}

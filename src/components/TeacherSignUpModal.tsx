@@ -15,7 +15,7 @@ import { Camera, FileText, School } from 'lucide-react';
 
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import '../app/get-a-free-tail/phone-input.css';
+import '../app/get-a-free-trial/phone-input.css';
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',

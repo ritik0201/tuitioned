@@ -77,7 +77,7 @@ export default function Home() {
         </p>
         <div className="mt-8 flex justify-center gap-4">
           <a href="/get-a-free-tail">
-            <RippleButton className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 transform hover:scale-105">
+            <RippleButton className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-lg shadow-md border-white border-solid border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center">
                 Get a Free Trial
                 <GoArrowRight className="ml-2" />

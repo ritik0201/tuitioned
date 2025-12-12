@@ -76,7 +76,7 @@ export default function StudentDashboardPage() {
           </Typography>
           <p className="text-muted-foreground">Here's a summary of your activities.</p>
         </div>
-        <Link href="/get-a-free-tail">
+        <Link href="/get-a-free-trial">
           <Button className="bg-[#0EA5E9] hover:bg-[#0284c7]">
             <PlusCircle className="mr-2 h-4 w-4" />
             Book a New Demo
@@ -168,7 +168,7 @@ export default function StudentDashboardPage() {
       {/* Demo Classes Section */}
       <Card className=" border-blue-500 border-2">
         <CardHeader>
-          <CardTitle>My Trail Classes</CardTitle>
+          <CardTitle>Trial Classes</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoadingClasses ? (
@@ -198,7 +198,7 @@ export default function StudentDashboardPage() {
               ))}
             </div>
           ) : (
-            <Alert severity="info">You have no Trail classes booked. Use the button above to book one!</Alert>
+            <Alert severity="info">You have no Trial classes booked. Use the button above to book one!</Alert>
           )}
         </CardContent>
       </Card>

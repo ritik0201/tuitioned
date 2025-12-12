@@ -164,7 +164,7 @@ export default function MyCoursesPage() {
 
           <div className="mt-auto">
             <a
-              href="/get-a-free-tail"
+              href="/get-a-free-trial"
               className="block w-full text-center py-3 rounded-lg font-semibold transition-all duration-300 bg-[#0EA5E9] hover:bg-[#0284c7] text-white border-white border-2"
             >
               Book a Free Demo

@@ -20,35 +20,30 @@ export async function POST(request: NextRequest) {
     if (!fullName || !email) {
       return NextResponse.json({ message: "Full name and email are required" }, { status: 400 });
     }
+    // this is testing phase
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser && existingUser.role === 'teacher') {
+      return NextResponse.json({ message: "User already exists. Please login." }, { status: 409 });
+    }
+
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
-    let user = await User.findOne({ email });
+    const user = new User({
+      fullName,
+      email,
+      mobile,
+      qualification,
+      experiance,
+      listOfSubjects,
+      profileImage,
+      cvUrl,
+      isVerified: false,
+      role: "teacher",
+    });
 
-    if (!user) {
-      user = new User({
-        fullName,
-        email,
-        mobile,
-        qualification,
-        experiance,
-        listOfSubjects,
-        profileImage,
-        cvUrl,
-        isVerified: false,
-        role: "teacher",
-      });
-    } else {
-      // If user exists, ensure their role is updated to teacher
-      user.role = "teacher";
-      user.fullName = fullName; // Also update their name
-      user.qualification = qualification;
-      user.experiance = experiance;
-      user.listOfSubjects = listOfSubjects;
-      user.profileImage = profileImage;
-      user.cvUrl = cvUrl;
-    }
     user.otp = otp;
     user.otpExpires = otpExpires;
     await user.save();

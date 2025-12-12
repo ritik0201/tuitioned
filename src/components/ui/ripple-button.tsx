@@ -40,7 +40,6 @@ const RippleButton: React.FC<RippleButtonProps> = ({
 
       <style jsx>{`
         .ripple-btn {
-          border: 0;
           border-radius: 0.6rem;
           position: relative;
           cursor: pointer;

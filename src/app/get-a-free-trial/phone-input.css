@@ -46,6 +46,58 @@
     padding-left: 0.5rem !important;
 }
 
+/* Vertical separator between country area and phone input + info icon */
+.phone-input-container .PhoneInputCountry {
+    position: relative !important;
+    padding-right: 0.75rem !important;
+}
+
+.phone-input-container .PhoneInputCountry::after {
+    /* thin vertical line placed at the right edge of the country area */
+    content: "" !important;
+    position: absolute !important;
+    right: -6px !important;
+    top: 18% !important;
+    bottom: 18% !important;
+    width: 1px !important;
+    background: rgba(255,255,255,0.14) !important;
+    border-radius: 1px !important;
+}
+
+.phone-input-container .PhoneInputCountry::before {
+    /* small circular info icon; use 'i' as text so no extra assets required */
+    content: "i" !important;
+    position: absolute !important;
+    right: 2px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 11px !important;
+    color: #ffffff !important;
+    background: rgba(255,255,255,0.06) !important;
+    border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 50% !important;
+    cursor: help !important;
+}
+
+/* Make sure the input has enough spacing so the icon/line don't overlap text */
+.phone-input-container .PhoneInputInput,
+.phone-input-container input[type="tel"] {
+    padding-left: 0.5rem !important;
+}
+
+/* If the country element contains a flag/icon, hide the info "i" */
+/* Use :has() to detect presence of common flag/icon classes from the library */
+.phone-input-container .PhoneInputCountry:has(.PhoneInputCountryIcon)::before,
+.phone-input-container .PhoneInputCountry:has(.PhoneInputCountryIconImg)::before,
+.phone-input-container .PhoneInputCountry:has(img)::before {
+    display: none !important;
+}
+
 /* Arrow */
 .PhoneInputCountrySelect-arrow,
 [class*="PhoneInputCountrySelect-arrow"] {

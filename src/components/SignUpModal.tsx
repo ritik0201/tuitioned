@@ -13,7 +13,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { Stack } from '@mui/material';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import '../app/get-a-free-tail/phone-input.css';
+import '../app/get-a-free-trial/phone-input.css';
 
 interface SignUpModalProps {
     open: boolean;
