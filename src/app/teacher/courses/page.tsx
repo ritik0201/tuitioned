@@ -41,8 +41,8 @@ export type CourseData = {
   courseName: string
   studentId?: string
   studentName: string
-  email: string
   grade: string
+  noOfClasses: number
 }
 
 export default function StudentDataTable() {
@@ -112,8 +112,12 @@ export default function StudentDataTable() {
       cell: ({ row }) => <div>{row.getValue("studentName")}</div>,
     },
     {
-      accessorKey: "email",
-      header: "Email",
+      accessorKey: "noOfClasses",
+      header: "No Of Remaining Classes",
+      cell: ({ row }) => {
+        const classes = row.getValue("noOfClasses") as number
+        return <div>{classes ?? 0} Classes</div>
+      },
     },
     {
       accessorKey: "grade",

@@ -25,9 +25,12 @@ export async function GET(request: Request) {
     if (session.user.role === 'admin') {
       demoClasses = await DemoClass.find({})
         .populate({ path: 'studentId', model: User, select: 'email fullName' })
+        .populate({ path: 'teacherId', model: User, select: 'fullName email' })
         .sort({ date: -1 });
     } else {
-      demoClasses = await DemoClass.find({ studentId: session.user.id }).sort({ date: -1 });
+      demoClasses = await DemoClass.find({ studentId: session.user.id })
+        .populate({ path: 'teacherId', model: User, select: 'fullName email' })
+        .sort({ date: -1 });
     }
 
     // The data is returned as a plain array, not nested in a `data` property.
@@ -55,7 +58,7 @@ export async function POST(request: Request) {
 
     // Validation for fields coming from the form
     const { fatherName, email, grade, subject, topic, city, country, date } = body;
-    if (!fatherName || !email || !grade || !subject || !topic || !city || !country || !date) {
+    if (!fatherName || !email || !grade || !subject || !city || !country || !date) {
       return NextResponse.json(
         { success: false, message: 'Missing required fields.' },
         { status: 400 }
@@ -80,7 +83,7 @@ export async function POST(request: Request) {
       topic,
       subject: subject === 'other' ? body.otherSubject : subject,
       date,
-      // teacherName can be assigned later by an admin
+      // teacherId can be assigned later by an admin
     });
 
     // Send confirmation email
@@ -100,7 +103,7 @@ export async function POST(request: Request) {
         <h1>Hi ${session.user.fullName},</h1>
         <p>Your demo class has been successfully booked!</p>
         <p><b>Subject:</b> ${subject === 'other' ? body.otherSubject : subject}</p>
-        <p><b>Time:</b> ${new Date(date).toLocaleString()}</p>
+        <p><b>Date:</b> ${new Date(date).toDateString()}</p>
         <p>We're excited to see you there!</p>
         <p>Best,</p>
         <p>The Tuition-ed Team</p>
@@ -123,7 +126,7 @@ export async function POST(request: Request) {
           <li><strong>Grade:</strong> ${grade}</li>
           <li><strong>Subject:</strong> ${subject === 'other' ? body.otherSubject : subject}</li>
           <li><strong>Topic:</strong> ${topic}</li>
-          <li><strong>Preferred Time:</strong> ${new Date(date).toLocaleString()}</li>
+          <li><strong>Preferred Date:</strong> ${new Date(date).toDateString()}</li>
           <li><strong>City:</strong> ${body.city}</li>
           <li><strong>Country:</strong> ${body.country}</li>
         </ul>
@@ -156,18 +159,32 @@ export async function PUT(request: Request) {
 
     await dbConnect();
 
-    const { id, status } = await request.json();
+    const { id, status, teacherId, joinLink } = await request.json();
 
-    if (!id || !status) {
+    if (!id) {
       return NextResponse.json(
-        { success: false, message: 'Demo Class ID and status are required.' },
+        { success: false, message: 'Demo Class ID is required.' },
         { status: 400 }
       );
     }
 
+    const updateData: any = {};
+    if (status) updateData.status = status;
+    if (teacherId) {
+      const teacher = await User.findById(teacherId);
+      if (!teacher || teacher.role !== 'teacher') {
+        return NextResponse.json(
+          { success: false, message: 'Invalid teacher ID or User is not a teacher.' },
+          { status: 400 }
+        );
+      }
+      updateData.teacherId = teacherId;
+    }
+    if (joinLink) updateData.joinLink = joinLink;
+
     const updatedDemoClass = await DemoClass.findByIdAndUpdate(
       id,
-      { status },
+      updateData,
       { new: true }
     );
 

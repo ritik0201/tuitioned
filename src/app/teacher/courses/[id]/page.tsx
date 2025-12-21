@@ -55,6 +55,8 @@ interface CourseDetails {
   noOfclassTeacher?: number;
   teacherPerClassPrice?: number;
   classroomLink?: string;
+  classTime?: string;
+  classDays?: string[];
 }
 
 interface CompletedClass {
@@ -279,6 +281,18 @@ export default function CourseDetailsPage() {
                   <User size={20} />
                   <Typography>{course.studentId.fullName}</Typography>
                 </Box>
+                {course.classTime && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Clock size={20} />
+                    <Typography>{course.classTime}</Typography>
+                  </Box>
+                )}
+                {course.classDays && course.classDays.length > 0 && (
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                    <Calendar size={20} />
+                    <Typography>{course.classDays.join(", ")}</Typography>
+                  </Box>
+                )}
                 <Button
                   fullWidth
                   title="Start class"

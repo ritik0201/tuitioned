@@ -6,7 +6,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
-    const {
+    const body = await request.json();
+    console.log("Teacher Signup Request Body:", body); // Debugging: Check server logs to see received data
+
+    let {
       fullName,
       email,
       mobile,
@@ -15,7 +18,14 @@ export async function POST(request: NextRequest) {
       listOfSubjects,
       profileImage,
       cvUrl,
-    } = await request.json();
+    } = body;
+
+    // Ensure listOfSubjects is an array. If it's a string, split it by commas.
+    if (typeof listOfSubjects === 'string') {
+      listOfSubjects = listOfSubjects.split(',').map((s: string) => s.trim()).filter(Boolean);
+    } else if (!Array.isArray(listOfSubjects)) {
+      listOfSubjects = [];
+    }
 
     if (!fullName || !email) {
       return NextResponse.json({ message: "Full name and email are required" }, { status: 400 });

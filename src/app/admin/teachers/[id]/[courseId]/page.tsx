@@ -46,6 +46,8 @@ interface CourseDetails {
   noOfclassTeacher?: number;
   teacherPerClassPrice?: number;
   studentId: Student;
+  classTime?: string;
+  classDays?: string;
 }
 
 interface CompletedClass {
@@ -234,6 +236,8 @@ export default function TeacherCourseDetailPage() {
             <Typography variant="h5" fontWeight="bold" gutterBottom>Course & Payment Info</Typography>
             <Divider sx={{ my: 2 }} />
             <InfoItem icon={<BookOpen size={20} />} label="Classes Left" value={String(course.noOfClasses)} />
+            <InfoItem icon={<Clock size={20} />} label="Class Time" value={course.classTime} />
+            <InfoItem icon={<Calendar size={20} />} label="Class Days" value={course.classDays} />
             <InfoItem icon={<IndianRupee size={20} />} label="Price Per Class" value={`₹${course.perClassPrice.toFixed(2)}`} />
             <Divider sx={{ my: 2 }} />
             <Typography variant="h6" fontWeight="medium" gutterBottom>Payment Status</Typography>

@@ -76,7 +76,7 @@ export default function Home() {
           Begin your academic adventure with us at Tuitioned, where each step leads to personal and academic growth. Our dedicated educators are here to guide you, providing the support needed for academic success. 🎉
         </p>
         <div className="mt-8 flex justify-center gap-4">
-          <a href="/get-a-free-tail">
+          <a href="/get-a-free-trial">
             <RippleButton className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-lg shadow-md border-white border-solid border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center">
                 Get a Free Trial

@@ -15,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { LayoutDashboard, BookOpen, User, LogOut, Menu } from 'lucide-react';
+import { LayoutDashboard, BookOpen, User, LogOut, Menu, ClipboardList } from 'lucide-react';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -25,6 +25,7 @@ const drawerWidth = 240;
 const navItems = [
   { text: 'Dashboard', icon: <LayoutDashboard size={20} />, href: '/teacher/dashboard' },
   { text: 'Courses', icon: <BookOpen size={20} />, href: '/teacher/courses' },
+  { text: 'Demo Classes', icon: <ClipboardList size={20} />, href: '/teacher/demo-classes-assigned' },
   { text: 'Profile', icon: <User size={20} />, href: '/teacher/profile' },
 ];
 

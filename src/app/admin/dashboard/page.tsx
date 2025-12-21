@@ -18,7 +18,6 @@ import {
   Users,
   UserCheck,
   BookOpen,
-  IndianRupee,
   Bell,
   UserPlus,
 } from "lucide-react";
@@ -28,7 +27,6 @@ interface DashboardData {
   totalStudents: number;
   totalTeachers: number;
   activeCourses: number;
-  totalPendingEarnings: number;
   recentDemos: {
     _id: string;
     subject: string;
@@ -131,7 +129,7 @@ export default function AdminDashboardPage() {
           gridTemplateColumns: {
             xs: '1fr',
             sm: 'repeat(2, 1fr)',
-            md: 'repeat(4, 1fr)',
+            md: 'repeat(3, 1fr)',
           },
           mb: 4,
         }}
@@ -139,7 +137,6 @@ export default function AdminDashboardPage() {
         <StatCard title="Total Students" value={data.totalStudents} icon={<Users />} />
         <StatCard title="Total Teachers" value={data.totalTeachers} icon={<UserCheck />} />
         <StatCard title="Active Courses" value={data.activeCourses} icon={<BookOpen />} />
-        <StatCard title="Pending Earnings" value={`₹${data.totalPendingEarnings.toFixed(2)}`} icon={<IndianRupee />} />
       </Box>
 
       {/* Recent Activity Sections */}
@@ -152,7 +149,7 @@ export default function AdminDashboardPage() {
             <List>
               {data.recentDemos.filter(demo => demo.studentId).map((demo, index) => (
                 <React.Fragment key={demo._id}>
-                  <Link href={`/admin/democlass-student/${demo.studentId._id}`}>
+                  <Link href={`/admin/democlass-student/${demo._id}`}>
                     <ListItem>
                       <ListItemAvatar><Avatar sx={{ bgcolor: 'secondary.main' }}>{demo.studentId.fullName.charAt(0)}</Avatar></ListItemAvatar>
                       <ListItemText primary={demo.studentId.fullName} secondary={`Subject: ${demo.subject}`} />

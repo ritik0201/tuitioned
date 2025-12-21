@@ -7,7 +7,7 @@ export async function GET() {
     await dbConnect();
 
     // Fetch all documents from the User collection where the role is 'teacher'
-    const teachersFromDb = await User.find({ role: 'teacher' }).select('id fullName email mobile');
+    const teachersFromDb = await User.find({ role: 'teacher' });
 
     // Map the data to match the frontend's expected 'Teacher' type
     const teachers = teachersFromDb.map(teacher => ({
@@ -15,6 +15,7 @@ export async function GET() {
       name: teacher.fullName,
       email: teacher.email,
       mobile: teacher.mobile || 'N/A', // Provide a fallback for optional fields
+      listOfSubjects: teacher.listOfSubjects || [],
     }));
 
     return NextResponse.json(teachers, {

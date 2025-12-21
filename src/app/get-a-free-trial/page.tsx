@@ -256,7 +256,7 @@ export default function FreeTrialPage() {
             <input
               name="topic"
               type="text"
-              placeholder="Specific Demo Topic"
+              placeholder="Specific Demo Topic (Optional)"
               value={formData.topic || ""}
               onChange={handleChange}
               className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
@@ -296,7 +296,7 @@ export default function FreeTrialPage() {
             />
             <input
               name="date"
-              type="datetime-local"
+              type="date"
               required
               value={formData.date || ""}
               onChange={handleChange}
@@ -400,7 +400,7 @@ export default function FreeTrialPage() {
                 <h3 className="text-xl font-semibold mb-2">🎉 Demo Class Confirmed!</h3>
                 <p className="text-gray-300 mb-1">
                   Your demo class for{" "}
-                  <strong>{new Date(formData.date).toLocaleString()}</strong> has been booked.
+                  <strong>{new Date(formData.date + 'T00:00').toDateString()}</strong> has been booked.
                 </p>
                 <p className="text-gray-400 mb-4">
                   A confirmation email has been sent to <strong>{formData.email}</strong>.

@@ -124,10 +124,12 @@ export default function TeacherDetailPage({
               </Avatar>
               <Box>
                 <Typography variant="h4" fontWeight="bold">{teacher.fullName}</Typography>
-                <Typography variant="body1" color="text.secondary">{teacher.email}</Typography>
+                <Typography variant="body1" color="text.secondary">{teacher.listOfSubjects?.join(", ") || "No subjects"}</Typography>
               </Box>
             </Box>
             <Divider sx={{ my: 2 }} />
+            <InfoItem icon={<Mail size={20} />} label="Email" value={teacher.email} />
+            <InfoItem icon={<Book size={20} />} label="Subject" value={teacher.listOfSubjects?.join(", ")} />
             <InfoItem icon={<Phone size={20} />} label="Mobile" value={teacher.mobile} />
             <InfoItem icon={<GraduationCap size={20} />} label="Qualification" value={teacher.qualification} />
             <InfoItem icon={<Briefcase size={20} />} label="Experience" value={teacher.experience} />

@@ -12,10 +12,13 @@ import Link from 'next/link';
 // Define the type for the demo class data we expect from the API
 interface DemoClass {
   _id: string;
-  teacherName: string;
+  teacherId?: {
+    fullName: string;
+  };
   subject: string;
   date: string; // Dates will be strings in JSON
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  joinLink?: string;
 }
 
 // Define the type for the assigned course data
@@ -186,14 +189,24 @@ export default function StudentDashboardPage() {
                         {demo.status}
                       </Badge>
                     </div>
-                      <p className="text-sm text-muted-foreground">
-                        <span className="font-medium">Teacher:</span> {demo.teacherName || 'TBD'}
-                      </p>
+                    <p className="text-sm text-muted-foreground">
+                      <span className="font-medium">Teacher:</span> {demo.teacherId?.fullName || 'Allocation comming soon'}
+                    </p>
                   </CardHeader>
-                  <CardContent className="space-y-2 text-sm mt-auto">
+                  <CardContent className="space-y-2 text-sm">
                     <div className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /><span>{new Date(demo.date).toLocaleDateString()}</span></div>
-                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-muted-foreground" /><span>{new Date(demo.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div>
                   </CardContent>
+                  <div className="p-6 pt-4 mt-auto">
+                    {demo.status === 'confirmed' && demo.joinLink ? (
+                      <Link href={demo.joinLink} target="_blank" rel="noopener noreferrer" className="w-full">
+                        <Button className="w-full bg-green-500 hover:bg-green-600">Join Class</Button>
+                      </Link>
+                    ) : (
+                      <Button className="w-full" disabled>
+                        {demo.status === 'pending' ? 'Confirmation Pending' : 'Join Link Available Comming Soom'}
+                      </Button>
+                    )}
+                  </div>
                 </Card>
               ))}
             </div>

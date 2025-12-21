@@ -42,6 +42,7 @@ export type Teacher = {
   name: string
   email: string
   mobile: string
+  listOfSubjects?: string[]
 }
 
 export default function TeacherDataTable() {
@@ -100,8 +101,12 @@ export default function TeacherDataTable() {
       header: "Teacher ID",
     },
     {
-      accessorKey: "email",
-      header: "Email",
+      accessorKey: "listOfSubjects",
+      header: "Subjects",
+      cell: ({ row }) => {
+        const subjects = row.getValue("listOfSubjects");
+        return <div>{Array.isArray(subjects) && subjects.length > 0 ? subjects.join(", ") : "N/A"}</div>
+      },
     },
     {
       accessorKey: "mobile",

@@ -16,6 +16,7 @@ interface PopulatedCourse {
   title: string;
   grade: string;
   studentId?: PopulatedStudent;
+  noOfClasses: number;
 }
 /**
  * GET handler to fetch students for a logged-in teacher.
@@ -58,6 +59,7 @@ export async function GET(request: NextRequest) {
       studentName: course.studentId?.fullName || 'N/A',
       email: course.studentId?.email || 'N/A',
       grade: course.grade,
+      noOfClasses: course.noOfClasses,
     }));
 
     // Step 4: Return the list of students.

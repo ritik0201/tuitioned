@@ -2,25 +2,27 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IDemoClass extends Document {
   studentId: Types.ObjectId;
-  teacherName: string;
+  teacherId?: Types.ObjectId;
+  joinLink?: string;
   fatherName: string;
   subject: string;
-  topic: string;
+  topic?: string;
   grade: string;
   city: string;
   country: string;
   date: Date;
-  status: 'Demo pending' | 'confirmed' | 'completed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
 }
 
 const DemoClassSchema: Schema = new Schema({
   studentId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  teacherName: { type: String },
+  teacherId: { type: Schema.Types.ObjectId, ref: 'User' },
+  joinLink: { type: String },
   fatherName: { type: String , required: true },
   grade: { type: String, required: true },
   city: { type: String},
   country: { type: String},
-  topic: { type: String, required: true },
+  topic: { type: String },
   subject: { type: String, required: true },
   date: { type: Date, required: true },
   status: { type: String, enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending' },
