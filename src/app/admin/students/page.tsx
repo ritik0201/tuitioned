@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Paper, Typography } from "@mui/material"
+import { toast } from "sonner";
 
 export type Student = {
   id: string
@@ -56,6 +57,23 @@ export default function StudentDataTable() {
   const [rowSelection, setRowSelection] = React.useState({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this student? This action cannot be undone.")) return;
+
+    try {
+      const response = await fetch(`/api/students/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete student");
+
+      setData((prev) => prev.filter((student) => student.id !== id));
+      toast.success("Student deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete student");
+    }
+  };
 
   const columns: ColumnDef<Student>[] = [
     {
@@ -122,6 +140,10 @@ export default function StudentDataTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
+              <DropdownMenuItem 
+                onClick={() => handleDelete(student.id)}
+                className="text-red-500 focus:text-red-500 cursor-pointer"
+              >Delete</DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(student.id)}
                 className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"

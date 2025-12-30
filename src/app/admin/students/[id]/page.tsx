@@ -11,6 +11,7 @@ import {
   Divider,
   Avatar,
   Chip,
+  IconButton,
 } from "@mui/material";
 import {
   Mail,
@@ -22,6 +23,7 @@ import {
   GraduationCap,
   Globe,
   ArrowRight,
+  Trash2,
 } from "lucide-react";
 import {
   Dialog,
@@ -33,6 +35,7 @@ import {
 import CreateCourseForm from "@/components/admin/CreateCourseForm";
 import { ICourse } from "@/models/Course";
 import Link from "next/link";
+import { toast } from "sonner";
 
 export type StudentFromAPI = {
   _id: string;
@@ -85,6 +88,24 @@ export default function StudentDetailPage({
     };
     fetchData();
   }, [params, isDialogOpen]); // Re-fetch when a new course is created
+
+  const handleDeleteCourse = async (courseId: string) => {
+    if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) return;
+
+    try {
+      const response = await fetch(`/api/course/${courseId}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Failed to delete course");
+
+      setCourses((prev) => prev.filter((c) => c._id.toString() !== courseId));
+      toast.success("Course deleted successfully");
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
 
   if (loading) {
     return (
@@ -182,11 +203,16 @@ export default function StudentDetailPage({
                     <Box>
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <Typography variant="h6" fontWeight="bold">{course.title}</Typography>
-                        <Chip
-                          label={course.noOfClasses > 0 ? "Running" : "Pending"}
-                          size="small"
-                          color={course.noOfClasses > 0 ? 'success' : 'warning'}
-                        />
+                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                          <Chip
+                            label={course.noOfClasses > 0 ? "Running" : "Pending"}
+                            size="small"
+                            color={course.noOfClasses > 0 ? 'success' : 'warning'}
+                          />
+                          <IconButton onClick={() => handleDeleteCourse(course._id.toString())} color="error" size="small">
+                            <Trash2 size={18} />
+                          </IconButton>
+                        </Box>
                       </Box>
                       <Typography variant="body2" color="text.secondary" gutterBottom>
                         {course.grade} Grade

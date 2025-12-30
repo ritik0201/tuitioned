@@ -184,9 +184,10 @@ const TeacherProfilePage = () => {
               if (profile) setProfile({ ...profile, listOfSubjects: newValue });
             }}
             renderTags={(value, getTagProps) =>
-              value.map((option, index) => (
-                <Chip variant="outlined" label={option} {...getTagProps({ index })} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }} />
-              ))
+              value.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                return <Chip key={key} variant="outlined" label={option} {...tagProps} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }} />;
+              })
             }
             renderInput={(params) => (
               <TextField {...params} variant="filled" label="Subjects You Teach" placeholder="Type a subject and press Enter" />

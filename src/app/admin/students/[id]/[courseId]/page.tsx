@@ -315,7 +315,7 @@ export default function AdminCourseDetailPage() {
                       </Box>
                       <Box textAlign="right">
                         <Typography variant="body2" color="text.secondary">{new Date(c.completedAt).toLocaleDateString()}</Typography>
-                        {c.duration && <Typography variant="caption" color="text.secondary">{c.duration} mins</Typography>}
+                        {c.duration && <Typography variant="caption" color="text.secondary">{(c.duration / 60).toFixed(1).replace(/\.0$/, '')} hours</Typography>}
                       </Box>
                     </Paper>
                   ))}

@@ -124,7 +124,8 @@ export default function CourseDetailsPage() {
       formData.append('courseId', courseId as string);
       formData.append('topic', topic);
       if (duration) {
-        formData.append('duration', duration);
+        // Convert hours to minutes for storage
+        formData.append('duration', (parseFloat(duration) * 60).toString());
       }
       if (homeworkFile) {
         formData.append('homeworkFile', homeworkFile);
@@ -447,7 +448,7 @@ export default function CourseDetailsPage() {
                             >
                               <Clock size={14} />
                               <Typography variant="caption">
-                                {c.duration} minutes
+                                {(c.duration ? c.duration / 60 : 0).toFixed(1).replace(/\.0$/, '')} hours
                               </Typography>
                             </Box>
                           )}
@@ -513,11 +514,12 @@ export default function CourseDetailsPage() {
                 autoFocus
               />
               <TextField
-                label="Duration (in minutes)"
+                label="Duration (in hours)"
                 type="number"
                 value={duration}
                 onChange={(e) => setDuration(e.target.value)}
                 fullWidth
+                inputProps={{ step: 0.5, min: 0 }}
               />
               <Button
                 variant="outlined"

@@ -75,3 +75,34 @@ export async function GET(
     return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user || session.user.role !== 'admin') {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
+    }
+
+    await dbConnect();
+    const { id } = await params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ message: 'Invalid Demo Class ID' }, { status: 400 });
+    }
+
+    const deletedDemoClass = await DemoClass.findByIdAndDelete(id);
+
+    if (!deletedDemoClass) {
+      return NextResponse.json({ message: 'Demo Class not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, message: 'Demo Class deleted successfully' });
+  } catch (error) {
+    console.error('[DELETE_DEMOCLASS]', error);
+    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+  }
+}

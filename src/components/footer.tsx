@@ -1,37 +1,39 @@
 import React from 'react';
-import { FaGithub, FaTwitter, FaLinkedin } from 'react-icons/fa';
+import { FaInstagram, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
 const footerLinks = [
   {
-    title: 'Solutions',
+    title: 'Courses',
     links: [
-      { label: 'For Startups', href: '#' },
-      { label: 'For Enterprise', href: '#' },
-      { label: 'Case Studies', href: '#' },
-    ],
-  },
-  {
-    title: 'Support',
-    links: [
-      { label: 'Pricing', href: '#' },
-      { label: 'Documentation', href: '#' },
-      { label: 'Guides', href: '#' },
+      { label: 'K-12 Tuition', href: 'https://tuition-ed.com/k-12-school-time-courses/' },
+      { label: 'Language Learning', href: '#' },
+      { label: 'Coding & Tech', href: '#' },
+      { label: 'Music & Arts', href: '#' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Jobs', href: '#' },
+      { label: 'About Us', href: 'https://tuition-ed.com/about-us/' },
+      { label: 'Careers', href: '#' },
+      { label: 'Contact Us', href: 'https://tuition-ed.com/contact-us/' },
+      { label: 'Become a Teacher', href: '#' },
+    ],
+  },
+  {
+    title: 'Resources',
+    links: [
+      { label: 'Blog', href: 'https://tuition-ed.com/blog/' },
+      { label: 'Community', href: '#' },
+      { label: 'Help Center', href: '#' },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Claim', href: '#' },
-      { label: 'Privacy', href: '#' },
-      { label: 'Terms', href: '#' },
+      { label: 'Privacy Policy', href: '#' },
+      { label: 'Terms of Service', href: '#' },
+      { label: 'Cookie Policy', href: '#' },
     ],
   },
 ];
@@ -39,8 +41,8 @@ const footerLinks = [
 const Footer = () => {
   const socialLinks = [
     { href: '#', icon: FaTwitter, label: 'Twitter' },
-    { href: '#', icon: FaGithub, label: 'GitHub' },
-    { href: '#', icon: FaLinkedin, label: 'LinkedIn' },
+    { href: 'https://www.instagram.com/wearetuitioned?igsh=MXBnMWwxbms2MDNmZw==', icon: FaInstagram, label: 'Instagram' },
+    { href: 'https://www.linkedin.com/company/tuitioned/', icon: FaLinkedin, label: 'LinkedIn' },
   ];
   const Logo = () => (
     <span className="font-bold text-xl tracking-tight">

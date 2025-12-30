@@ -5,6 +5,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import Course from "@/models/Course";
 import User from "@/models/User";
 import mongoose from "mongoose";
+import CompletedClass from "@/models/CompletedClass";
 
 /**
  * GET /api/admin/course/{courseId}
@@ -13,9 +14,9 @@ import mongoose from "mongoose";
  */
 export async function GET(
   request: NextRequest,
-  context: { params: Promise<{ courseId: string }> } // ✅ params is a Promise
+  context: { params: Promise<{ courseId: string }> } //  params is a Promise
 ) {
-  const { courseId } = await context.params; // ✅ await params
+  const { courseId } = await context.params; //  await params
   await dbConnect();
 
   try {
@@ -48,13 +49,71 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ success: true, course });
+    const completedClasses = await CompletedClass.find({ courseId }).sort({ createdAt: -1 });
+
+    return NextResponse.json({ success: true, course, completedClasses });
   } catch (error) {
     console.error("Error fetching course details for admin:", error);
     return NextResponse.json(
       {
         success: false,
         message: "An error occurred while fetching course details.",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * DELETE /api/admin/course/{courseId}
+ * Deletes a single course.
+ * Accessible only by users with the 'admin' role.
+ */
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ courseId: string }> }
+) {
+  const { courseId } = await context.params;
+  await dbConnect();
+
+  try {
+    // 1. Authenticate and Authorize the user as an admin
+    const session = await getServerSession(authOptions);
+    if (!session?.user || session.user.role !== "admin") {
+      return NextResponse.json(
+        { success: false, message: "Not authorized" },
+        { status: 403 }
+      );
+    }
+
+    // 2. Validate Course ID
+    if (!mongoose.Types.ObjectId.isValid(courseId)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid Course ID" },
+        { status: 400 }
+      );
+    }
+
+    // 3. Delete the course
+    const deletedCourse = await Course.findByIdAndDelete(courseId);
+
+    if (!deletedCourse) {
+      return NextResponse.json(
+        { success: false, message: "Course not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Course deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting course for admin:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "An error occurred while deleting the course.",
       },
       { status: 500 }
     );

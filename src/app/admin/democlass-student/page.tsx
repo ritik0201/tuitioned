@@ -84,6 +84,23 @@ export default function DemoClassStudentTable() {
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this demo class? This action cannot be undone.")) return;
+
+    try {
+      const response = await fetch(`/api/demoClass/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete demo class");
+
+      setData((prev) => prev.filter((booking) => booking._id !== id));
+      toast.success("Demo class deleted successfully");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to delete demo class");
+    }
+  };
+
   const columns: ColumnDef<DemoClassBooking>[] = [
     {
       id: "select",
@@ -160,7 +177,10 @@ export default function DemoClassStudentTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem 
+                onClick={() => handleDelete(booking._id)}
+                className="text-red-500 focus:text-red-500 cursor-pointer"
+              >Delete</DropdownMenuItem>
               {booking.status === 'pending' && (
                 <DropdownMenuItem
                   onClick={() => handleStatusUpdate(booking._id, 'confirmed')}

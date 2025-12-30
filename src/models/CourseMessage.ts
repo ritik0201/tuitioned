@@ -33,6 +33,11 @@ const CourseMessageSchema: Schema<ICourseMessage> = new Schema(
     attachmentType: {
       type: String,
     },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: '30d', // Automatically delete documents after 30 days
+    },
   },
   { timestamps: true }
 );

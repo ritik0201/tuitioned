@@ -36,6 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Typography } from "@mui/material"
+import { toast } from "sonner";
 
 export type Teacher = {
   id: string
@@ -57,6 +58,23 @@ export default function TeacherDataTable() {
   const [rowSelection, setRowSelection] = React.useState({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this teacher? This action cannot be undone.")) return;
+
+    try {
+      const response = await fetch(`/api/teachers/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error("Failed to delete teacher");
+
+      setData((prev) => prev.filter((teacher) => teacher.id !== id));
+      toast.success("Teacher deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete teacher");
+    }
+  };
 
   const columns: ColumnDef<Teacher>[] = [
     {
@@ -107,6 +125,11 @@ export default function TeacherDataTable() {
         const subjects = row.getValue("listOfSubjects");
         return <div>{Array.isArray(subjects) && subjects.length > 0 ? subjects.join(", ") : "N/A"}</div>
       },
+      filterFn: (row, id, value) => {
+        const subjects = row.getValue(id) as string[] | undefined;
+        if (!Array.isArray(subjects)) return false;
+        return subjects.join(", ").toLowerCase().includes((value as string).toLowerCase());
+      },
     },
     {
       accessorKey: "mobile",
@@ -127,7 +150,10 @@ export default function TeacherDataTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
-              <DropdownMenuLabel className="text-red-500">Delete</DropdownMenuLabel>
+              <DropdownMenuItem 
+                onClick={() => handleDelete(teacher.id)}
+                className="text-red-500 focus:text-red-500 cursor-pointer"
+              >Delete</DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(teacher.id)}
                 className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"
@@ -189,12 +215,22 @@ export default function TeacherDataTable() {
   return (
     <div className="w-full">
       <Typography variant="h4" gutterBottom>Teacher Management</Typography>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-4">
         <Input
           placeholder="Filter by teacher name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <Input
+          placeholder="Filter by subject..."
+          value={
+            (table.getColumn("listOfSubjects")?.getFilterValue() as string) ?? ""
+          }
+          onChange={(event) =>
+            table.getColumn("listOfSubjects")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

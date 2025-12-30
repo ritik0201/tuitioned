@@ -7,6 +7,8 @@ import 'react-phone-number-input/style.css';
 import './phone-input.css';
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
+import { toast } from "sonner";
+import { CountryDropdown } from 'react-country-region-selector';
 
 const steps = ["Your Details", "Academic Details", "Schedule Demo"];
 
@@ -80,6 +82,7 @@ export default function FreeTrialPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Failed to send OTP.");
       setOtpSent(true);
+      toast.success("OTP has been sent to your email");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -256,7 +259,7 @@ export default function FreeTrialPage() {
             <input
               name="topic"
               type="text"
-              placeholder="Specific Demo Topic (Optional)"
+              placeholder="Specific Demo Topic"
               value={formData.topic || ""}
               onChange={handleChange}
               className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
@@ -285,14 +288,11 @@ export default function FreeTrialPage() {
               onChange={handleChange}
               className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
             />
-            <input
-              name="country"
-              type="text"
-              placeholder="Country"
-              required
+            <CountryDropdown
               value={formData.country || ""}
-              onChange={handleChange}
+              onChange={(val) => setFormData({ ...formData, country: val })}
               className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
+              defaultOptionLabel="Select Country"
             />
             <input
               name="date"

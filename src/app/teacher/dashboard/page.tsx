@@ -169,7 +169,7 @@ const TeacherDashboardPage = () => {
                       primary={`Completed: ${activity.topic}`}
                       secondary={`With ${activity.studentId.fullName} on ${new Date(activity.completedAt).toLocaleDateString()}`}
                     />
-                    <Chip label={`${activity.duration || 'N/A'} min`} size="small" />
+                    <Chip label={activity.duration ? `${(activity.duration / 60).toFixed(1).replace(/\.0$/, '')} hours` : 'N/A'} size="small" />
                   </ListItem>
                   {index < recentActivity.length - 1 && <Divider component="li" sx={{ my: 1.5 }} />}
                 </React.Fragment>

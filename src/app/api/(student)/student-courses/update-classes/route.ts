@@ -76,14 +76,14 @@ export async function POST(request: Request) {
         .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .header { background-color: #22c55e; color: #ffffff; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
         .content { padding: 20px 0; }
-        .button { display: inline-block; background-color: #4f46e5; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .button { display: inline-block; background-color: #4f46e5; color: #ffffff !important; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; }
         .footer { text-align: center; margin-top: 30px; font-size: 0.9em; color: #777; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h2>🎉 Payment Successful!</h2>
+            <h2>Payment Successful!</h2>
         </div>
         <div class="content">
             <p>Hi ${session.user.name || 'Student'},</p>
