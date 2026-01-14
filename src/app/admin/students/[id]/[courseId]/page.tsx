@@ -29,6 +29,7 @@ import {
   Calendar,
   Clock,
   Download,
+  Video,
 } from "lucide-react";
 import { Edit } from "lucide-react";
 import Link from "next/link";
@@ -149,6 +150,19 @@ export default function AdminCourseDetailPage() {
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
+          {course.joinLink && (
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<Video />}
+              component="a"
+              href={course.joinLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Join Class
+            </Button>
+          )}
           <Button
             variant="contained"
             color="info"

@@ -60,13 +60,13 @@ export default function MyCoursesPage() {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <div className="container mx-auto px-4">
-      <h1 className="text-4xl font-bold text-center mb-10 text-gwhite">
+    <div className="container mx-auto px-4 py-6 md:py-0">
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 text-gwhite">
         Your Enrolled Courses
       </h1>
 
-      <div className="flex w-full gap-4">
-        <div className="w-7/12">
+      <div className="flex flex-col lg:flex-row w-full gap-6 lg:gap-4">
+        <div className="w-full lg:w-7/12">
           {courses.length > 0 ? (
             <div className="flex flex-col gap-8">
               {courses.map((course) => (
@@ -75,10 +75,10 @@ export default function MyCoursesPage() {
                   href={`/student/courses/${course._id}`}
                   className="w-full rounded-2xl shadow-lg hover:shadow-primary/20 hover:shadow-2xl duration-300 flex flex-col md:flex-row overflow-hidden bg-gray-800 border-blue-500 border-2"
                 >
-                  <div className="flex flex-col justify-between p-8 flex-1">
+                  <div className="flex flex-col justify-between p-6 md:p-8 flex-1">
                     <div>
-                      <div className="flex justify-between items-start mb-3">
-                        <h2 className="text-3xl font-semibold text-card-foreground">
+                      <div className="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2 sm:gap-0">
+                        <h2 className="text-2xl md:text-3xl font-semibold text-card-foreground">
                           {course.title}
                         </h2>
                         <span
@@ -95,8 +95,8 @@ export default function MyCoursesPage() {
                       <p className="text-muted-foreground mb-4">{course.grade} Grade</p>
                     </div>
 
-                    <div className="mt-6">
-                      <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <div className="mt-4 md:mt-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2 text-sm">
                         <p>
                           <span className="font-semibold text-foreground">Teacher:</span>{" "}
                           {course.teacherName || "Not Assigned"}
@@ -137,7 +137,7 @@ export default function MyCoursesPage() {
         </div>
 
         {/* Sidebar */}
-        <div className="w-4/12 bg-gray-800 rounded-2xl p-8 shadow-lg self-start sticky top-24 min-h-screen border-blue-500 border-2">
+        <div className="w-full lg:w-4/12 bg-gray-800 rounded-2xl p-6 md:p-8 shadow-lg self-start lg:sticky lg:top-24 lg:min-h-screen border-blue-500 border-2">
           <h3 className="text-2xl font-bold text-white mb-6">Your Progress</h3>
           <Image
             src="/courses.jpg"

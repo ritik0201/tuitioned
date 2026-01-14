@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input" 
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -35,7 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Typography } from "@mui/material"
+import { Paper, Typography } from "@mui/material"
 import { toast } from "sonner";
 
 export type Teacher = {
@@ -117,7 +117,7 @@ export default function TeacherDataTable() {
     {
       accessorKey: "id",
       header: "Teacher ID",
-    },
+    },    
     {
       accessorKey: "listOfSubjects",
       header: "Subjects",
@@ -213,16 +213,20 @@ export default function TeacherDataTable() {
   })
 
   return (
-    <div className="w-full">
-      <Typography variant="h4" gutterBottom>Teacher Management</Typography>
-      <div className="flex items-center py-4 gap-4">
+    <Paper
+      elevation={0}
+      className="border-2 border-blue-500"
+      sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, bgcolor: '#1f2937' }}
+    >
+      <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}>Teacher Management</Typography>
+      <div className="flex flex-col sm:flex-row items-center py-2 md:py-4 gap-4">
         <Input
           placeholder="Filter by teacher name..."
           value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm w-full bg-gray-700 text-white border-gray-600 placeholder:text-gray-400"
         />
         <Input
           placeholder="Filter by subject..."
@@ -232,23 +236,23 @@ export default function TeacherDataTable() {
           onChange={(event) =>
             table.getColumn("listOfSubjects")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className="max-w-sm w-full bg-gray-700 text-white border-gray-600 placeholder:text-gray-400"
         />
       </div>
-      <div className="rounded-md border">
+      <div className="rounded-md border border-gray-700 overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className={["id"].includes(header.column.id) ? "hidden md:table-cell" : ""}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
@@ -273,7 +277,7 @@ export default function TeacherDataTable() {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className={["id"].includes(cell.column.id) ? "hidden md:table-cell" : ""}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -295,8 +299,8 @@ export default function TeacherDataTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2 md:py-4">
+        <div className="text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
@@ -319,6 +323,6 @@ export default function TeacherDataTable() {
           </Button>
         </div>
       </div>
-    </div>
+    </Paper>
   )
 }

@@ -303,27 +303,27 @@ export default function CourseDetailPage() {
   const totalPrice = course ? classesToAdd * course.perClassPrice : 0;
   const completedDays = completedClasses.map(c => new Date(c.completedAt));
   const completedClassesCount = completedClasses.length;
-  const totalClasses = course.noOfClasses;
-  // const remainingClasses = totalClasses - completedClassesCount;
-  const completionPercentage = totalClasses > 0 ? (completedClassesCount / totalClasses) * 100 : 0;
+  const remainingClasses = course.noOfClasses;
+  const totalCourseClasses = remainingClasses + completedClassesCount;
+  const completionPercentage = totalCourseClasses > 0 ? (completedClassesCount / totalCourseClasses) * 100 : 0;
 
   return (
-    <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+    <Box sx={{ maxWidth: "1200px", mx: "auto", p: { xs: 2, sm: 3, lg: 4 } }}>
       <Button
         startIcon={<ArrowLeft size={16} />}
         onClick={() => router.back()}
-        sx={{ mb: 2, textTransform: "none", color: "text.secondary" }}
+        sx={{ mb: 3, textTransform: "none", color: "text.secondary" }}
       >
         Back to Courses
       </Button>
 
       {/* === CLASS MANAGEMENT BAR === */}
-      <Box mb={3}>
+      <Box mb={4}>
         <Paper
           elevation={0}
           className="border-blue-500 border"
           sx={{
-            p: 2.5,
+            p: { xs: 2, sm: 2.5 },
             borderRadius: 4,
             display: "flex",
             flexDirection: { xs: "column", sm: "row" },
@@ -333,15 +333,16 @@ export default function CourseDetailPage() {
             bgcolor: '#1f2937'
           }}
         >
-          <Typography variant="h6" fontWeight="medium">
+          <Typography variant="h6" fontWeight="medium" sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' }, textAlign: { xs: 'center', sm: 'left' }, width: { xs: '100%', sm: 'auto' } }}>
             Manage Your Enrollment
           </Typography>
-          <Box display="flex" alignItems="center" gap={3}>
+          <Box display="flex" alignItems="center" justifyContent={{ xs: 'center', sm: 'flex-end' }} gap={{ xs: 2, sm: 3 }} sx={{ width: { xs: '100%', sm: 'auto' } }}>
             <Typography variant="body1">
               <span className="font-semibold">{course.noOfClasses}</span> Classes 
             </Typography>
             <Button
               variant="contained"
+              size="small"
               startIcon={<PlusCircle size={18} />}
               onClick={handleOpenModal}
             >
@@ -357,7 +358,7 @@ export default function CourseDetailPage() {
   sx={{
     display: "flex",
     flexDirection: { xs: "column", md: "row" },
-    gap: 4,
+    gap: { xs: 3, md: 4 },
     mt: 2,
   }}
 >
@@ -367,7 +368,7 @@ export default function CourseDetailPage() {
       elevation={0}
       className="border-blue-500 border"
       sx={{
-        p: 4,
+        p: { xs: 2, sm: 3, md: 4 },
         borderRadius: 4,
         bgcolor: '#1f2937',
       }}
@@ -389,11 +390,11 @@ export default function CourseDetailPage() {
         variant="h4"
         fontWeight="bold"
         gutterBottom
-        sx={{ color: "text.primary" }}
+        sx={{ color: "text.primary", fontSize: { xs: '1.75rem', sm: '2.125rem' } }}
       >
         {course.title}
       </Typography>
-      <Typography variant="h6" color="text.secondary" gutterBottom>
+      <Typography variant="h6" color="text.secondary" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
         Grade {course.grade}
       </Typography>
 
@@ -487,7 +488,7 @@ export default function CourseDetailPage() {
       elevation={0}
       className="border-blue-500 border"
       sx={{
-        p: 3,
+        p: { xs: 2, sm: 3 },
         borderRadius: 4,
         flexGrow: 1,
         display: "flex",
@@ -605,7 +606,7 @@ export default function CourseDetailPage() {
 
 
       {/* === PROGRESS SECTION === */}
-      <Box mt={3}>
+      <Box mt={4}>
         <Box
           sx={{
             display: "flex",
@@ -620,7 +621,7 @@ export default function CourseDetailPage() {
             className="border-blue-500 border"
             sx={{
               flex: 1,
-              p: 3,
+              p: { xs: 2, sm: 3 },
               borderRadius: 4,
               display: 'flex',
               flexDirection: 'column',
@@ -632,14 +633,21 @@ export default function CourseDetailPage() {
               Classes Status <Info size={14} className="inline ml-1 text-gray-500" />
             </Typography>
             <Divider />
-            <Box sx={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexGrow: 1 }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', sm: 'row' }, 
+              justifyContent: 'space-around', 
+              alignItems: 'center', 
+              flexGrow: 1,
+              gap: { xs: 4, sm: 2 }
+            }}>
               {/* Circle 1 */}
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
                 <Box sx={{ position: 'relative', display: 'inline-flex' }}>
                   <CircularProgress
                     variant="determinate"
                     value={completionPercentage}
-                    size={120}
+                    size={100}
                     thickness={4}
                     sx={{ color: 'success.main' }}
                   />
@@ -665,7 +673,8 @@ export default function CourseDetailPage() {
                 </Typography>
               </Box>
 
-              <Divider orientation="vertical" flexItem />
+              <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+              <Divider sx={{ width: '80%', display: { xs: 'block', sm: 'none' } }} />
 
               {/* Circle 2 */}
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
@@ -673,7 +682,7 @@ export default function CourseDetailPage() {
                   <CircularProgress
                     variant="determinate"
                     value={100}
-                    size={120}
+                    size={100}
                     thickness={4}
                     sx={{ color: 'warning.main' }}
                   />
@@ -685,7 +694,7 @@ export default function CourseDetailPage() {
                     }}
                   >
                     <Typography variant="h5" component="div" fontWeight="bold">
-                      {totalClasses}
+                      {remainingClasses}
                     </Typography>
                   </Box>
                 </Box>
@@ -702,14 +711,16 @@ export default function CourseDetailPage() {
             className="border-blue-500 border"
             sx={{
               flexBasis: { xs: "100%", md: "40%" },
-              p: 3,
+              p: { xs: 2, sm: 3 },
               borderRadius: 4,
               textAlign: "center",
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              bgcolor: '#1f2937'
+              bgcolor: '#1f2937',
+              overflowX: 'auto',
+              maxWidth: '100%'
             }}
           >
             <Typography variant="h6" fontWeight="bold" gutterBottom>
@@ -730,14 +741,21 @@ export default function CourseDetailPage() {
 
       
       {/* === COMPLETED CLASSES SECTION === */}
-      <Box mt={3}>
-        <Typography variant="h5" fontWeight="bold" gutterBottom>
+      <Box mt={4}>
+        <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
           Completed Class History
         </Typography>
         <div className="space-y-4">
           {completedClasses.length > 0 ? (
             completedClasses.map((c) => (
-              <Paper key={c._id} className="border-blue-500 border" sx={{ p: 2, borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', bgcolor: '#1f2937' }}>
+              <Paper key={c._id} className="border-blue-500 border" sx={{ 
+                p: 2, 
+                borderRadius: 2, 
+                display: 'flex', 
+                flexDirection: { xs: 'column', sm: 'row' }, 
+                alignItems: { xs: 'flex-start', sm: 'center' }, 
+                justifyContent: 'space-between', bgcolor: '#1f2937' 
+              }}>
                 <Box>
                   <Typography variant="body1" fontWeight="medium">{c.topic}</Typography>
                   {c.homeworkFile && (
@@ -758,7 +776,7 @@ export default function CourseDetailPage() {
                     >View Homework</Button>
                   )}
                 </Box>
-                <Box textAlign="right" sx={{ flexShrink: 0, ml: 2 }}>
+                <Box textAlign={{ xs: 'left', sm: 'right' }} sx={{ flexShrink: 0, ml: { xs: 0, sm: 2 }, mt: { xs: 1, sm: 0 } }}>
                   <Typography variant="body2" color="text.secondary">{new Date(c.completedAt).toLocaleDateString()}</Typography>
                   {c.duration && <Typography variant="caption" display="block" color="text.secondary">{c.duration} mins</Typography>}
                 </Box>
@@ -825,7 +843,7 @@ export default function CourseDetailPage() {
             variant="contained"
             size="large"
             disabled={isProcessing}
-            sx={{ flexGrow: 1, minWidth: '220px' }}
+            sx={{ flexGrow: 1, minWidth: { xs: 'auto', sm: '220px' } }}
           >
             {isProcessing ? (
               <CircularProgress size={24} color="inherit" />
@@ -842,6 +860,6 @@ export default function CourseDetailPage() {
           onClose={() => setIsMessageModalOpen(false)}
         />
       )}
-    </div>
+    </Box>
   );
 }

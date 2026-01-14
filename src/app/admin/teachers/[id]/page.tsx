@@ -19,6 +19,7 @@ import {
   Briefcase,
   GraduationCap,
   ArrowRight,
+  FileText,
 } from "lucide-react";
 import { ICourse } from "@/models/Course";
 import Link from "next/link";
@@ -31,6 +32,7 @@ export type TeacherFromAPI = {
   qualification?: string;
   experience?: string;
   listOfSubjects?: string[];
+  cvUrl?: string;
 };
 
 interface ApiResponse {
@@ -133,6 +135,22 @@ export default function TeacherDetailPage({
             <InfoItem icon={<Phone size={20} />} label="Mobile" value={teacher.mobile} />
             <InfoItem icon={<GraduationCap size={20} />} label="Qualification" value={teacher.qualification} />
             <InfoItem icon={<Briefcase size={20} />} label="Experience" value={teacher.experience} />
+
+            {teacher.cvUrl && (
+              <Box sx={{ mt: 3 }}>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  component="a"
+                  href={teacher.cvUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  startIcon={<FileText size={16} />}
+                >
+                  View CV
+                </Button>
+              </Box>
+            )}
             <Divider sx={{ my: 2 }} />
             <Typography variant="body2" color="text.secondary" mb={1}>Subjects</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>

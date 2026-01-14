@@ -19,10 +19,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -45,7 +43,7 @@ export type Student = {
   mobile: string
 }
 
-export default function StudentDataTable() {
+export default function SignupStudentDataTable() {
   const router = useRouter()
   const [data, setData] = React.useState<Student[]>([])
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -59,6 +57,8 @@ export default function StudentDataTable() {
   const [error, setError] = React.useState<string | null>(null)
 
   const handleDelete = async (id: string) => {
+    // Assuming a delete endpoint exists for students.
+    // This might need to be adjusted based on actual API.
     if (!confirm("Are you sure you want to delete this student? This action cannot be undone.")) return;
 
     try {
@@ -168,7 +168,7 @@ export default function StudentDataTable() {
     const fetchStudents = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/students?status=confirmed')
+        const response = await fetch('/api/signup-std')
 
         const contentType = response.headers.get('content-type');
         if (!response.ok) {
@@ -214,7 +214,7 @@ export default function StudentDataTable() {
       className="border-2 border-blue-500"
       sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, bgcolor: '#1f2937' }}
     >
-      <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}>Confirmed Students</Typography>
+      <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}>All Students</Typography>
       <div className="flex items-center py-2 md:py-4">
         <Input
           placeholder="Filter by student name..."

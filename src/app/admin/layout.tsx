@@ -15,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { LayoutDashboard, BookOpen, Users, School, LogOut, Menu, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Users, School, LogOut, Menu, Sparkles, Receipt } from 'lucide-react';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -27,6 +27,8 @@ const navItems = [
   { text: 'Students', icon: <Users size={20} />, href: '/admin/students' },
   { text: 'Teachers', icon: <School size={20} />, href: '/admin/teachers' },
   { text: 'Trial Classes', icon: <Sparkles size={20} />, href: '/admin/democlass-student' },
+  { text: 'Signup Students', icon: <Users size={20} />, href: '/admin/signup-student' },
+  { text: 'Transactions', icon: <Receipt size={20} />, href: '/admin/transaction' },
 ];
 
 export default function AdminLayout({
