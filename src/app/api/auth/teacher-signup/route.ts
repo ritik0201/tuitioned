@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     const body = await request.json();
-    console.log("Teacher Signup Request Body:", body); // Debugging: Check server logs to see received data
+    // console.log("Teacher Signup Request Body:", body); // Debugging: Check server logs to see received data
 
     let {
       fullName,
@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
       listOfSubjects,
       profileImage,
       cvUrl,
+      aboutTeacher,
     } = body;
 
     // Ensure listOfSubjects is an array. If it's a string, split it by commas.
@@ -50,8 +51,10 @@ export async function POST(request: NextRequest) {
       listOfSubjects,
       profileImage,
       cvUrl,
+      aboutTeacher,
       isVerified: false,
       role: "teacher",
+      teacherStatus: "pending",
     });
 
     user.otp = otp;

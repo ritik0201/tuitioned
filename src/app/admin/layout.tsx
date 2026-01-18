@@ -15,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { LayoutDashboard, Users, School, LogOut, Menu, Sparkles, Receipt } from 'lucide-react';
+import { LayoutDashboard, Users, School, LogOut, Menu, Sparkles, Receipt, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -25,8 +25,9 @@ const drawerWidth = 240;
 const navItems = [
   { text: 'Dashboard', icon: <LayoutDashboard size={20} />, href: '/admin/dashboard' },
   { text: 'Students', icon: <Users size={20} />, href: '/admin/students' },
-  { text: 'Teachers', icon: <School size={20} />, href: '/admin/teachers' },
+  { text: 'Approved Teachers', icon: <UserCheck size={20} />, href: '/admin/approved-teacher' },
   { text: 'Trial Classes', icon: <Sparkles size={20} />, href: '/admin/democlass-student' },
+  { text: 'Teachers', icon: <School size={20} />, href: '/admin/teachers' },
   { text: 'Signup Students', icon: <Users size={20} />, href: '/admin/signup-student' },
   { text: 'Transactions', icon: <Receipt size={20} />, href: '/admin/transaction' },
 ];

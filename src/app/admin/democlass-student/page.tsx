@@ -189,6 +189,14 @@ export default function DemoClassStudentTable() {
                   Confirm Booking
                 </DropdownMenuItem>
               )}
+              {booking.status === 'confirmed' && (
+                <DropdownMenuItem
+                  onClick={() => handleStatusUpdate(booking._id, 'completed')}
+                  className="cursor-pointer"
+                >
+                  Mark as Completed
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 onClick={() => booking.studentId?._id && navigator.clipboard.writeText(booking.studentId._id)}
               >

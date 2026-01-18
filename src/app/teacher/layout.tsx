@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -15,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { LayoutDashboard, BookOpen, User, LogOut, Menu, ClipboardList } from 'lucide-react';
+import { LayoutDashboard, BookOpen, User, LogOut, Menu, ClipboardList, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -35,6 +35,8 @@ export default function TeacherLayout({
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [teacherStatus, setTeacherStatus] = useState<string | null>(null);
+  const [loadingStatus, setLoadingStatus] = useState(true);
   const pathname = usePathname();
 
   const handleDrawerToggle = () => {
@@ -51,6 +53,31 @@ export default function TeacherLayout({
     };
   }, [session]);
 
+  useEffect(() => {
+    const fetchStatus = async () => {
+      if (session?.user?.email) {
+        try {
+          const res = await fetch('/api/teachers/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: session.user.email }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setTeacherStatus(data.teacherStatus);
+          }
+        } catch (error) {
+          console.error("Failed to fetch status", error);
+        } finally {
+          setLoadingStatus(false);
+        }
+      } else if (session === null) {
+        setLoadingStatus(false);
+      }
+    };
+    fetchStatus();
+  }, [session]);
+
   const drawerContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
@@ -62,7 +89,7 @@ export default function TeacherLayout({
       </Toolbar>
       <Divider />
       <List>
-        {navItems.map((item) => {
+        {(teacherStatus === 'approved' ? navItems : []).map((item) => {
           const isActive = pathname.startsWith(item.href);
           return (
             <ListItem key={item.text} disablePadding component={Link} href={item.href} sx={{ color: 'inherit', textDecoration: 'none' }}>
@@ -199,7 +226,34 @@ export default function TeacherLayout({
         component="main"
         sx={{ flexGrow: 1, bgcolor: '#030712', p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
       >
-        {children}
+        {loadingStatus ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', color: 'white' }}>
+            <Typography>Loading...</Typography>
+          </Box>
+        ) : teacherStatus === 'approved' ? (
+          children
+        ) : (
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            height: '80vh', 
+            color: 'white',
+            textAlign: 'center',
+            p: 3
+          }}>
+            <AlertCircle size={64} className={teacherStatus === 'rejected' ? "text-red-500 mb-4" : "text-yellow-500 mb-4"} />
+            <Typography variant="h4" gutterBottom fontWeight="bold">
+              Account {teacherStatus === 'rejected' ? 'Rejected' : 'Pending Approval'}
+            </Typography>
+            <Typography variant="body1" sx={{ maxWidth: 600, color: 'gray.400' }}>
+              {teacherStatus === 'rejected' 
+                ? "We're sorry, but your application to become a teacher has been rejected. Please contact support for more information."
+                : "Your application is currently under review by our administrators. You will receive full access to the dashboard and courses once your account is approved."}
+            </Typography>
+          </Box>
+        )}
       </Box>
     </Box>
   );

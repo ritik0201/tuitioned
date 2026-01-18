@@ -11,7 +11,11 @@ import IconButton from '@mui/material/IconButton';
 import { X } from 'lucide-react';
 import CircularProgress from '@mui/material/CircularProgress'; 
 import { Alert, Autocomplete, Chip, Stack } from '@mui/material';
-import { Camera, FileText, School } from 'lucide-react';
+import { Camera, FileText, School, Edit } from 'lucide-react';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
@@ -32,6 +36,16 @@ const style = {
   overflow: 'hidden',
 };
 
+const textFieldStyles = {
+  '& .MuiInputBase-input': { color: '#fff' },
+  '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
+    '&:hover fieldset': { borderColor: '#fff' },
+    '&.Mui-focused fieldset': { borderColor: '#fff' },
+  },
+};
+
 interface TeacherSignUpModalProps {
   open: boolean;
   onClose: () => void;
@@ -48,20 +62,12 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   const [cvUrl, setCvUrl] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [listOfSubjects, setListOfSubjects] = useState<string[]>([]);
+  const [aboutTeacher, setAboutTeacher] = useState('');
+  const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const textFieldStyles = {
-    '& .MuiInputBase-input': { color: '#fff' },
-    '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
-      '&:hover fieldset': { borderColor: '#fff' },
-      '&.Mui-focused fieldset': { borderColor: '#fff' },
-    },
-  };
 
   const handlePhoneChange = (value: string | undefined) => {
     setMobile(value || '');
@@ -140,6 +146,12 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       return;
     }
 
+    if (!aboutTeacher.trim()) {
+      setError('Please write a short description about yourself.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const roleCheckRes = await fetch('/api/auth/check-role', {
         method: 'POST',
@@ -173,7 +185,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName, email, mobile, qualification, experiance, listOfSubjects, profileImage: profileImageUrl, cvUrl
+          fullName, email, mobile, qualification, experiance, listOfSubjects, profileImage: profileImageUrl, cvUrl, aboutTeacher
         }),
       });
       const data = await res.json();
@@ -227,7 +239,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
             Share your knowledge and inspire the next generation of learners.
           </Typography>
         </Box>
-        <Box sx={{ p: 4, position: 'relative', width: { xs: '100%', md: 550 }, color: '#fff' }}>
+        <Box sx={{ p: 4, position: 'relative', width: { xs: '100%', md: 500 }, color: '#fff' }}>
           <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}><X /></IconButton>
           {step === 'details' && (
             <Box component="form" sx={{ mt: 4 }}>
@@ -289,6 +301,14 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   ) : (
                     <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1 }}>Upload Profile Photo</Typography>
                   )}
+                  <Button
+                    variant="outlined"
+                    startIcon={<Edit size={16} />}
+                    onClick={() => setIsAboutModalOpen(true)}
+                    sx={{ mt: 2, textTransform: 'none', borderColor: 'rgba(255,255,255,0.5)', color: 'white', '&:hover': { borderColor: 'white' } }}
+                  >
+                    {aboutTeacher ? "Edit Bio" : "Write Bio"}
+                  </Button>
                 </Stack>
               </Box>
               <Button variant="contained" onClick={handleVerify} disabled={loading} fullWidth sx={{ mt: 3, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}>
@@ -314,6 +334,32 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
             </Box>
           )}
         </Box>
+        
+        {/* About Teacher Modal */}
+        <Dialog open={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} fullWidth maxWidth="md" PaperProps={{ sx: { bgcolor: '#1f2937', color: 'white' } }}>
+          <DialogTitle>About Yourself</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="about"
+              label="Short Bio"
+              placeholder="Tell students about your teaching style and experience..."
+              type="text"
+              fullWidth
+              multiline
+              rows={4}
+              variant="outlined"
+              value={aboutTeacher}
+              onChange={(e) => setAboutTeacher(e.target.value)}
+              sx={textFieldStyles}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsAboutModalOpen(false)} sx={{ color: 'grey.400' }}>Cancel</Button>
+            <Button onClick={() => setIsAboutModalOpen(false)} variant="contained">Save</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Modal>
   );

@@ -44,6 +44,7 @@ export type Teacher = {
   email: string
   mobile: string
   listOfSubjects?: string[]
+  teacherStatus?: 'pending' | 'approved' | 'rejected'
 }
 
 export default function TeacherDataTable() {
@@ -58,6 +59,25 @@ export default function TeacherDataTable() {
   const [rowSelection, setRowSelection] = React.useState({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+
+  const handleStatusUpdate = async (id: string, newStatus: Teacher['teacherStatus']) => {
+    try {
+      const response = await fetch('/api/teachers', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, teacherStatus: newStatus }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+
+      toast.success(`Teacher status updated to ${newStatus}`);
+      setData((prev) =>
+        prev.map((teacher) => (teacher.id === id ? { ...teacher, teacherStatus: newStatus } : teacher))
+      );
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update status");
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this teacher? This action cannot be undone.")) return;
@@ -132,6 +152,18 @@ export default function TeacherDataTable() {
       },
     },
     {
+      accessorKey: "teacherStatus",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("teacherStatus") as string;
+        const color = 
+          status === "approved" ? "text-green-400" :
+          status === "rejected" ? "text-red-400" :
+          "text-yellow-400";
+        return <div className={`capitalize font-medium ${color}`}>{status || 'pending'}</div>
+      },
+    },
+    {
       accessorKey: "mobile",
       header: "Mobile No.",
     },
@@ -150,6 +182,17 @@ export default function TeacherDataTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
+              <DropdownMenuLabel>Update Status</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleStatusUpdate(teacher.id, 'approved')}>
+                Mark as Approved
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleStatusUpdate(teacher.id, 'rejected')}>
+                Mark as Rejected
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleStatusUpdate(teacher.id, 'pending')}>
+                Mark as Pending
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={() => handleDelete(teacher.id)}
                 className="text-red-500 focus:text-red-500 cursor-pointer"
@@ -235,6 +278,14 @@ export default function TeacherDataTable() {
           }
           onChange={(event) =>
             table.getColumn("listOfSubjects")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm w-full bg-gray-700 text-white border-gray-600 placeholder:text-gray-400"
+        />
+        <Input
+          placeholder="Filter by status..."
+          value={(table.getColumn("teacherStatus")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("teacherStatus")?.setFilterValue(event.target.value)
           }
           className="max-w-sm w-full bg-gray-700 text-white border-gray-600 placeholder:text-gray-400"
         />
