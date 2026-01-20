@@ -98,38 +98,87 @@ export async function POST(request: Request) {
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: email,
-      subject: "Demo Class Confirmed! 🎉",
+      subject: "Demo Class Confirmed!",
       html: `
-        <h1>Hi ${session.user.fullName},</h1>
-        <p>Your demo class has been successfully booked!</p>
-        <p><b>Subject:</b> ${subject === 'other' ? body.otherSubject : subject}</p>
-        <p><b>Date:</b> ${new Date(date).toDateString()}</p>
-        <p>We're excited to see you there!</p>
-        <p>Best,</p>
-        <p>The Tuition-ed Team</p>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f9f9f9; padding: 20px; border-radius: 10px;">
+          <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h1 style="color: #0EA5E9; text-align: center; margin-bottom: 20px;">Demo Class Confirmed!</h1>
+            <p style="font-size: 16px; color: #333;">Hi <strong>${session.user.fullName}</strong>,</p>
+            <p style="font-size: 16px; color: #555; line-height: 1.6;">
+              Your demo class has been successfully booked! We are excited to help you on your learning journey.
+            </p>
+            <div style="background-color: #f0f9ff; border-left: 5px solid #0EA5E9; padding: 15px; margin: 20px 0;">
+              <p style="margin: 5px 0; font-size: 16px;"><strong>Subject:</strong> ${subject === 'other' ? body.otherSubject : subject}</p>
+              <p style="margin: 5px 0; font-size: 16px;"><strong>Date:</strong> ${new Date(date).toDateString()}</p>
+            </div>
+            <p style="font-size: 16px; color: #555;">We look forward to seeing you there! And Our team contact you withing 24 hours.</p>
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
+            <p style="font-size: 14px; color: #888; text-align: center;">
+              Best regards,<br/>
+              <strong>The Tuition-ed Team</strong>
+            </p>
+          </div>
+        </div>
       `,
     });
 
     // Send notification email to admin
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: "ritikkatsa2005@gmail.com",
-      subject: "New Demo Class Request! 🚀",
+      to: "ritikkatsa2005@gmail.com, adityayadav114@gmail.com, tuitioned01@gmail.com",
+      subject: "New Demo Class Request!",
       html: `
-        <h1>New Demo Class Request</h1>
-        <p>A new demo class has been booked. Here are the details:</p>
-        <ul>
-          <li><strong>Student Name:</strong> ${session.user.fullName}</li>
-          <li><strong>Father's Name:</strong> ${fatherName}</li>
-          <li><strong>Email:</strong> ${body.email}</li>
-          <li><strong>Mobile:</strong> ${body.mobile || 'Not provided'}</li>
-          <li><strong>Grade:</strong> ${grade}</li>
-          <li><strong>Subject:</strong> ${subject === 'other' ? body.otherSubject : subject}</li>
-          <li><strong>Topic:</strong> ${topic}</li>
-          <li><strong>Preferred Date:</strong> ${new Date(date).toDateString()}</li>
-          <li><strong>City:</strong> ${body.city}</li>
-          <li><strong>Country:</strong> ${body.country}</li>
-        </ul>
+        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f4f4f5; padding: 20px; border-radius: 10px;">
+          <div style="background-color: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <h2 style="color: #2563EB; text-align: center; border-bottom: 2px solid #f4f4f5; padding-bottom: 15px; margin-top: 0;">New Demo Class Request </h2>
+            <p style="font-size: 16px; color: #333; text-align: center; margin-bottom: 25px;">
+              A new demo class has been booked. Here are the details:
+            </p>
+            
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr style="background-color: #f8fafc;">
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600; width: 40%;">Student Name</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${session.user.fullName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Father's Name</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${fatherName}</td>
+              </tr>
+              <tr style="background-color: #f8fafc;">
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Email</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.email}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Mobile</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.mobile || 'Not provided'}</td>
+              </tr>
+              <tr style="background-color: #f8fafc;">
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Grade</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${grade}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Subject</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${subject === 'other' ? body.otherSubject : subject}</td>
+              </tr>
+              <tr style="background-color: #f8fafc;">
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Topic</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${topic}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Preferred Date</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${new Date(date).toDateString()}</td>
+              </tr>
+              <tr style="background-color: #f8fafc;">
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">City</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.city}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Country</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.country}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
       `,
     });
 

@@ -61,7 +61,7 @@ export default function MyCoursesPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-0">
-      <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 text-gwhite">
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-10 text-white">
         Your Enrolled Courses
       </h1>
 

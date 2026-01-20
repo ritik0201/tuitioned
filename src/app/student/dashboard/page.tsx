@@ -190,7 +190,7 @@ export default function StudentDashboardPage() {
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      <span className="font-medium">Teacher:</span> {demo.teacherId?.fullName || 'Allocation comming soon'}
+                      <span className="font-medium">Teacher:</span> {demo.teacherId?.fullName || 'Allocation coming soon'}
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
@@ -203,7 +203,7 @@ export default function StudentDashboardPage() {
                       </Link>
                     ) : (
                       <Button className="w-full" disabled>
-                        {demo.status === 'pending' ? 'Confirmation Pending' : 'Join Link Available Comming Soom'}
+                        {demo.status === 'pending' ? 'Confirmation Pending' : 'Join Link Available Coming Soon'}
                       </Button>
                     )}
                   </div>
