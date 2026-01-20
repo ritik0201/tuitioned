@@ -33,9 +33,13 @@ export async function POST(request: NextRequest) {
     }
     // this is testing phase
     const existingUser = await User.findOne({ email });
-
-    if (existingUser && existingUser.role === 'teacher') {
-      return NextResponse.json({ message: "User already exists. Please login." }, { status: 409 });
+    
+    // if (existingUser && existingUser.role === 'teacher') {
+    //   return NextResponse.json({ message: "User already exists. Please login." }, { status: 409 });
+    // }
+    
+    if (existingUser) {
+      return NextResponse.json({ message: `Email ID already exists with role: ${existingUser.role}` }, { status: 409 });
     }
 
 
