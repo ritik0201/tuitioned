@@ -47,7 +47,7 @@ export type DemoClassBooking = {
   }
   topic: string
   subject: string
-  date: string
+  bookingDateAndTime: string
   status: "pending" | "confirmed" | "completed" | "cancelled"
 }
 
@@ -155,9 +155,9 @@ export default function DemoClassStudentTable() {
       header: "Demo Class Topic",
     },
     {
-      accessorKey: "date",
+      accessorKey: "bookingDateAndTime",
       header: "Booking Date",
-      cell: ({ row }) => new Date(row.getValue("date")).toLocaleString(),
+      cell: ({ row }) => new Date(row.getValue("bookingDateAndTime")).toLocaleString(),
     },
     {
       accessorKey: "status",
@@ -283,7 +283,7 @@ export default function DemoClassStudentTable() {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className={["studentId._id", "studentId.email", "date"].includes(header.column.id) ? "hidden md:table-cell" : ""}>
+                  <TableHead key={header.id} className={["studentId._id", "studentId.email", "bookingDateAndTime"].includes(header.column.id) ? "hidden md:table-cell" : ""}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -309,7 +309,7 @@ export default function DemoClassStudentTable() {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={["studentId._id", "studentId.email", "date"].includes(cell.column.id) ? "hidden md:table-cell" : ""}>
+                    <TableCell key={cell.id} className={["studentId._id", "studentId.email", "bookingDateAndTime"].includes(cell.column.id) ? "hidden md:table-cell" : ""}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

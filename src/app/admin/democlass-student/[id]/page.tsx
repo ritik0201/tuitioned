@@ -29,7 +29,7 @@ export type DemoClassDetails = {
   country?: string;
   topic: string;
   subject: string;
-  date: string;
+  bookingDateAndTime: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
 };
 
@@ -43,6 +43,8 @@ export default function DemoClassDetailPage({
   const [error, setError] = useState<string | null>(null);
   const [teacherIdInput, setTeacherIdInput] = useState("");
   const [joinLinkInput, setJoinLinkInput] = useState("");
+  const [bookingDateAndTimeInput, setBookingDateAndTimeInput] = useState("");
+  const [statusInput, setStatusInput] = useState<'pending' | 'confirmed' | 'completed' | 'cancelled'>('pending');
   const [isUpdating, setIsUpdating] = useState(false);
   const { id } = React.use(params);
 
@@ -57,6 +59,14 @@ export default function DemoClassDetailPage({
         setBooking(data);
         setTeacherIdInput(data.teacherId?._id || "");
         setJoinLinkInput(data.joinLink || "");
+        setStatusInput(data.status || 'pending');
+        if (data.bookingDateAndTime) {
+          // Convert to local datetime string for input (YYYY-MM-DDThh:mm)
+          const date = new Date(data.bookingDateAndTime);
+          const offset = date.getTimezoneOffset();
+          const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+          setBookingDateAndTimeInput(localDate.toISOString().slice(0, 16));
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -76,7 +86,9 @@ export default function DemoClassDetailPage({
         body: JSON.stringify({
           id: booking?._id,
           teacherId: teacherIdInput,
-          joinLink: joinLinkInput
+          joinLink: joinLinkInput,
+          bookingDateAndTime: bookingDateAndTimeInput,
+          status: statusInput
         }),
       });
 
@@ -186,7 +198,7 @@ export default function DemoClassDetailPage({
             <Calendar className="h-5 w-5 text-primary" />
             <div>
               <p className="text-muted-foreground">Booking Date & Time</p>
-              <p className="font-semibold">{new Date(booking.date).toLocaleString()}</p>
+              <p className="font-semibold">{new Date(booking.bookingDateAndTime).toLocaleString()}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -239,6 +251,31 @@ export default function DemoClassDetailPage({
                 value={joinLinkInput} 
                 onChange={(e) => setJoinLinkInput(e.target.value)}
               />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Booking Date & Time
+              </label>
+              <Input 
+                type="datetime-local"
+                value={bookingDateAndTimeInput} 
+                onChange={(e) => setBookingDateAndTimeInput(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Status
+              </label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={statusInput}
+                onChange={(e) => setStatusInput(e.target.value as any)}
+              >
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
             </div>
           </div>
           <Button 

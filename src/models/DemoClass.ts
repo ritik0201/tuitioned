@@ -10,8 +10,10 @@ export interface IDemoClass extends Document {
   grade: string;
   city: string;
   country: string;
-  date: Date;
+  bookingDateAndTime: Date;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const DemoClassSchema: Schema = new Schema({
@@ -24,8 +26,12 @@ const DemoClassSchema: Schema = new Schema({
   country: { type: String},
   topic: { type: String },
   subject: { type: String, required: true },
-  date: { type: Date, required: true },
+  bookingDateAndTime: { type: Date, required: true },
   status: { type: String, enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending' },
 }, { timestamps: true });
+
+if (process.env.NODE_ENV === 'development') {
+  delete mongoose.models.DemoClass;
+}
 
 export default mongoose.models.DemoClass || mongoose.model<IDemoClass>('DemoClass', DemoClassSchema);

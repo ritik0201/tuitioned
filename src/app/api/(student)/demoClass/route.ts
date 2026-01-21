@@ -26,11 +26,11 @@ export async function GET(request: Request) {
       demoClasses = await DemoClass.find({})
         .populate({ path: 'studentId', model: User, select: 'email fullName' })
         .populate({ path: 'teacherId', model: User, select: 'fullName email' })
-        .sort({ date: -1 });
+        .sort({ bookingDateAndTime: -1 });
     } else {
       demoClasses = await DemoClass.find({ studentId: session.user.id })
         .populate({ path: 'teacherId', model: User, select: 'fullName email' })
-        .sort({ date: -1 });
+        .sort({ bookingDateAndTime: -1 });
     }
 
     // The data is returned as a plain array, not nested in a `data` property.
@@ -57,8 +57,8 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Validation for fields coming from the form
-    const { fatherName, email, grade, subject, topic, city, country, date } = body;
-    if (!fatherName || !email || !grade || !subject || !city || !country || !date) {
+    const { fatherName, email, grade, subject, topic, city, country, bookingDateAndTime } = body;
+    if (!fatherName || !email || !grade || !subject || !city || !country || !bookingDateAndTime) {
       return NextResponse.json(
         { success: false, message: 'Missing required fields.' },
         { status: 400 }
@@ -73,6 +73,9 @@ export async function POST(request: Request) {
         );
     }
 
+    const dateObj = new Date(bookingDateAndTime);
+    dateObj.setUTCHours(0, 0, 0, 0);
+
     const newDemoClass = await DemoClass.create({
       studentId: session.user.id,
       studentName: session.user.fullName,
@@ -82,7 +85,7 @@ export async function POST(request: Request) {
       country,
       topic,
       subject: subject === 'other' ? body.otherSubject : subject,
-      date,
+      bookingDateAndTime,
       // teacherId can be assigned later by an admin
     });
 
@@ -109,7 +112,7 @@ export async function POST(request: Request) {
             </p>
             <div style="background-color: #f0f9ff; border-left: 5px solid #0EA5E9; padding: 15px; margin: 20px 0;">
               <p style="margin: 5px 0; font-size: 16px;"><strong>Subject:</strong> ${subject === 'other' ? body.otherSubject : subject}</p>
-              <p style="margin: 5px 0; font-size: 16px;"><strong>Date:</strong> ${new Date(date).toDateString()}</p>
+              <p style="margin: 5px 0; font-size: 16px;"><strong>Date:</strong> ${dateObj.toDateString()}</p>
             </div>
             <p style="font-size: 16px; color: #555;">We look forward to seeing you there! And Our team contact you withing 24 hours.</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
@@ -166,7 +169,7 @@ export async function POST(request: Request) {
               </tr>
               <tr>
                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Preferred Date</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${new Date(date).toDateString()}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${dateObj.toDateString()}</td>
               </tr>
               <tr style="background-color: #f8fafc;">
                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">City</td>
@@ -208,7 +211,7 @@ export async function PUT(request: Request) {
 
     await dbConnect();
 
-    const { id, status, teacherId, joinLink } = await request.json();
+    const { id, status, teacherId, joinLink, bookingDateAndTime } = await request.json();
 
     if (!id) {
       return NextResponse.json(
@@ -230,6 +233,7 @@ export async function PUT(request: Request) {
       updateData.teacherId = teacherId;
     }
     if (joinLink) updateData.joinLink = joinLink;
+    if (bookingDateAndTime) updateData.bookingDateAndTime = bookingDateAndTime;
 
     const updatedDemoClass = await DemoClass.findByIdAndUpdate(
       id,

@@ -16,7 +16,7 @@ interface DemoClass {
     fullName: string;
   };
   subject: string;
-  date: string; // Dates will be strings in JSON
+  bookingDateAndTime: string; // Dates will be strings in JSON
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   joinLink?: string;
 }
@@ -194,7 +194,16 @@ export default function StudentDashboardPage() {
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" /><span>{new Date(demo.date).toLocaleDateString()}</span></div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span>{new Date(demo.bookingDateAndTime).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-muted-foreground" />
+                      <span>
+                        {demo.status === 'confirmed' || demo.status === 'completed' ? new Date(demo.bookingDateAndTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Time Pending"}
+                      </span>
+                    </div>
                   </CardContent>
                   <div className="p-6 pt-4 mt-auto">
                     {demo.status === 'confirmed' && demo.joinLink ? (

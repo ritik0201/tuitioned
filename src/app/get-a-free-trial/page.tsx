@@ -156,7 +156,7 @@ export default function FreeTrialPage() {
             {!session && (
               <>
                 <input
-                  name="fullName"
+                  name="Student fullName"
                   type="text"
                   placeholder="Full Name"
                   required
@@ -295,21 +295,21 @@ export default function FreeTrialPage() {
               defaultOptionLabel="Select Country"
             />
             <input
-              name="date"
+              name="bookingDateAndTime"
               type="date"
               required
-              value={formData.date || ""}
+              value={formData.bookingDateAndTime || ""}
               onChange={handleChange}
               className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
             />
-            <textarea
+            {/* <textarea
               name="comment"
               rows={4}
               placeholder="Additional Comments"
               value={formData.comment || ""}
               onChange={handleChange}
               className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-            />
+            /> */}
           </div>
         );
       default:
@@ -400,7 +400,7 @@ export default function FreeTrialPage() {
                 <h3 className="text-xl font-semibold mb-2">🎉 Demo Class Confirmed!</h3>
                 <p className="text-gray-300 mb-1">
                   Your demo class for{" "}
-                  <strong>{new Date(formData.date + 'T00:00').toDateString()}</strong> has been booked.
+                  <strong>{new Date(formData.bookingDateAndTime + 'T00:00').toDateString()}</strong> has been booked.
                 </p>
                 <p className="text-gray-400 mb-4">
                   A confirmation email has been sent to <strong>{formData.email}</strong>.
