@@ -12,6 +12,7 @@ export interface IDemoClass extends Document {
   country: string;
   bookingDateAndTime: Date;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  timeZone?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,6 +29,7 @@ const DemoClassSchema: Schema = new Schema({
   subject: { type: String, required: true },
   bookingDateAndTime: { type: Date, required: true },
   status: { type: String, enum: ['pending', 'confirmed', 'completed', 'cancelled'], default: 'pending' },
+  timeZone: { type: String },
 }, { timestamps: true });
 
 if (process.env.NODE_ENV === 'development') {

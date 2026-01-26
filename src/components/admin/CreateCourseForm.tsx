@@ -23,10 +23,10 @@ interface CourseFormValues {
   teacherId: string;
   classTime: string;
   classDays: string[];
-  noOfClasses: number;
-  perClassPrice: number;
-  noOfclassTeacher?: number;
-  teacherPerClassPrice?: number;
+  noOfClasses: number | string;
+  perClassPrice: number | string;
+  noOfclassTeacher?: number | string;
+  teacherPerClassPrice?: number | string;
   joinLink?: string;
   classroomLink?: string;
 }
@@ -48,10 +48,10 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
       teacherId: '',
       classTime: '',
       classDays: [],
-      noOfClasses: 8,
-      perClassPrice: 500,
-      noOfclassTeacher: 0,
-      teacherPerClassPrice: 0,
+      noOfClasses: '',
+      perClassPrice: '',
+      noOfclassTeacher: '',
+      teacherPerClassPrice: '',
       joinLink: '',
       classroomLink: '',
     },
@@ -68,10 +68,18 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
   const onSubmit: SubmitHandler<CourseFormValues> = async (data) => {
     setIsSubmitting(true);
     try {
+      const payload = {
+        ...data,
+        noOfClasses: Number(data.noOfClasses),
+        perClassPrice: Number(data.perClassPrice),
+        noOfclassTeacher: Number(data.noOfclassTeacher),
+        teacherPerClassPrice: Number(data.teacherPerClassPrice),
+      };
+
       const response = await fetch(`/api/students/${studentId}/my-courses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       // Handle non-JSON responses, which often indicate an auth redirect (HTML page)
@@ -99,7 +107,7 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
 
   return (
     <Form {...form} >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid md:grid-cols-4 gap-x-6 gap-y-4 backdrop-blur-3xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid md:grid-cols-4 gap-x-6 gap-y-4 backdrop-blur-3xl text-gray-300">
         {/* Course Title */}
         <div key="title" className="md:col-span-2">
           <FormField control={form.control} name="title" render={({ field }) => (<FormItem><FormLabel>Title</FormLabel><FormControl><Input placeholder="e.g., Mathematics" {...field} /></FormControl><FormMessage /></FormItem>)} />
@@ -144,9 +152,13 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                   <Button
                     key={day}
                     type="button"
-                    variant={selectedDays.includes(day) ? 'default' : 'outline'}
+                    variant="outline"
                     onClick={() => toggleDay(day)}
-                    className="rounded-full"
+                    className={`rounded-full ${
+                      selectedDays.includes(day)
+                        ? "!bg-blue-600 !text-white !border-blue-600 hover:!bg-blue-700 hover:!text-white"
+                        : ""
+                    }`}
                   >
                     {day}
                   </Button>
@@ -160,13 +172,13 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
         {/* Number of Classes, Prices */}
         <div className="md:col-span-4 grid md:grid-cols-3 gap-x-6 gap-y-4">
           <div key="noOfClasses">
-            <FormField control={form.control} name="noOfClasses" render={({ field }) => (<FormItem><FormLabel>Number of Classes</FormLabel><FormControl><Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)} /></FormControl><FormMessage /></FormItem>)} />
+            <FormField control={form.control} name="noOfClasses" render={({ field }) => (<FormItem><FormLabel>Number of Classes</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
           </div>
           <div key="perClassPrice">
-            <FormField control={form.control} name="perClassPrice" render={({ field }) => (<FormItem><FormLabel>Price per Class</FormLabel><FormControl><Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)} /></FormControl><FormMessage /></FormItem>)} />
+            <FormField control={form.control} name="perClassPrice" render={({ field }) => (<FormItem><FormLabel>Price per Class</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
           </div>
           <div key="teacherPerClassPrice">
-            <FormField control={form.control} name="teacherPerClassPrice" render={({ field }) => (<FormItem><FormLabel>Teacher's Price/Class</FormLabel><FormControl><Input type="number" {...field} onChange={e => field.onChange(parseInt(e.target.value, 10) || 0)} /></FormControl><FormMessage /></FormItem>)} />
+            <FormField control={form.control} name="teacherPerClassPrice" render={({ field }) => (<FormItem><FormLabel>Teacher's Price/Class</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
           </div>
         </div>
 
@@ -194,8 +206,8 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
           </div>
         </div>
         {/* Submit Button */}
-        <div key="submit" className="md:col-span-4">
-          <Button type="submit" disabled={isSubmitting} className="w-full">
+        <div key="submit" className="md:col-span-4 pt-2">
+          <Button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold">
           {isSubmitting ? (
             <> <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating... </>
           ) : (

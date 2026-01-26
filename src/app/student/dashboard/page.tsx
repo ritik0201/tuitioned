@@ -19,6 +19,7 @@ interface DemoClass {
   bookingDateAndTime: string; // Dates will be strings in JSON
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   joinLink?: string;
+  timeZone?: string;
 }
 
 // Define the type for the assigned course data
@@ -204,6 +205,12 @@ export default function StudentDashboardPage() {
                         {demo.status === 'confirmed' || demo.status === 'completed' ? new Date(demo.bookingDateAndTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Time Pending"}
                       </span>
                     </div>
+                    {demo.timeZone && (
+                      <div className="flex items-center gap-2">
+                        <Hourglass className="h-4 w-4 text-muted-foreground" />
+                        <span>Time Zone: {demo.timeZone}</span>
+                      </div>
+                    )}
                   </CardContent>
                   <div className="p-6 pt-4 mt-auto">
                     {demo.status === 'confirmed' && demo.joinLink ? (

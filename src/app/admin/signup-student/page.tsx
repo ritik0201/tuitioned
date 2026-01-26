@@ -13,14 +13,14 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+} from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -33,14 +33,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Paper, Typography } from "@mui/material"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 
 export type Student = {
   id: string
   name: string
   email: string
-  mobile: string
+  mobile: string,
+  studentStatus: 'pending' | 'approved' | 'rejected'
 }
 
 export default function SignupStudentDataTable() {
@@ -52,9 +53,77 @@ export default function SignupStudentDataTable() {
   )
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+  const [isMigrating, setIsMigrating] = React.useState(false);
+
+  const fetchStudents = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // const response = await fetch('/api/signup-std');
+      const response = await fetch('/api/signup-std', { cache: 'no-store' });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to fetch students');
+      }
+      const students = await response.json();
+      setData(students);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    fetchStudents();
+  }, [fetchStudents]);
+
+  const handleMigration = async () => {
+    if (!confirm("This will update all existing students without a status to 'pending'. This is a one-time operation. Are you sure?")) return;
+
+    setIsMigrating(true);
+    try {
+      const response = await fetch('/api/migrate-student-status', {
+        method: 'POST',
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Migration failed');
+      toast.success(result.message, {
+        description: `${result.updatedCount} student(s) updated. The list will now refresh.`,
+      });
+      fetchStudents(); // Refresh data
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during migration.");
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
+  const handleStatusUpdate = async (id: string, newStatus: Student['studentStatus']) => {
+    try {
+      const response = await fetch('/api/signup-std', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to update status');
+      }
+
+      toast.success(`Student status updated to ${newStatus}`);
+      setData((prev) =>
+        prev.map((student) => (student.id === id ? { ...student, studentStatus: newStatus } : student))
+      );
+      fetchStudents(); // Refetch data to ensure consistency
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update status");
+    }
+  };
 
   const handleDelete = async (id: string) => {
     // Assuming a delete endpoint exists for students.
@@ -76,28 +145,6 @@ export default function SignupStudentDataTable() {
   };
 
   const columns: ColumnDef<Student>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
     {
       accessorKey: "name",
       header: ({ column }) => {
@@ -126,6 +173,18 @@ export default function SignupStudentDataTable() {
       header: "Mobile No.",
     },
     {
+      accessorKey: "studentStatus",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("studentStatus") as string;
+        const color = 
+          status === "approved" ? "text-green-400" :
+          status === "rejected" ? "text-red-400" :
+          "text-yellow-400";
+        return <div className={`capitalize font-medium ${color}`}>{status || 'pending'}</div>
+      },
+    },
+    {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
@@ -140,6 +199,17 @@ export default function SignupStudentDataTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
+              <DropdownMenuLabel>Update Status</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleStatusUpdate(student.id, 'approved')}>
+                Mark as Approved
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleStatusUpdate(student.id, 'rejected')}>
+                Mark as Rejected
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleStatusUpdate(student.id, 'pending')}>
+                Mark as Pending
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={() => handleDelete(student.id)}
                 className="text-red-500 focus:text-red-500 cursor-pointer"
@@ -164,31 +234,6 @@ export default function SignupStudentDataTable() {
     },
   ]
 
-  React.useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch('/api/signup-std')
-
-        const contentType = response.headers.get('content-type');
-        if (!response.ok) {
-          if (contentType && contentType.includes('application/json')) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch students');
-          }
-          throw new Error('Your session may have expired. Please log in again.');
-        }
-        const students = await response.json()
-        setData(students)
-      } catch (err: any) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchStudents()
-  }, [])
-
   const table = useReactTable({
     data,
     columns,
@@ -199,116 +244,122 @@ export default function SignupStudentDataTable() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
     },
   })
 
   return (
-    <Paper
-      elevation={0}
-      className="border-2 border-blue-500"
-      sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, bgcolor: '#1f2937' }}
-    >
-      <Typography variant="h4" gutterBottom fontWeight="bold" sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }}>All Students</Typography>
-      <div className="flex items-center py-2 md:py-4">
-        <Input
-          placeholder="Filter by student name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm w-full bg-gray-700 text-white border-gray-600 placeholder:text-gray-400"
-        />
-      </div>
-      <div className="rounded-md border border-gray-700 overflow-x-auto">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className={["id", "email"].includes(header.column.id) ? "hidden md:table-cell" : ""}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Loading students...
-                </TableCell>
-              </TableRow>
-            ) : error ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-red-500">{error}</TableCell>
-              </TableRow>
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className={["id", "email"].includes(cell.column.id) ? "hidden md:table-cell" : ""}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+    <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <Card className="w-full">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl md:text-2xl">All Students</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between py-3 md:py-4 gap-4">
+            <Input
+              placeholder="Filter by student name..."
+              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("name")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+            <Button onClick={handleMigration} disabled={isMigrating} variant="outline">
+              {isMigrating ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Migrating...</>
+              ) : "Migrate Old Students"}
+            </Button>
+          </div>
+          <div className="rounded-md border overflow-x-auto">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      )
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center">
+                      Loading students...
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-2 md:py-4">
-        <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
-        </div>
-        <div className="space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      </div>
-    </Paper>
+                  </TableRow>
+                ) : error ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">{error}</TableCell>
+                  </TableRow>
+                ) : table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      className="hover:bg-muted/50 even:bg-muted/20"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-20 md:h-24 text-center"
+                    >
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 py-3 md:py-4">
+            <div className="text-xs md:text-sm text-muted-foreground order-2 sm:order-1">
+              {table.getFilteredRowModel().rows.length} student(s) total
+            </div>
+            <div className="flex gap-2 order-1 sm:order-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className="text-xs md:text-sm"
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className="text-xs md:text-sm"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

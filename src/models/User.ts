@@ -26,6 +26,7 @@ export interface IUser extends Document {
   cvUrl?: string;
   aboutTeacher?: string;
   teacherStatus?: 'pending' | 'approved' | 'rejected';
+  studentStatus?: 'pending' | 'approved' | 'rejected';
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,10 +57,19 @@ const UserSchema: Schema<IUser> = new Schema({
   profileImage: { type: String },
   cvUrl: { type: String },
   aboutTeacher: { type: String },
+  studentStatus: { 
+    type: String, 
+    enum: ['pending', 'approved', 'rejected'], 
+    default: 'pending' 
+  },
   teacherStatus: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   isAcceptingMessages: { type: Boolean, default: true },
   // messages: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Message' }],
 }, { timestamps: true });
+
+if (process.env.NODE_ENV === 'development') {
+  delete mongoose.models.User;
+}
 
 const User: Model<IUser> = models.User || mongoose.model<IUser>('User', UserSchema);
 export default User;

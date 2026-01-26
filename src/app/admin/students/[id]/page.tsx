@@ -134,25 +134,25 @@ export default function StudentDetailPage({
   );
 
   return (
-    <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
         {/* Left Column - Student Details */}
         <Box sx={{ flex: '1 1 400px', minWidth: 300 }}>
           <Paper
             elevation={0}
             className="border-2 border-blue-500"
-            sx={{ p: 3, borderRadius: 4, bgcolor: '#1f2937', height: '100%' }}
+            sx={{ p: { xs: 2, md: 3 }, borderRadius: 4, bgcolor: '#1f2937', height: '100%' }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3 }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: { xs: 2, sm: 3 }, mb: 3, textAlign: { xs: 'center', sm: 'left' } }}>
               <Avatar
                 src={`https://api.dicebear.com/7.x/initials/svg?seed=${student.name}`}
-                sx={{ width: 80, height: 80, fontSize: '2.5rem' }}
+                sx={{ width: { xs: 64, md: 80 }, height: { xs: 64, md: 80 }, fontSize: { xs: '2rem', md: '2.5rem' } }}
               >
                 {student.name.charAt(0).toUpperCase()}
               </Avatar>
               <Box>
-                <Typography variant="h4" fontWeight="bold">{student.name}</Typography>
-                <Typography variant="body1" color="text.secondary">{student.email}</Typography>
+                <Typography variant="h4" component="h1" fontWeight="bold" sx={{ fontSize: { xs: '1.75rem', md: '2.125rem' } }}>{student.name}</Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ wordBreak: 'break-word' }}>{student.email}</Typography>
               </Box>
             </Box>
             <Divider sx={{ my: 2 }} />
@@ -170,24 +170,27 @@ export default function StudentDetailPage({
           <Paper
             elevation={0}
             className="border-2 border-blue-500"
-            sx={{ p: 3, borderRadius: 4, bgcolor: '#1f2937' }}
+            sx={{ p: { xs: 2, md: 3 }, borderRadius: 4, bgcolor: '#1f2937' }}
           >
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'stretch', sm: 'center' }, gap: 2, mb: 2 }}>
               <Typography variant="h5" fontWeight="bold">Enrolled Courses</Typography>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="contained" startIcon={<PlusCircle />}>
+                  <Button variant="contained" startIcon={<PlusCircle />} sx={{ width: { xs: '100%', sm: 'auto' } }}>
                     Create Course
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="backdrop-blur-3xl sm:max-w-3xl bg-gray-800 text-white border-blue-500">
-                  <DialogHeader>
-                    <DialogTitle>Create a new course for {student.name}</DialogTitle>
+                <DialogContent className="sm:max-w-2xl bg-[#111827] border border-gray-700 text-white shadow-2xl p-0 gap-0 overflow-hidden z-[1200] max-h-[90vh] flex flex-col">
+                  <DialogHeader className="p-6 border-b border-gray-800 bg-gray-900/50 shrink-0">
+                    <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Create New Course</DialogTitle>
+                    <p className="text-sm text-gray-400">Configure the course details for <span className="text-white font-medium">{student.name}</span> below.</p>
                   </DialogHeader>
-                  <CreateCourseForm
-                    studentId={student._id}
-                    onCourseCreated={() => setIsDialogOpen(false)}
-                  />
+                  <div className="p-6 overflow-y-auto">
+                    <CreateCourseForm
+                      studentId={student._id}
+                      onCourseCreated={() => setIsDialogOpen(false)}
+                    />
+                  </div>
                 </DialogContent>
               </Dialog>
             </Box>

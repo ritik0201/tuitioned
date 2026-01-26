@@ -13,10 +13,13 @@ export async function GET(request: NextRequest) {
     // Extract unique student IDs
     const studentIds = [...new Set(completedDemos.map(demo => demo.studentId.toString()))];
 
-    // Fetch only the users who are in the completed list
+    // Fetch users who are in the completed list OR have approved status
     const students = await User.find({
-      _id: { $in: studentIds },
-      role: 'student'
+      role: 'student',
+      $or: [
+        { _id: { $in: studentIds } },
+        { studentStatus: 'approved' }
+      ]
     }).select('fullName email mobile').lean();
 
     const formattedStudents = students.map(student => ({

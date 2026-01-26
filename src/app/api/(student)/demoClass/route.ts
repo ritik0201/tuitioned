@@ -211,7 +211,7 @@ export async function PUT(request: Request) {
 
     await dbConnect();
 
-    const { id, status, teacherId, joinLink, bookingDateAndTime } = await request.json();
+    const { id, status, teacherId, joinLink, bookingDateAndTime, timeZone } = await request.json();
 
     if (!id) {
       return NextResponse.json(
@@ -234,6 +234,7 @@ export async function PUT(request: Request) {
     }
     if (joinLink) updateData.joinLink = joinLink;
     if (bookingDateAndTime) updateData.bookingDateAndTime = bookingDateAndTime;
+    if (timeZone) updateData.timeZone = timeZone;
 
     const updatedDemoClass = await DemoClass.findByIdAndUpdate(
       id,

@@ -10,7 +10,7 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, Calendar, Video } from "lucide-react"
+import { ArrowUpDown, Calendar, Video, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -32,9 +32,10 @@ export type DemoClass = {
     mobile: string
   }
   subject: string
-  date: string
+  bookingDateAndTime: string
   status: string
   joinLink?: string
+  timeZone?: string
 }
 
 export default function AssignedDemoClassesPage() {
@@ -64,25 +65,39 @@ export default function AssignedDemoClassesPage() {
       header: "Subject",
     },
     {
-      accessorKey: "date",
+      accessorKey: "bookingDateAndTime",
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Date
+            Date & Time
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => {
-        const dateVal = row.getValue("date") as string;
+        const dateVal = row.getValue("bookingDateAndTime") as string;
         const date = new Date(dateVal);
+        const timeZone = row.original.timeZone;
+        const status = row.original.status?.toLowerCase();
+
         return (
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span>{date.toLocaleDateString()}</span>
+          <div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span>{date.toLocaleDateString()}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span>
+                {status === 'confirmed' || status === 'completed'
+                  ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  : "Time Pending"}
+              </span>
+            </div>
+            {timeZone && <div className="text-xs text-muted-foreground">({timeZone})</div>}
           </div>
         )
       },

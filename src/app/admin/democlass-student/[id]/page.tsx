@@ -3,11 +3,18 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Mail, Phone, Hash, User as UserIcon, MapPin, BookOpen, Calendar, Tag, Clock, Link as LinkIcon, UserCheck } from "lucide-react";
+import { Mail, Phone, Hash, User as UserIcon, MapPin, BookOpen, Calendar, Tag, Clock, Link as LinkIcon, UserCheck, Globe } from "lucide-react";
 import { Alert, CircularProgress } from "@mui/material";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 export type DemoClassDetails = {
@@ -31,6 +38,7 @@ export type DemoClassDetails = {
   subject: string;
   bookingDateAndTime: string;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  timeZone?: string;
 };
 
 export default function DemoClassDetailPage({
@@ -45,6 +53,7 @@ export default function DemoClassDetailPage({
   const [joinLinkInput, setJoinLinkInput] = useState("");
   const [bookingDateAndTimeInput, setBookingDateAndTimeInput] = useState("");
   const [statusInput, setStatusInput] = useState<'pending' | 'confirmed' | 'completed' | 'cancelled'>('pending');
+  const [timeZoneInput, setTimeZoneInput] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const { id } = React.use(params);
 
@@ -60,6 +69,7 @@ export default function DemoClassDetailPage({
         setTeacherIdInput(data.teacherId?._id || "");
         setJoinLinkInput(data.joinLink || "");
         setStatusInput(data.status || 'pending');
+        setTimeZoneInput(data.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone);
         if (data.bookingDateAndTime) {
           // Convert to local datetime string for input (YYYY-MM-DDThh:mm)
           const date = new Date(data.bookingDateAndTime);
@@ -88,7 +98,8 @@ export default function DemoClassDetailPage({
           teacherId: teacherIdInput,
           joinLink: joinLinkInput,
           bookingDateAndTime: bookingDateAndTimeInput,
-          status: statusInput
+          status: statusInput,
+          timeZone: timeZoneInput
         }),
       });
 
@@ -197,8 +208,14 @@ export default function DemoClassDetailPage({
           <div className="flex items-center gap-3">
             <Calendar className="h-5 w-5 text-primary" />
             <div>
-              <p className="text-muted-foreground">Booking Date & Time</p>
-              <p className="font-semibold">{new Date(booking.bookingDateAndTime).toLocaleString()}</p>
+              <p className="text-muted-foreground">Demo Date & Time</p>
+              <p className="font-semibold">
+                {new Date(booking.bookingDateAndTime).toLocaleString(undefined, {
+                  timeZone: booking.timeZone,
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -206,6 +223,13 @@ export default function DemoClassDetailPage({
             <div>
               <p className="text-muted-foreground">Status</p>
               <Badge>{booking.status}</Badge>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <Globe className="h-5 w-5 text-primary" />
+            <div>
+              <p className="text-muted-foreground">Time Zone</p>
+              <p className="font-semibold">{booking.timeZone || "Not Set"}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -254,7 +278,7 @@ export default function DemoClassDetailPage({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Booking Date & Time
+                Demo Date & Time
               </label>
               <Input 
                 type="datetime-local"
@@ -264,18 +288,35 @@ export default function DemoClassDetailPage({
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                Time Zone
+              </label>
+              <Select value={timeZoneInput} onValueChange={setTimeZoneInput}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a timezone" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[200px] bg-background/80 backdrop-blur-sm">
+                  {/* @ts-ignore */}
+                  {Intl.supportedValuesOf("timeZone").map((tz: string) => (
+                    <SelectItem key={tz} value={tz}>{tz}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                 Status
               </label>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                value={statusInput}
-                onChange={(e) => setStatusInput(e.target.value as any)}
-              >
-                <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+              <Select value={statusInput} onValueChange={(value) => setStatusInput(value as any)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent className="bg-background/80 backdrop-blur-sm">
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="confirmed">Confirmed</SelectItem>
+                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <Button 

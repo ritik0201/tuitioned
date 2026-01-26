@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import { X } from 'lucide-react';
 import CircularProgress from '@mui/material/CircularProgress'; 
 import { Alert, Autocomplete, Chip, Stack } from '@mui/material';
-import { Camera, FileText, School, Edit } from 'lucide-react';
+import { Camera, FileText, School, Edit, Plus } from 'lucide-react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -62,6 +62,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   const [cvUrl, setCvUrl] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [listOfSubjects, setListOfSubjects] = useState<string[]>([]);
+  const [subjectInputValue, setSubjectInputValue] = useState('');
   const [aboutTeacher, setAboutTeacher] = useState('');
   const [isAboutModalOpen, setIsAboutModalOpen] = useState(false);
   const [otp, setOtp] = useState('');
@@ -71,6 +72,14 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
 
   const handlePhoneChange = (value: string | undefined) => {
     setMobile(value || '');
+  };
+
+  const handleAddSubject = () => {
+    const subject = subjectInputValue.trim();
+    if (subject && !listOfSubjects.includes(subject)) {
+      setListOfSubjects([...listOfSubjects, subject]);
+      setSubjectInputValue('');
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -181,11 +190,17 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         return;
       }
 
+      // Add any pending subject from input before submitting
+      let finalSubjects = [...listOfSubjects];
+      if (subjectInputValue.trim() && !listOfSubjects.includes(subjectInputValue.trim())) {
+        finalSubjects.push(subjectInputValue.trim());
+      }
+
       const res = await fetch('/api/auth/teacher-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName, email, mobile, qualification, experiance, listOfSubjects, profileImage: profileImageUrl, cvUrl, aboutTeacher
+          fullName, email, mobile, qualification, experiance, listOfSubjects: finalSubjects, profileImage: profileImageUrl, cvUrl, aboutTeacher
         }),
       });
       const data = await res.json();
@@ -260,24 +275,62 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   <TextField label="Highest Qualification" variant="outlined" fullWidth value={qualification} onChange={(e) => setQualification(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Years of Experience" variant="outlined" fullWidth value={experiance} onChange={(e) => setExperiance(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Google Drive CV Link" placeholder="Paste your CV link here" variant="outlined" fullWidth required value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
-                  <Autocomplete
-                    multiple
-                    freeSolo
-                    options={[]}
-                    value={listOfSubjects}
-                    onChange={(event, newValue) => {
-                      setListOfSubjects(newValue);
-                    }}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => {
-                        const { key, ...tagProps } = getTagProps({ index });
-                        return <Chip key={key} variant="outlined" label={option} {...tagProps} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }} />;
-                      })
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} variant="outlined" label="Subjects You Teach" placeholder="Type a subject and press Enter" sx={textFieldStyles} />
-                    )}
-                  />
+                  <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
+                    <Autocomplete
+                      multiple
+                      freeSolo
+                      options={[]}
+                      value={listOfSubjects}
+                      inputValue={subjectInputValue}
+                      onInputChange={(event, newInputValue) => {
+                        setSubjectInputValue(newInputValue);
+                      }}
+                      onChange={(event, newValue) => {
+                        setListOfSubjects(newValue);
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          handleAddSubject();
+                        }
+                      }}
+                      renderTags={(value, getTagProps) =>
+                        value.map((option, index) => {
+                          const { key, ...tagProps } = getTagProps({ index });
+                          return <Chip key={key} variant="outlined" label={option} {...tagProps} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }} />;
+                        })
+                      }
+                      renderInput={(params) => (
+                        <TextField {...params} variant="outlined" label="Subjects You Teach" placeholder="Type a subject..." sx={textFieldStyles} />
+                      )}
+                      sx={{ flex: 1 }}
+                    />
+                    <IconButton
+                      onClick={handleAddSubject}
+                      disabled={!subjectInputValue.trim() || listOfSubjects.includes(subjectInputValue.trim())}
+                      sx={{
+                        color: 'white',
+                        backgroundColor: 'primary.main',
+                        borderRadius: '50%',
+                        width: 40,
+                        height: 40,
+                        mt: 1,
+                        '&:hover': {
+                          backgroundColor: 'primary.dark',
+                          transform: 'scale(1.05)'
+                        },
+                        '&.Mui-disabled': {
+                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                          color: 'rgba(255, 255, 255, 0.3)'
+                        },
+                        transition: 'all 0.2s ease-in-out',
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
+                      }}
+                      title="Add subject"
+                    >
+                      <Plus size={20} />
+                    </IconButton>
+                  </Box>
                 </Stack>
                 {/* Right side for image */}
                 <Stack spacing={2} sx={{ alignItems: 'center', pt: 2 }}>

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     await dbConnect();
 
     const studentsFromDb = await User.find({ role: 'student' })
-      .select('fullName email mobile')
+      .select('fullName email mobile studentStatus')
       .lean();
 
     const formattedStudents = studentsFromDb.map(student => ({
@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
       name: student.fullName,
       email: student.email,
       mobile: student.mobile || 'N/A',
+      studentStatus: student.studentStatus || 'pending',
     }));
 
     return NextResponse.json(formattedStudents, {
@@ -38,4 +39,39 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     // The original student signup logic should be implemented here.
     return NextResponse.json({ message: "This is the student signup endpoint. Implement your POST logic here." });
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    await dbConnect();
+    const { id, status } = await request.json();
+
+    if (!id || !status) {
+      return new NextResponse('Missing id or status', { status: 400 });
+    }
+
+    const allowedStatuses = ['pending', 'approved', 'rejected'];
+    if (!allowedStatuses.includes(status)) {
+      return new NextResponse('Invalid status', { status: 400 });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { studentStatus: status },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return new NextResponse('User not found', { status: 404 });
+    }
+
+    if (updatedUser.studentStatus !== status) {
+      return NextResponse.json({ message: "Status not saved. Please check if 'studentStatus' is defined in your User schema." }, { status: 500 });
+    }
+
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error('[PUT_STUDENT_STATUS]', error);
+    return new NextResponse('Internal Server Error', { status: 500 });
+  }
 }

@@ -19,6 +19,7 @@ import { LayoutDashboard, BookOpen, User, LogOut, Menu, ClipboardList, AlertCirc
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
+import UserProfileMenu from '@/components/UserProfileMenu';
 
 const drawerWidth = 240;
 
@@ -170,7 +171,7 @@ export default function TeacherLayout({
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>{userName}</Typography>
-            <Avatar sx={{ bgcolor: 'primary.main' }}>{userInitial}</Avatar>
+            <UserProfileMenu userType="teacher" />
           </Box>
         </Toolbar>
       </AppBar>

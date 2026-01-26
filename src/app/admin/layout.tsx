@@ -19,6 +19,7 @@ import { LayoutDashboard, Users, School, LogOut, Menu, Sparkles, Receipt, UserCh
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
+import UserProfileMenu from '@/components/UserProfileMenu';
 
 const drawerWidth = 240;
 
@@ -146,7 +147,7 @@ export default function AdminLayout({
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>{userName}</Typography>
-            <Avatar sx={{ bgcolor: 'primary.main' }}>{userInitial}</Avatar>
+            <UserProfileMenu userType="admin" />
           </Box>
         </Toolbar>
       </AppBar>

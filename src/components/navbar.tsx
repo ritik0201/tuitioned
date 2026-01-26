@@ -5,19 +5,14 @@ import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import {
     Button,
-    Avatar,
-    Menu as MuiMenu,
-    MenuItem,
-    ListItemIcon,
-    ListItemText,
-    Divider,
 } from '@mui/material';
-import { Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import LoginModal from './LoginModal';
 import SignUpModal from './SignUpModal';
 import TeacherAuthModal from './TeacherAuthModal';
 import TeacherSignInModal from './TeacherSignInModal';
 import TeacherSignUpModal from './TeacherSignUpModal';
+import UserProfileMenu from './UserProfileMenu';
 import { useUI } from '@/provider/UIProvider';
 
 const Logo = () => (
@@ -37,34 +32,11 @@ const Navbar = () => {
     const { data: session, status } = useSession();
     const { activeModal, openModal, closeModal, switchModal } = useUI();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [isClient, setIsClient] = useState(false);
-    const isUserMenuOpen = Boolean(anchorEl);
-
-    const handleUserMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleUserMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleLogout = () => {
-        handleUserMenuClose();
-        signOut({ callbackUrl: '/' });
-    };
 
     useEffect(() => {
         setIsClient(true);
     }, []);
-
-    const getInitials = (name: string = "") => {
-        return name
-            .split(' ')
-            .map((n) => n[0])
-            .join('')
-            .toUpperCase();
-    };
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-lg">
@@ -79,32 +51,7 @@ const Navbar = () => {
                 <div className="hidden md:flex items-center gap-2">
                     {status === 'authenticated' ? (
                         <>
-                            <Button
-                                onClick={handleUserMenuOpen}
-                                sx={{ borderRadius: '9999px', p: 0.5, minWidth: 0 }}
-                            >
-                                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}>
-                                    {getInitials(session.user?.fullName)}
-                                </Avatar>
-                            </Button>
-                            <MuiMenu
-                                anchorEl={anchorEl}
-                                open={isUserMenuOpen}
-                                onClose={handleUserMenuClose}
-                                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-                                PaperProps={{ sx: { mt: 1.5, bgcolor: '#1f2937', color: 'white', borderRadius: 2 } }}
-                            >
-                                <MenuItem component={Link} href="/dashboard" onClick={handleUserMenuClose}>
-                                    <ListItemIcon><LayoutDashboard size={20} className="text-white/70" /></ListItemIcon>
-                                    <ListItemText>Dashboard</ListItemText>
-                                </MenuItem>
-                                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
-                                <MenuItem onClick={handleLogout}>
-                                    <ListItemIcon><LogOut size={20} className="text-white/70" /></ListItemIcon>
-                                    <ListItemText>Logout</ListItemText>
-                                </MenuItem>
-                            </MuiMenu>
+                            <UserProfileMenu userType="student" showDashboardLink={true} dashboardHref="/dashboard" />
                         </>
                     ) : (<>
                         <Button
