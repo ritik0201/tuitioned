@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type Student = {
   id: string
@@ -42,6 +43,31 @@ export type Student = {
   email: string
   mobile: string,
   studentStatus: 'pending' | 'approved' | 'rejected'
+}
+
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = React.useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQueryList = window.matchMedia(query);
+    const listener = (event: MediaQueryListEvent) => {
+      setMatches(event.matches);
+    };
+
+    setMatches(mediaQueryList.matches);
+
+    mediaQueryList.addEventListener('change', listener);
+    return () => {
+      mediaQueryList.removeEventListener('change', listener);
+    };
+  }, [query]);
+
+  return matches;
 }
 
 export default function SignupStudentDataTable() {
@@ -56,6 +82,12 @@ export default function SignupStudentDataTable() {
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [isMigrating, setIsMigrating] = React.useState(false);
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  React.useEffect(() => {
+    setColumnVisibility(isDesktop ? {} : { id: false, email: false, mobile: false, studentStatus: false });
+  }, [isDesktop]);
 
   const fetchStudents = React.useCallback(async () => {
     try {
@@ -295,11 +327,15 @@ export default function SignupStudentDataTable() {
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center">
-                      Loading students...
-                    </TableCell>
-                  </TableRow>
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <TableRow key={`skeleton-row-${i}`}>
+                      {table.getVisibleLeafColumns().map(column => (
+                        <TableCell key={column.id}>
+                          <Skeleton className="h-6 w-full" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
                 ) : error ? (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">{error}</TableCell>

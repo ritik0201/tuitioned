@@ -14,6 +14,8 @@ import {
   CardHeader,
   Paper,
   Chip,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
 import {
   User,
@@ -37,6 +39,7 @@ import CourseMessageModal from "@/components/CourseMessageModal";
 import { CourseDetails } from "@/types/admin";
 import { ITransaction } from "@/models/Transaction";
 import AdminCourseEditModal from "@/components/AdminCourseEditModal";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CompletedClass {
   _id: string;
@@ -44,6 +47,119 @@ interface CompletedClass {
   duration?: number;
   completedAt: string;
   homeworkFile?: string;
+}
+
+function CourseDetailSkeleton() {
+  return (
+    <Box sx={{ maxWidth: "1200px", mx: "auto", p: 3 }}>
+      <Skeleton className="h-10 w-32 mb-3 bg-gray-800" />
+
+      {/* Header Skeleton */}
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 2, md: 3 },
+          mb: 4,
+          borderRadius: 3,
+          bgcolor: '#1f2937',
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", sm: "center" },
+          gap: 2,
+          border: '1px solid rgba(59, 130, 246, 0.5)'
+        }}
+      >
+        <Box>
+          <Skeleton className="h-10 w-64 mb-2 bg-gray-700" />
+          <Skeleton className="h-6 w-32 bg-gray-700" />
+        </Box>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Skeleton className="h-10 w-32 bg-gray-700" />
+          <Skeleton className="h-10 w-32 bg-gray-700" />
+        </Box>
+      </Paper>
+
+      {/* Main Content Skeleton */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {/* Top row of cards */}
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
+          {[1, 2, 3].map((i) => (
+            <Box key={i} sx={{ flex: 1, width: '100%' }}>
+              <Card variant="outlined" sx={{ borderRadius: 3, height: '100%', bgcolor: '#1f2937', borderColor: 'rgba(255,255,255,0.1)' }}>
+                <CardHeader title={<Skeleton className="h-6 w-40 bg-gray-700" />} />
+                <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+                <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                  {[1, 2, 3, 4].map((j) => (
+                    <Box key={j} sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Skeleton className="h-5 w-5 rounded bg-gray-700" />
+                      <Box sx={{ flex: 1 }}>
+                        <Skeleton className="h-3 w-20 mb-1 bg-gray-700" />
+                        <Skeleton className="h-4 w-32 bg-gray-700" />
+                      </Box>
+                    </Box>
+                  ))}
+                </CardContent>
+              </Card>
+            </Box>
+          ))}
+        </Box>
+
+        {/* Description Skeleton */}
+        <Box>
+          <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: '#1f2937', borderColor: 'rgba(255,255,255,0.1)' }}>
+            <CardHeader title={<Skeleton className="h-6 w-48 bg-gray-700" />} />
+            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+            <CardContent>
+              <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
+              <Skeleton className="h-4 w-full mb-2 bg-gray-700" />
+              <Skeleton className="h-4 w-3/4 bg-gray-700" />
+            </CardContent>
+          </Card>
+        </Box>
+
+        {/* Transaction History Skeleton */}
+        <Box>
+          <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: '#1f2937', borderColor: 'rgba(255,255,255,0.1)' }}>
+            <CardHeader
+              title={<Skeleton className="h-6 w-48 bg-gray-700" />}
+              action={<Skeleton className="h-8 w-24 bg-gray-700" />}
+            />
+            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+            <CardContent>
+               <Skeleton className="h-20 w-full bg-gray-700 rounded-md" />
+            </CardContent>
+          </Card>
+        </Box>
+
+        {/* Completed Classes History Skeleton */}
+        <Box>
+          <Card variant="outlined" sx={{ borderRadius: 3, bgcolor: '#1f2937', borderColor: 'rgba(255,255,255,0.1)' }}>
+            <CardHeader title={<Skeleton className="h-6 w-56 bg-gray-700" />} />
+            <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+            <CardContent>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {[1, 2].map((i) => (
+                  <Paper key={i} variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#374151', borderColor: 'rgba(255,255,255,0.1)' }}>
+                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Box>
+                           <Skeleton className="h-5 w-48 mb-2 bg-gray-700" />
+                           <Skeleton className="h-8 w-32 bg-gray-700" />
+                        </Box>
+                        <Box sx={{ textAlign: 'right' }}>
+                           <Skeleton className="h-4 w-24 mb-1 bg-gray-700" />
+                           <Skeleton className="h-3 w-16 bg-gray-700" />
+                        </Box>
+                     </Box>
+                  </Paper>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
+        </Box>
+      </Box>
+    </Box>
+  );
 }
 
 export default function AdminCourseDetailPage() {
@@ -56,6 +172,8 @@ export default function AdminCourseDetailPage() {
   const [transactions, setTransactions] = useState<ITransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false); // New state for edit modal
 
@@ -95,11 +213,7 @@ export default function AdminCourseDetailPage() {
   }, [courseId]);
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <CourseDetailSkeleton />;
   }
 
   if (error) {
@@ -257,37 +371,44 @@ export default function AdminCourseDetailPage() {
               }
             />
             <Divider />
-            {/* <CardContent>
+            <CardContent>
               {transactions.length > 0 ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                   {transactions.map((tx) => ( 
-                    <Paper key={tx._id.toString()} variant="outlined" sx={{ p: 2, borderRadius: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Box>
-                        <Typography variant="body1" fontWeight="500">
-                          {tx.numberOfClasses} {tx.numberOfClasses > 1 ? 'classes' : 'class'} added
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                    <Paper 
+                      key={tx._id.toString()} 
+                      variant="outlined" 
+                      sx={{ 
+                        p: 2, 
+                        borderRadius: 2, 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        alignItems: 'center',
+                        bgcolor: '#374151', 
+                        borderColor: 'rgba(255,255,255,0.1)'
+                      }}
+                    >
+                      {isMobile ? (
+                        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                           <CreditCard size={14} /> {tx.transactionId}
                         </Typography>
-                      </Box>
-                      <Box textAlign="right">
-                        <Chip
-                          label={tx.paymentStatus.toUpperCase()}
-                          size="small"
-                          color={
-                            tx.paymentStatus === 'completed' ? 'success' :
-                            tx.paymentStatus === 'pending' ? 'warning' : 'error'
-                          }
-                          variant="outlined"
-                          sx={{ mb: 0.5 }}
-                        />
-                        <Typography variant="body1" fontWeight="500">
-                          ₹{tx.amount.toFixed(2)}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {new Date(tx.createdAt).toLocaleString()}
-                        </Typography>
-                      </Box>
+                      ) : (
+                        <>
+                          <Box>
+                            <Typography variant="body1" fontWeight="500">
+                              {tx.numberOfClasses} {tx.numberOfClasses > 1 ? 'classes' : 'class'} added
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                              <CreditCard size={14} /> {tx.transactionId}
+                            </Typography>
+                          </Box>
+                          <Box textAlign="right">
+                            <Chip label={tx.paymentStatus.toUpperCase()} size="small" color={ tx.paymentStatus === 'completed' ? 'success' : tx.paymentStatus === 'pending' ? 'warning' : 'error' } variant="outlined" sx={{ mb: 0.5 }} />
+                            <Typography variant="body1" fontWeight="500">₹{tx.amount.toFixed(2)}</Typography>
+                            <Typography variant="caption" color="text.secondary">{new Date(tx.createdAt).toLocaleString()}</Typography>
+                          </Box>
+                        </>
+                      )}
                     </Paper>
                   ))}
                 </Box>
@@ -296,7 +417,7 @@ export default function AdminCourseDetailPage() {
                   No transactions found for this course.
                 </Alert>
               )}
-            </CardContent> */}
+            </CardContent>
           </Card>
         </Box>
 

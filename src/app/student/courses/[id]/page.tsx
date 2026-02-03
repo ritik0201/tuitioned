@@ -36,6 +36,7 @@ import Calendar from "@/components/lightswind/calendar";
 import { toast } from "sonner";
 import CourseMessageModal from "@/components/CourseMessageModal";
 import { type RazorpayOptions } from "@/types/global";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ICourse { 
   _id: string;
@@ -75,6 +76,43 @@ const statusColors = {
   completed: "bg-green-100 text-green-700 border-green-400",
   failed: "bg-red-100 text-red-700 border-red-400",
 };
+
+function CourseDetailSkeleton() {
+  return (
+    <Box sx={{ maxWidth: "1200px", mx: "auto", p: { xs: 2, sm: 3, lg: 4 } }}>
+      <Skeleton className="h-10 w-32 mb-6 bg-gray-800" />
+
+      {/* Class Management Bar */}
+      <Skeleton className="h-20 w-full rounded-xl mb-8 bg-gray-800 border-blue-500/30 border" />
+
+      {/* Main Content */}
+      <div className="flex flex-col md:flex-row gap-6 mt-2">
+        {/* Left Section */}
+        <div className="flex-1">
+          <Skeleton className="h-[400px] w-full rounded-xl bg-gray-800 border-blue-500/30 border" />
+        </div>
+        {/* Right Section */}
+        <div className="md:w-[35%] flex flex-col">
+          <Skeleton className="h-[300px] w-full rounded-xl bg-gray-800 border-blue-500/30 border" />
+        </div>
+      </div>
+
+      {/* Progress Section */}
+      <div className="flex flex-col md:flex-row gap-6 mt-8">
+         <Skeleton className="flex-1 h-64 rounded-xl bg-gray-800 border-blue-500/30 border" />
+         <Skeleton className="md:w-[40%] h-64 rounded-xl bg-gray-800 border-blue-500/30 border" />
+      </div>
+
+      {/* Completed Classes */}
+      <div className="mt-8 space-y-4">
+        <Skeleton className="h-8 w-64 mb-4 bg-gray-800" />
+        {[1, 2, 3].map((i) => (
+          <Skeleton key={i} className="h-24 w-full rounded-xl bg-gray-800 border-blue-500/30 border" />
+        ))}
+      </div>
+    </Box>
+  )
+}
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -156,11 +194,7 @@ export default function CourseDetailPage() {
   }, [courseId, notFound, searchParams]);
 
   if (loading) {
-    return (
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <CourseDetailSkeleton />;
   }
 
   if (error) {

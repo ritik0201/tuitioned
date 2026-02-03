@@ -10,6 +10,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   SortingState,
+  VisibilityState,
   useReactTable,
 } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react";
@@ -24,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type Transaction = {
   id: string;
@@ -34,12 +36,40 @@ export type Transaction = {
   date: string;
 }
 
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = React.useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQueryList = window.matchMedia(query);
+    const listener = (event: MediaQueryListEvent) => {
+      setMatches(event.matches);
+    };
+
+    setMatches(mediaQueryList.matches);
+
+    mediaQueryList.addEventListener('change', listener);
+    return () => {
+      mediaQueryList.removeEventListener('change', listener);
+    };
+  }, [query]);
+
+  return matches;
+}
+
 export default function TransactionDataTable() {
   const [data, setData] = React.useState<Transaction[]>([])
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const columns: ColumnDef<Transaction>[] = [
     {
@@ -76,6 +106,10 @@ export default function TransactionDataTable() {
   ]
 
   React.useEffect(() => {
+    setColumnVisibility(isDesktop ? {} : { studentName: false, amount: false, status: false, date: false });
+  }, [isDesktop]);
+
+  React.useEffect(() => {
     const fetchTransactions = async () => {
       try {
         setLoading(true)
@@ -103,9 +137,11 @@ export default function TransactionDataTable() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
   })
 
@@ -141,7 +177,15 @@ export default function TransactionDataTable() {
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  <TableRow><TableCell colSpan={columns.length} className="h-20 md:h-24 text-center">Loading transactions...</TableCell></TableRow>
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <TableRow key={`skeleton-row-${i}`}>
+                      {table.getVisibleLeafColumns().map(column => (
+                        <TableCell key={column.id}>
+                          <Skeleton className="h-6 w-full" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
                 ) : error ? (
                   <TableRow><TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">{error}</TableCell></TableRow>
                 ) : table.getRowModel().rows?.length ? (

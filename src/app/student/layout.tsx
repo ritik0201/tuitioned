@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import UserProfileMenu from '@/components/UserProfileMenu';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const drawerWidth = 240;
 
@@ -41,7 +42,7 @@ export default function StudentLayout({
     setMobileOpen(!mobileOpen);
   };
 
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const { userName, userInitial } = useMemo(() => {
     const name = session?.user?.fullName || 'User';
@@ -142,7 +143,11 @@ export default function StudentLayout({
             <Typography variant="h6" noWrap component="div">Student Portal</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>{userName}</Typography>
+            {status === 'loading' ? (
+              <Skeleton className="h-6 w-32 bg-gray-700 hidden sm:block" />
+            ) : (
+              <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>{userName}</Typography>
+            )}
             <UserProfileMenu userType="student" />
           </Box>
         </Toolbar>

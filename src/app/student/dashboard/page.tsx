@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { Typography, CircularProgress, Box, Alert } from "@mui/material";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Clock, BookCheck, Hourglass, PlusCircle, BookOpen, Users } from 'lucide-react';
 import Link from 'next/link';
@@ -33,37 +34,128 @@ interface AssignedCourse {
   paymentStatus: 'completed' | 'pending';
 }
 
+function DashboardSkeleton() {
+  return (
+    <div className='w-full space-y-8'>
+      {/* Header Skeleton */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <Skeleton className="h-8 w-48 mb-2" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-40" />
+      </div>
+
+      {/* Stat Cards Skeleton */}
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
+        {[...Array(3)].map((_, i) => (
+          <Card key={i} className="bg-gray-800 border-blue-500 border-2">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-4" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-8 w-10" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Assigned Courses Skeleton */}
+      <Card className="border-blue-500 border-2">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-8 w-28" />
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i} className="flex flex-col group bg-gray-800 border-blue-500 border-2">
+              <CardHeader className="pb-4">
+                <Skeleton className="h-5 w-40" />
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+              </CardContent>
+              <div className="p-6 pt-4 mt-auto flex flex-col sm:flex-row gap-2">
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </Card>
+          ))}
+        </CardContent>
+      </Card>
+      
+      {/* Demo Classes Skeleton */}
+      <Card className=" border-blue-500 border-2">
+        <CardHeader>
+          <Skeleton className="h-6 w-32" />
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i} className="flex flex-col bg-gray-800 border-blue-500 border-2">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <Skeleton className="h-5 w-24" />
+                  <Skeleton className="h-6 w-16" />
+                </div>
+                <Skeleton className="h-4 w-48 mt-2" />
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-28" />
+                </div>
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </CardContent>
+              <div className="p-6 pt-4 mt-auto">
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </Card>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function StudentDashboardPage() {
   const { data: session, status } = useSession();
   const [demoClasses, setDemoClasses] = useState<DemoClass[]>([]);
   const [assignedCourses, setAssignedCourses] = useState<AssignedCourse[]>([]);
-  const [isLoadingClasses, setIsLoadingClasses] = useState(true);
-  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (status === "authenticated") {
-      fetch('/api/demoClass')
-        .then(res => res.json())
-        .then(data => {
-          setDemoClasses(data || []);
-          setIsLoadingClasses(false);
-        });
-
-      fetch('/api/student-courses')
-        .then(res => res.json())
-        .then(data => {
-          setAssignedCourses(data || []);
-          setIsLoadingCourses(false);
-        });
+      Promise.all([
+        fetch('/api/demoClass').then(res => res.json()),
+        fetch('/api/student-courses').then(res => res.json())
+      ])
+      .then(([demoData, courseData]) => {
+        setDemoClasses(demoData || []);
+        setAssignedCourses(courseData || []);
+      })
+      .catch(console.error) // Basic error handling
+      .finally(() => setIsLoading(false));
+    } else if (status === "unauthenticated") {
+      setIsLoading(false);
     }
   }, [status]);
 
-  if (status === "loading") {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-        <CircularProgress />
-      </Box>
-    );
+  if (isLoading) {
+    return <DashboardSkeleton />;
   }
 
   if (status === "unauthenticated") {
@@ -127,11 +219,7 @@ export default function StudentDashboardPage() {
           </Link>
         </CardHeader>
         <CardContent>
-          {isLoadingCourses ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress size={24} />
-            </Box>
-          ) : assignedCourses.length > 0 ? (
+          {assignedCourses.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {assignedCourses.slice(0, 3).map((course) => (
                 <Card key={course._id} className="flex flex-col group bg-gray-800 border-blue-500 border-2">
@@ -175,11 +263,7 @@ export default function StudentDashboardPage() {
           <CardTitle>Trial Classes</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoadingClasses ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
-              <CircularProgress size={24} />
-            </Box>
-          ) : demoClasses.length > 0 ? (
+          {demoClasses.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {demoClasses.slice(0, 3).map((demo) => (
                 <Card key={demo._id} className="flex flex-col bg-gray-800 border-blue-500 border-2">

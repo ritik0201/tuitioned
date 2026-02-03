@@ -12,6 +12,7 @@ import {
   useReactTable,
   SortingState,
   ColumnFiltersState,
+  VisibilityState,
 } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -32,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Paper, Typography } from "@mui/material"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export type ApprovedTeacher = {
   id: string
@@ -42,12 +44,38 @@ export type ApprovedTeacher = {
   teacherStatus: string
 }
 
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = React.useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQueryList = window.matchMedia(query);
+    const listener = (event: MediaQueryListEvent) => {
+      setMatches(event.matches);
+    };
+
+    setMatches(mediaQueryList.matches);
+
+    mediaQueryList.addEventListener('change', listener);
+    return () => {
+      mediaQueryList.removeEventListener('change', listener);
+    };
+  }, [query]);
+
+  return matches;
+}
+
 export default function ApprovedTeachersPage() {
   const router = useRouter()
   const [data, setData] = React.useState<ApprovedTeacher[]>([])
   const [loading, setLoading] = React.useState(true)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
 
   React.useEffect(() => {
     const fetchTeachers = async () => {
@@ -65,6 +93,12 @@ export default function ApprovedTeachersPage() {
     }
     fetchTeachers()
   }, [])
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  React.useEffect(() => {
+    setColumnVisibility(isDesktop ? {} : { email: false, mobile: false, listOfSubjects: false, teacherStatus: false });
+  }, [isDesktop]);
 
   const columns: ColumnDef<ApprovedTeacher>[] = [
     {
@@ -108,6 +142,7 @@ export default function ApprovedTeachersPage() {
     },
     {
       id: "actions",
+      enableHiding: false,
       cell: ({ row }) => {
         const teacher = row.original
  
@@ -146,9 +181,11 @@ export default function ApprovedTeachersPage() {
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
   })
 
@@ -187,11 +224,15 @@ export default function ApprovedTeachersPage() {
           </TableHeader>
           <TableBody>
             {loading ? (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-gray-400">
-                  Loading...
-                </TableCell>
-              </TableRow>
+              Array.from({ length: 10 }).map((_, i) => (
+                <TableRow key={`skeleton-row-${i}`} className="border-gray-700">
+                  {table.getVisibleLeafColumns().map(column => (
+                    <TableCell key={column.id}>
+                      <Skeleton className="h-6 w-full bg-gray-700" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
             ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

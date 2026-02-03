@@ -35,6 +35,7 @@ import {
 import CreateCourseForm from "@/components/admin/CreateCourseForm";
 import { ICourse } from "@/models/Course";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
 export type StudentFromAPI = {
@@ -53,6 +54,80 @@ export type StudentFromAPI = {
   fatherName?: string;
   country?: string;
 };
+
+function StudentDetailSkeleton() {
+  return (
+    <Box sx={{ p: { xs: 2, md: 3 } }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
+        {/* Left Column Skeleton */}
+        <Box sx={{ flex: '1 1 400px', minWidth: 300 }}>
+          <Paper
+            elevation={0}
+            className="border-2 border-blue-500"
+            sx={{ p: { xs: 2, md: 3 }, borderRadius: 4, bgcolor: '#1f2937', height: '100%' }}
+          >
+            {/* Avatar and Name Skeleton */}
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: { xs: 2, sm: 3 }, mb: 3 }}>
+              <Skeleton className="h-20 w-20 rounded-full bg-gray-700" />
+              <Box>
+                <Skeleton className="h-8 w-48 mb-2 bg-gray-700" />
+                <Skeleton className="h-4 w-64 bg-gray-700" />
+              </Box>
+            </Box>
+            <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.1)' }} />
+            {/* Info Items Skeleton */}
+            {[...Array(6)].map((_, i) => (
+              <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1 }}>
+                <Skeleton className="h-5 w-5 rounded bg-gray-700" />
+                <Box className="flex-1">
+                  <Skeleton className="h-4 w-20 mb-1 bg-gray-700" />
+                  <Skeleton className="h-5 w-32 bg-gray-700" />
+                </Box>
+              </Box>
+            ))}
+          </Paper>
+        </Box>
+
+        {/* Right Column Skeleton */}
+        <Box sx={{ flex: '2 1 600px' }}>
+          <Paper
+            elevation={0}
+            className="border-2 border-blue-500"
+            sx={{ p: { xs: 2, md: 3 }, borderRadius: 4, bgcolor: '#1f2937' }}
+          >
+            {/* Header Skeleton */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, mb: 2 }}>
+              <Skeleton className="h-8 w-48 bg-gray-700" />
+              <Skeleton className="h-10 w-36 bg-gray-700 rounded-md" />
+            </Box>
+            <Divider sx={{ mb: 3, borderColor: 'rgba(255,255,255,0.1)' }} />
+            {/* Course Cards Skeleton */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
+              {[...Array(2)].map((_, i) => (
+                <Paper key={i} elevation={0} sx={{ p: 2.5, borderRadius: 3, bgcolor: '#374151', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <Skeleton className="h-6 w-3/5 bg-gray-700" />
+                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                        <Skeleton className="h-6 w-20 bg-gray-700 rounded-full" />
+                        <Skeleton className="h-5 w-5 bg-gray-700 rounded-full" />
+                      </Box>
+                    </Box>
+                    <Skeleton className="h-4 w-1/4 mt-1 bg-gray-700" />
+                    <Divider sx={{ my: 1.5, borderColor: 'rgba(255,255,255,0.1)' }} />
+                    <Skeleton className="h-4 w-1/2 mb-1 bg-gray-700" />
+                    <Skeleton className="h-4 w-1/3 bg-gray-700" />
+                  </Box>
+                  <Skeleton className="h-10 w-full mt-2 bg-gray-700 rounded-md" />
+                </Paper>
+              ))}
+            </Box>
+          </Paper>
+        </Box>
+      </Box>
+    </Box>
+  );
+}
 
 export default function StudentDetailPage({
   params,
@@ -108,11 +183,7 @@ export default function StudentDetailPage({
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-[70vh]">
-        <CircularProgress />
-      </div>
-    );
+    return <StudentDetailSkeleton />;
   }
 
   if (error) {

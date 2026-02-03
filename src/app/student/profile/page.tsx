@@ -15,6 +15,7 @@ import {
 } from '@mui/material'; // Removed the extra comma here
 import { Edit, Save, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface ProfileData {
   fullName: string;
@@ -28,6 +29,59 @@ interface ProfileData {
   };
   grade: string;
   fatherName: string;
+}
+
+function ProfileSkeleton() {
+  return (
+    <Paper
+      elevation={0}
+      className="border-2 border-blue-500"
+      sx={{ p: { xs: 2, md: 4 }, borderRadius: 4, bgcolor: '#1f2937' }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Skeleton className="h-10 w-48 bg-gray-700" />
+        <Skeleton className="h-10 w-32 bg-gray-700" />
+      </Box>
+
+      <Divider sx={{ my: 3, borderColor: 'rgba(255,255,255,0.1)' }} />
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', mx: -1.5 }}>
+        {[1, 2, 3, 4].map((i) => (
+          <Box key={i} sx={{ p: 1.5, width: { xs: '100%', sm: '50%' } }}>
+            <Skeleton className="h-14 w-full bg-gray-700 rounded-md" />
+          </Box>
+        ))}
+        
+        <Box sx={{ width: '100%', px: 1.5, py: 2 }}>
+             <div className="flex items-center gap-4">
+                <Skeleton className="h-[1px] flex-1 bg-gray-700" />
+                <Skeleton className="h-4 w-32 bg-gray-700" />
+                <Skeleton className="h-[1px] flex-1 bg-gray-700" />
+             </div>
+        </Box>
+
+        {[1, 2].map((i) => (
+          <Box key={`add-${i}`} sx={{ p: 1.5, width: { xs: '100%', sm: '50%' } }}>
+            <Skeleton className="h-14 w-full bg-gray-700 rounded-md" />
+          </Box>
+        ))}
+
+        <Box sx={{ width: '100%', px: 1.5, py: 2 }}>
+             <div className="flex items-center gap-4">
+                <Skeleton className="h-[1px] flex-1 bg-gray-700" />
+                <Skeleton className="h-4 w-24 bg-gray-700" />
+                <Skeleton className="h-[1px] flex-1 bg-gray-700" />
+             </div>
+        </Box>
+
+        {[1, 2, 3].map((i) => (
+          <Box key={`addr-${i}`} sx={{ p: 1.5, width: { xs: '100%', sm: '50%' } }}>
+            <Skeleton className="h-14 w-full bg-gray-700 rounded-md" />
+          </Box>
+        ))}
+      </Box>
+    </Paper>
+  );
 }
 
 const StudentProfilePage = () => {
@@ -123,11 +177,7 @@ const StudentProfilePage = () => {
   };
 
   if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
-        <CircularProgress />
-      </Box>
-    );
+    return <ProfileSkeleton />;
   }
 
   if (error && !profile) {

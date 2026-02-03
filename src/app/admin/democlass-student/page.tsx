@@ -36,6 +36,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner"
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type DemoClassBooking = {
   _id: string
@@ -52,6 +53,31 @@ export type DemoClassBooking = {
   timeZone?: string;
 }
 
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = React.useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const mediaQueryList = window.matchMedia(query);
+    const listener = (event: MediaQueryListEvent) => {
+      setMatches(event.matches);
+    };
+
+    setMatches(mediaQueryList.matches);
+
+    mediaQueryList.addEventListener('change', listener);
+    return () => {
+      mediaQueryList.removeEventListener('change', listener);
+    };
+  }, [query]);
+
+  return matches;
+}
+
 export default function DemoClassStudentTable() {
   const router = useRouter()
   const [data, setData] = React.useState<DemoClassBooking[]>([])
@@ -60,6 +86,18 @@ export default function DemoClassStudentTable() {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  React.useEffect(() => {
+    setColumnVisibility(isDesktop ? {} : { 
+      studentId: false, 
+      email: false, 
+      topic: false, 
+      bookingDateAndTime: false, 
+      status: false 
+    });
+  }, [isDesktop]);
 
   const handleStatusUpdate = async (id: string, newStatus: DemoClassBooking['status']) => {
     try {
@@ -120,11 +158,13 @@ export default function DemoClassStudentTable() {
     },
     {
       accessorKey: "studentId._id",
+      id: "studentId",
       header: "Student ID",
       cell: ({ row }) => row.original.studentId?._id ?? "N/A",
     },
     {
       accessorKey: "studentId.email",
+      id: "email",
       header: "Email",
       cell: ({ row }) => row.original.studentId?.email ?? "N/A",
     },
@@ -285,11 +325,15 @@ export default function DemoClassStudentTable() {
               </TableHeader>
               <TableBody>
                 {loading ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center">
-                      Loading...
-                    </TableCell>
-                  </TableRow>
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <TableRow key={`skeleton-row-${i}`}>
+                      {table.getVisibleLeafColumns().map(column => (
+                        <TableCell key={column.id}>
+                          <Skeleton className="h-6 w-full" />
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
                 ) : error ? (
                   <TableRow>
                     <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">
