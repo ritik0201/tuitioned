@@ -49,7 +49,7 @@ export default function RootLayout({
               "@type": "Organization",
               name: "TuitionEd", 
               url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-              logo: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/logo.png`,
+              logo: "/logo.png",
             }),
           }}
         />
