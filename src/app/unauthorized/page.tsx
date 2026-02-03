@@ -22,7 +22,7 @@ export default function UnauthorizedPage() {
           <div className="space-y-2">
             <p className="text-lg font-medium text-gray-200">Unauthorized Access</p>
             <p className="text-sm text-gray-400">
-              You do not have the necessary permissions to view this page. Please contact your administrator if you believe this is an error.
+              You do not have the necessary permissions to view this current page. Please contact your administrator if you believe this is an error.
             </p>
           </div>
           
