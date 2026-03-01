@@ -3,23 +3,31 @@ import "./globals.css";
 import { AppProviders } from "@/provider/AppProviders";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import { Toaster } from 'sonner';
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Toaster } from "sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from "next/script";
+
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+  ),
   title: {
     default: "TuitionEd - Online Tutoring",
     template: `%s | TuitionEd - Online Tutoring`,
   },
-  description: "Expert Online Tutoring for personal and academic growth.",
+  description:
+    "Expert Online Tutoring for personal and academic growth.",
   icons: {
     icon: "/logo.png",
   },
   openGraph: {
     title: "TuitionEd",
-    description: "Expert Online Tutoring for personal and academic growth.",
-    url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+    description:
+      "Expert Online Tutoring for personal and academic growth.",
+    url:
+      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
     siteName: "TuitionEd",
     images: [
       {
@@ -41,19 +49,23 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <head>
+        {/* Structured Data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "TuitionEd", 
-              url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+              name: "TuitionEd",
+              url:
+                process.env.NEXT_PUBLIC_BASE_URL ||
+                "http://localhost:3000",
               logo: "/logo.png",
             }),
           }}
         />
       </head>
+
       <body>
         <AppProviders>
           <Navbar />
@@ -61,7 +73,26 @@ export default function RootLayout({
           <Toaster richColors />
           <Footer />
         </AppProviders>
+
         <SpeedInsights />
+
+        {/* Google Analytics */}
+        {GA_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){window.dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GA_ID}');
+              `}
+            </Script>
+          </>
+        )}
       </body>
     </html>
   );
