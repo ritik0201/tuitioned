@@ -20,7 +20,7 @@ if (!cached) {
 async function dbConnect(): Promise<Mongoose> {
   if (!MONGODB_URI) {
     // Avoid throwing at module-evaluation time so Next/Turbopack can build.
-    // The connection will be skipped in environments without the variable.
+    // The connection will be skipped in environments without the variable.  mm
     console.warn('MONGODB_URI not defined — skipping DB connection (likely build phase).');
     return {} as Mongoose;
   }
