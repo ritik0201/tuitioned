@@ -6,14 +6,6 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import nodemailer from 'nodemailer';
 
-interface DemoClassUpdateData {
-  status?: string;
-  teacherId?: string;
-  joinLink?: string;
-  bookingDateAndTime?: Date;
-  timeZone?: string;
-}
-
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -45,11 +37,7 @@ export async function GET(request: Request) {
     return NextResponse.json(demoClasses);
   } catch (error: any) {
     console.error('API GET Error:', error);
-    const errorMessage = process.env.NODE_ENV === 'development' ? error.message : 'Server Error';
-    return NextResponse.json(
-      { success: false, message: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message: 'Server Error' }, { status: 500 });
   }
 }
 
@@ -70,13 +58,12 @@ export async function POST(request: Request) {
 
     // Validation for fields coming from the form
     const { fatherName, email, grade, subject, topic, city, country, bookingDateAndTime } = body;
-    if (!fatherName) return NextResponse.json({ success: false, message: "Father's Name is required." }, { status: 400 });
-    if (!email) return NextResponse.json({ success: false, message: "Email is required." }, { status: 400 });
-    if (!grade) return NextResponse.json({ success: false, message: "Grade is required." }, { status: 400 });
-    if (!subject) return NextResponse.json({ success: false, message: "Subject is required." }, { status: 400 });
-    if (!city) return NextResponse.json({ success: false, message: "City is required." }, { status: 400 });
-    if (!country) return NextResponse.json({ success: false, message: "Country is required." }, { status: 400 });
-    if (!bookingDateAndTime) return NextResponse.json({ success: false, message: "Booking Date and Time is required." }, { status: 400 });
+    if (!fatherName || !email || !grade || !subject || !city || !country || !bookingDateAndTime) {
+      return NextResponse.json(
+        { success: false, message: 'Missing required fields.' },
+        { status: 400 }
+      );
+    }
 
     // If 'other' is the subject, ensure otherSubject is provided
     if (subject === 'other' && !body.otherSubject) {
@@ -84,12 +71,6 @@ export async function POST(request: Request) {
             { success: false, message: 'Please specify the subject.' },
             { status: 400 }
         );
-    }
-
-    // Check for email credentials
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error('Email credentials are not configured in environment variables.');
-      return NextResponse.json({ success: false, message: 'Server is not configured to send emails.' }, { status: 500 });
     }
 
     const dateObj = new Date(bookingDateAndTime);
@@ -147,7 +128,7 @@ export async function POST(request: Request) {
     // Send notification email to admin
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: process.env.ADMIN_EMAILS || "admin@example.com",
+      to: "ritikkatsa2005@gmail.com, adityayadav114@gmail.com, tuitioned01@gmail.com",
       subject: "New Demo Class Request!",
       html: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f4f4f5; padding: 20px; border-radius: 10px;">
@@ -209,11 +190,9 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error('API POST Error:', error);
-    // In production, avoid sending back raw error messages
-    const errorMessage = process.env.NODE_ENV === 'development' ? error.message : 'Server Error';
+    console.error('API Error:', error);
     return NextResponse.json(
-      { success: false, message: errorMessage },
+      { success: false, message: error.message || 'Server Error' },
       { status: 500 }
     );
   }
@@ -241,7 +220,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    const updateData: DemoClassUpdateData = {};
+    const updateData: any = {};
     if (status) updateData.status = status;
     if (teacherId) {
       const teacher = await User.findById(teacherId);
@@ -270,10 +249,6 @@ export async function PUT(request: Request) {
     return NextResponse.json({ success: true, data: updatedDemoClass }, { status: 200 });
   } catch (error: any) {
     console.error('API PUT Error:', error);
-    const errorMessage = process.env.NODE_ENV === 'development' ? error.message : 'Server Error';
-    return NextResponse.json(
-      { success: false, message: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message: 'Server Error' }, { status: 500 });
   }
 }
