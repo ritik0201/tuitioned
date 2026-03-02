@@ -6,6 +6,14 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import nodemailer from 'nodemailer';
 
+interface DemoClassUpdateData {
+  status?: string;
+  teacherId?: string;
+  joinLink?: string;
+  bookingDateAndTime?: Date;
+  timeZone?: string;
+}
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -37,7 +45,11 @@ export async function GET(request: Request) {
     return NextResponse.json(demoClasses);
   } catch (error: any) {
     console.error('API GET Error:', error);
-    return NextResponse.json({ success: false, message: 'Server Error' }, { status: 500 });
+    const errorMessage = process.env.NODE_ENV === 'development' ? error.message : 'Server Error';
+    return NextResponse.json(
+      { success: false, message: errorMessage },
+      { status: 500 }
+    );
   }
 }
 
@@ -72,6 +84,12 @@ export async function POST(request: Request) {
             { success: false, message: 'Please specify the subject.' },
             { status: 400 }
         );
+    }
+
+    // Check for email credentials
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error('Email credentials are not configured in environment variables.');
+      return NextResponse.json({ success: false, message: 'Server is not configured to send emails.' }, { status: 500 });
     }
 
     const dateObj = new Date(bookingDateAndTime);
@@ -129,7 +147,7 @@ export async function POST(request: Request) {
     // Send notification email to admin
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: "ritikkatsa2005@gmail.com, adityayadav114@gmail.com, tuitioned01@gmail.com",
+      to: process.env.ADMIN_EMAILS || "admin@example.com",
       subject: "New Demo Class Request!",
       html: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f4f4f5; padding: 20px; border-radius: 10px;">
@@ -191,9 +209,11 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error: any) {
-    console.error('API Error:', error);
+    console.error('API POST Error:', error);
+    // In production, avoid sending back raw error messages
+    const errorMessage = process.env.NODE_ENV === 'development' ? error.message : 'Server Error';
     return NextResponse.json(
-      { success: false, message: error.message || 'Server Error' },
+      { success: false, message: errorMessage },
       { status: 500 }
     );
   }
@@ -221,7 +241,7 @@ export async function PUT(request: Request) {
       );
     }
 
-    const updateData: any = {};
+    const updateData: DemoClassUpdateData = {};
     if (status) updateData.status = status;
     if (teacherId) {
       const teacher = await User.findById(teacherId);
@@ -250,6 +270,10 @@ export async function PUT(request: Request) {
     return NextResponse.json({ success: true, data: updatedDemoClass }, { status: 200 });
   } catch (error: any) {
     console.error('API PUT Error:', error);
-    return NextResponse.json({ success: false, message: 'Server Error' }, { status: 500 });
+    const errorMessage = process.env.NODE_ENV === 'development' ? error.message : 'Server Error';
+    return NextResponse.json(
+      { success: false, message: errorMessage },
+      { status: 500 }
+    );
   }
 }
