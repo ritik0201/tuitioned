@@ -169,7 +169,7 @@ export default function FreeTrialPage() {
                   placeholder="Mobile Number"
                   required
                   value={formData.mobile}
-                  onChange={handlePhoneChange} //hii
+                  onChange={handlePhoneChange} 
                   international
                   countryCallingCodeEditable={false}
                   disabled={otpSent}
