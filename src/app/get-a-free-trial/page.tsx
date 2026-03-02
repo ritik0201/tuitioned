@@ -156,9 +156,9 @@ export default function FreeTrialPage() {
             {!session && (
               <>
                 <input
-                  name="Student fullName"
+                  name="fullName"
                   type="text"
-                  placeholder="Full Name"
+                  placeholder="Student Full Name"
                   required
                   value={formData.fullName || ""}
                   onChange={handleChange}

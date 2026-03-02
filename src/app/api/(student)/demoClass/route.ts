@@ -56,13 +56,24 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    // Validation for fields coming from the form
     const { fatherName, email, grade, subject, topic, city, country, bookingDateAndTime } = body;
-    if (!fatherName || !email || !grade || !subject || !city || !country || !bookingDateAndTime) {
-      return NextResponse.json(
-        { success: false, message: 'Missing required fields.' },
-        { status: 400 }
-      );
+
+    const requiredFields = {
+      fatherName: "Father's name is required.",
+      email: "Email is required.",
+      grade: "Grade is required.",
+      subject: "Subject is required.",
+      topic: "Topic is required.",
+      city: "City is required.",
+      country: "Country is required.",
+      bookingDateAndTime: "Booking date and time are required."
+    };
+
+    for (const field in requiredFields) {
+      if (!body[field]) {
+        const message = requiredFields[field as keyof typeof requiredFields];
+        return NextResponse.json({ success: false, message }, { status: 400 });
+      }
     }
 
     // If 'other' is the subject, ensure otherSubject is provided
