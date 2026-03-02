@@ -3,7 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import Course from '@/models/Course';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import mongoose from 'mongoose';
 import { sendEmail } from '@/lib/sendEmail';
 

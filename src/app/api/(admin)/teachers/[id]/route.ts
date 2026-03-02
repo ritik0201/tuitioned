@@ -3,7 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import Course from '@/models/Course';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(
   request: Request,

@@ -3,7 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import DemoClass from '@/models/DemoClass';
 import User from '@/models/User';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import nodemailer from 'nodemailer';
 
 export async function GET(request: Request) {

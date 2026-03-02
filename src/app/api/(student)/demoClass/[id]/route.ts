@@ -4,7 +4,7 @@ import DemoClass from '@/models/DemoClass';
 import User from '@/models/User';
 import mongoose, { Types } from 'mongoose';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 interface PopulatedDemoClass {
   _id: Types.ObjectId;

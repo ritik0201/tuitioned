@@ -3,7 +3,7 @@ import dbConnect from '@/lib/dbConnect';
 import User from '@/models/User';
 import DemoClass, { IDemoClass } from '@/models/DemoClass';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params; // ✅ Await here
