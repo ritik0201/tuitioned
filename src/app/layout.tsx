@@ -49,6 +49,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <head>
+        {/* Robots Meta Tag */}
+        <meta name="robots" content="noindex" />
+
         {/* Structured Data */}
         <script
           type="application/ld+json"
