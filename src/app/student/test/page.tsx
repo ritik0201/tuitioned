@@ -20,6 +20,7 @@ interface Question {
 export default function TestPage() {
   const [topic, setTopic] = useState('');
   const [numQuestions, setNumQuestions] = useState('5');
+  const [classLevel, setClassLevel] = useState('10');
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<number[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -32,6 +33,10 @@ export default function TestPage() {
       setError('Please enter a topic');
       return;
     }
+    if (!classLevel) {
+      setError('Please select a class level');
+      return;
+    }
 
     setIsGenerating(true);
     setError('');
@@ -40,7 +45,7 @@ export default function TestPage() {
     setIsSubmitted(false);
 
     try {
-      const prompt = `Generate ${numQuestions} multiple choice questions on the topic: ${topic}. Each question should have 4 options. Return the response as a valid JSON array of objects, where each object has:
+      const prompt = `Generate ${numQuestions} multiple choice questions for a grade ${classLevel} student on the topic: ${topic}. Each question should have 4 options. Return the response as a valid JSON array of objects, where each object has:
 - "question": string
 - "options": array of 4 strings
 - "correctAnswer": number (0-3 index of the correct option)
@@ -103,7 +108,7 @@ Do not include any other text, just the JSON array.`;
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex items-center gap-3 mb-8">
         <BrainCircuit className="h-8 w-8 text-orange-500" />
-        <h1 className="text-3xl font-bold">AI Test Generator</h1>
+        <h1 className="text-3xl font-bold">Generated Test</h1>
       </div>
 
       {!questions.length && !isGenerating && (
@@ -120,6 +125,28 @@ Do not include any other text, just the JSON array.`;
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
               />
+            </div>
+            <div>
+              <Label htmlFor="classLevel">Class</Label>
+              <Select value={classLevel} onValueChange={setClassLevel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a class" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1st Class</SelectItem>
+                  <SelectItem value="2">2nd Class</SelectItem>
+                  <SelectItem value="3">3rd Class</SelectItem>
+                  <SelectItem value="4">4th Class</SelectItem>
+                  <SelectItem value="5">5th Class</SelectItem>
+                  <SelectItem value="6">6th Class</SelectItem>
+                  <SelectItem value="7">7th Class</SelectItem>
+                  <SelectItem value="8">8th Class</SelectItem>
+                  <SelectItem value="9">9th Class</SelectItem>
+                  <SelectItem value="10">10th Class</SelectItem>
+                  <SelectItem value="11">11th Class</SelectItem>
+                  <SelectItem value="12">12th Class</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="numQuestions">Number of Questions</Label>
