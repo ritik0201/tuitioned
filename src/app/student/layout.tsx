@@ -27,7 +27,7 @@ const drawerWidth = 240;
 const navItems = [
   { text: 'Dashboard', icon: <LayoutDashboard size={20} />, href: '/student/dashboard' },
   { text: 'My Courses', icon: <BookOpen size={20} />, href: '/student/courses' },
-  // { text: 'AI Test', icon: <BrainCircuit size={20} />, href: '/student/test' },
+  { text: 'AI Test', icon: <BrainCircuit size={20} />, href: '/student/test' },
   { text: 'Profile', icon: <User size={20} />, href: '/student/profile' },
 ];
 
