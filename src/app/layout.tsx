@@ -5,6 +5,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { Toaster } from "sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import GeminiAI from "@/components/gemini-ai";
 import Script from "next/script";
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
@@ -75,6 +76,7 @@ export default function RootLayout({
           <div className="pt-16">{children}</div>
           <Toaster richColors />
           <Footer />
+          <GeminiAI />
         </AppProviders>
 
         <SpeedInsights />
