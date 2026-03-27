@@ -64,7 +64,7 @@ export default function Home() {
       {/* Background Grid */}
       <div className="absolute inset-0 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
 
-      {/* Spotlight Effect */}
+      {/* Spotlight Effect  hy*/}
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
 
       {/* Content */}
@@ -80,7 +80,7 @@ export default function Home() {
             <RippleButton className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-lg shadow-md border-white border-solid border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center">
                 Get a Free Trial
-                <GoArrowRight className="ml-2" />
+                <GoArrowRight className="ml-2" />  /
               </span>
             </RippleButton>
           </a>
