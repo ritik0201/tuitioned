@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AppProviders } from "@/provider/AppProviders";
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import MainLayout from "@/components/main-layout";
 import { Toaster } from "sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GeminiAI from "@/components/gemini-ai";
@@ -72,10 +71,10 @@ export default function RootLayout({
 
       <body>
         <AppProviders>
-          <Navbar />
-          <div className="pt-16">{children}</div>
           <Toaster richColors />
-          <Footer />
+          <MainLayout>
+            {children}
+          </MainLayout>
           <GeminiAI />
         </AppProviders>
 

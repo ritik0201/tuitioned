@@ -1,24 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react"; 
+import { useSession } from "next-auth/react";
 import { useParams, useRouter, notFound, useSearchParams } from "next/navigation";
-import {
-  CircularProgress,
-  Alert,
-  Box,
-  Button,
-  Paper,
-  Typography,
-  Chip,
-  Divider,
-} from "@mui/material";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
+import Link from "next/link";
 import {
   ArrowLeft,
   Calendar as CalendarIcon,
@@ -30,17 +15,35 @@ import {
   Plus,
   Minus,
   MessageSquare,
+  Download,
+  Rocket,
+  ShieldCheck,
+  TrendingUp,
+  Layout,
+  Target,
+  Sparkles
 } from "lucide-react";
-import { Download } from "lucide-react";
 import Calendar from "@/components/lightswind/calendar";
 import { toast } from "sonner";
 import CourseMessageModal from "@/components/CourseMessageModal";
 import { type RazorpayOptions } from "@/types/global";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-interface ICourse { 
+interface ICourse {
   _id: string;
-  studentId: string; // Add studentId to ICourse for message modal context
+  studentId: string;
   title: string;
   description: string;
   grade: string;
@@ -50,7 +53,7 @@ interface ICourse {
   perClassPrice: number;
   joinLink?: string;
   classroomLink?: string;
-  paymentStatus?: "pending" | "completed" | "failed"; // This is already here
+  paymentStatus?: "pending" | "completed" | "failed";
   teacherName?: string;
   teacherId?: string;
   createdAt: string;
@@ -71,47 +74,23 @@ interface ApiResponse {
   completedClasses: CompletedClass[];
 }
 
-const statusColors = {
-  pending: "bg-yellow-100 text-yellow-700 border-yellow-400",
-  completed: "bg-green-100 text-green-700 border-green-400",
-  failed: "bg-red-100 text-red-700 border-red-400",
-};
-
 function CourseDetailSkeleton() {
   return (
-    <Box sx={{ maxWidth: "1200px", mx: "auto", p: { xs: 2, sm: 3, lg: 4 } }}>
-      <Skeleton className="h-10 w-32 mb-6 bg-gray-800" />
-
-      {/* Class Management Bar */}
-      <Skeleton className="h-20 w-full rounded-xl mb-8 bg-gray-800 border-blue-500/30 border" />
-
-      {/* Main Content */}
-      <div className="flex flex-col md:flex-row gap-6 mt-2">
-        {/* Left Section */}
-        <div className="flex-1">
-          <Skeleton className="h-[400px] w-full rounded-xl bg-gray-800 border-blue-500/30 border" />
+    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-pulse">
+      <Skeleton className="h-10 w-32 bg-slate-800 rounded-xl" />
+      <Skeleton className="h-24 w-full bg-slate-800 rounded-[2rem]" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-8">
+          <Skeleton className="h-[400px] w-full bg-slate-800 rounded-[2.5rem]" />
+          <Skeleton className="h-[300px] w-full bg-slate-800 rounded-[2.5rem]" />
         </div>
-        {/* Right Section */}
-        <div className="md:w-[35%] flex flex-col">
-          <Skeleton className="h-[300px] w-full rounded-xl bg-gray-800 border-blue-500/30 border" />
+        <div className="space-y-8">
+          <Skeleton className="h-[250px] w-full bg-slate-800 rounded-[2.5rem]" />
+          <Skeleton className="h-[250px] w-full bg-slate-800 rounded-[2.5rem]" />
         </div>
       </div>
-
-      {/* Progress Section */}
-      <div className="flex flex-col md:flex-row gap-6 mt-8">
-         <Skeleton className="flex-1 h-64 rounded-xl bg-gray-800 border-blue-500/30 border" />
-         <Skeleton className="md:w-[40%] h-64 rounded-xl bg-gray-800 border-blue-500/30 border" />
-      </div>
-
-      {/* Completed Classes */}
-      <div className="mt-8 space-y-4">
-        <Skeleton className="h-8 w-64 mb-4 bg-gray-800" />
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-24 w-full rounded-xl bg-gray-800 border-blue-500/30 border" />
-        ))}
-      </div>
-    </Box>
-  )
+    </div>
+  );
 }
 
 export default function CourseDetailPage() {
@@ -127,14 +106,14 @@ export default function CourseDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false); // New state for message modal
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [classesToAdd, setClassesToAdd] = useState(6);
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setClassesToAdd(6); // Reset on close
+    setClassesToAdd(6);
   };
 
   const handleIncrease = () => setClassesToAdd((prev) => prev + 1);
@@ -144,7 +123,6 @@ export default function CourseDetailPage() {
     if (!courseId) return;
 
     const fetchCourseDetails = async () => {
-      // Load Razorpay script
       if (!document.getElementById("razorpay-script")) {
         const script = document.createElement("script");
         script.id = "razorpay-script";
@@ -180,10 +158,8 @@ export default function CourseDetailPage() {
 
     fetchCourseDetails();
 
-    // Check for payment retry parameters in the URL
     const retry = searchParams.get('retry');
     const classes = searchParams.get('classes');
-
     if (retry === 'true' && classes) {
       const numClasses = parseInt(classes, 10);
       if (!isNaN(numClasses) && numClasses > 0) {
@@ -191,51 +167,27 @@ export default function CourseDetailPage() {
         handleOpenModal();
       }
     }
-  }, [courseId, notFound, searchParams]);
-
-  if (loading) {
-    return <CourseDetailSkeleton />;
-  }
-
-  if (error) {
-    return <Alert severity="error" sx={{ m: 4 }}>{error}</Alert>;
-  }
-
-  if (!course) {
-    return notFound();
-  }
+  }, [courseId, searchParams]);
 
   const handleProcessPayment = async () => {
-    if (!session?.user) {
-      toast.error("You must be logged in to make a payment.");
+    if (!session?.user || !course) {
+      toast.error("Please login to proceed.");
       return;
     }
-    if (!course) {
-      toast.error("Course details not found.");
-      return;
-    }
-
     setIsProcessing(true);
-
     try {
-      // 1. Create a Razorpay order
       const res = await fetch("/api/razorpay/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: totalPrice,
-          // Using a shorter receipt ID to stay within Razorpay's 40-character limit.
           receipt: `rec_${course._id}_${Date.now() % 10000000}`,
         }),
       });
       const order = await res.json();
+      if (!res.ok) throw new Error(order.message || "Failed to create order.");
 
-      if (!res.ok) {
-        throw new Error(order.message || "Failed to create payment order.");
-      }
-
-      // 2. Create a pending transaction record in the database
-      const transactionRes = await fetch('/api/transactions', {
+      await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -243,26 +195,19 @@ export default function CourseDetailPage() {
           amount: totalPrice,
           numberOfClasses: classesToAdd,
           currency: order.currency,
-          transactionId: order.id, // Razorpay Order ID
+          transactionId: order.id,
           paymentGateway: 'Razorpay',
         }),
       });
 
-      if (!transactionRes.ok) {
-        console.error("Failed to create pending transaction record.");
-        // We can still proceed with payment, but this should be logged.
-      }
-
-      // 3. Open Razorpay checkout
       const options: RazorpayOptions & { modal: { ondismiss: () => void } } = {
         key: process.env.NEXT_PUBLIC_RP_KEY_ID ?? "",
         amount: order.amount,
         currency: order.currency,
         name: "Tuition ED",
-        description: `Payment for ${classesToAdd} extra classes for ${course.title}`,
+        description: `Adding ${classesToAdd} classes to ${course.title}`,
         order_id: order.id,
-        handler: async function (response) { // This handler is only called on successful payment
-          // 4. Verify payment and update database (which adds the classes)
+        handler: async function (response) {
           const updateRes = await fetch("/api/student-courses/update-classes", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -271,29 +216,21 @@ export default function CourseDetailPage() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
               courseId: course._id,
-              classesToAdd: classesToAdd, // Corrected parameter name
-              currentClasses: course.noOfClasses, // Pass current classes for safe calculation
-              paymentStatus: 'completed', // Set the new payment status for the course
+              classesToAdd,
+              currentClasses: course.noOfClasses,
+              paymentStatus: 'completed',
             }),
           });
 
           if (updateRes.ok) {
-            // 5. Update the transaction status to 'completed'
             await fetch('/api/transactions', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                transactionId: response.razorpay_order_id,
-                status: 'completed',
-              }),
+              body: JSON.stringify({ transactionId: response.razorpay_order_id, status: 'completed' }),
             });
-
-            toast.success("Payment successful! Your course has been updated.");
-            router.refresh(); // Refresh the page to show updated class count
+            toast.success("Success! Your course has been updated.");
+            router.refresh();
             handleCloseModal();
-          } else {
-            const errorData = await updateRes.json();
-            toast.error(errorData.message || "Failed to update course after payment.");
           }
         },
         prefill: {
@@ -304,596 +241,361 @@ export default function CourseDetailPage() {
         modal: {
           ondismiss: async () => {
             toast.info("Payment was cancelled.");
-            // Update the transaction to 'failed' since the user closed the modal
             await fetch('/api/transactions', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                transactionId: order.id,
-                status: 'failed',
-              }),
+              body: JSON.stringify({ transactionId: order.id, status: 'failed' }),
             });
           },
         },
-        theme: { color: "#4f46e5" }, // Indigo color
+        theme: { color: "#6366f1" },
       };
 
-      if (typeof window.Razorpay !== "function") {
-        toast.error("Razorpay SDK not loaded. Please try again in a moment.");
-        setIsProcessing(false);
-        return;
-      }
-
-      const rzp = new window.Razorpay(options);
+      const rzp = new (window as any).Razorpay(options);
       rzp.open();
-
     } catch (error: any) {
-      toast.error(error.message || "An unexpected error occurred.");
+      toast.error(error.message);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const totalPrice = course ? classesToAdd * course.perClassPrice : 0;
+  if (loading) return <div className="min-h-screen bg-slate-950"><CourseDetailSkeleton /></div>;
+  if (error) return <div className="min-h-screen bg-slate-950 flex p-8"><Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert></div>;
+  if (!course) return notFound();
+
+  const totalPrice = classesToAdd * course.perClassPrice;
   const completedDays = completedClasses.map(c => new Date(c.completedAt));
   const completedClassesCount = completedClasses.length;
-  const remainingClasses = course.noOfClasses;
-  const totalCourseClasses = remainingClasses + completedClassesCount;
+  const remainingClassesCount = course.noOfClasses;
+  const totalCourseClasses = remainingClassesCount + completedClassesCount;
   const completionPercentage = totalCourseClasses > 0 ? (completedClassesCount / totalCourseClasses) * 100 : 0;
 
   return (
-    <Box sx={{ maxWidth: "1200px", mx: "auto", p: { xs: 2, sm: 3, lg: 4 } }}>
-      <Button
-        startIcon={<ArrowLeft size={16} />}
-        onClick={() => router.back()}
-        sx={{ mb: 3, textTransform: "none", color: "text.secondary" }}
-      >
-        Back to Courses
-      </Button>
-
-      {/* === CLASS MANAGEMENT BAR === */}
-      <Box mb={4}>
-        <Paper
-          elevation={0}
-          className="border-blue-500 border"
-          sx={{
-            p: { xs: 2, sm: 2.5 },
-            borderRadius: 4,
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-            bgcolor: '#1f2937'
-          }}
-        >
-          <Typography variant="h6" fontWeight="medium" sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' }, textAlign: { xs: 'center', sm: 'left' }, width: { xs: '100%', sm: 'auto' } }}>
-            Manage Your Enrollment
-          </Typography>
-          <Box display="flex" alignItems="center" justifyContent={{ xs: 'center', sm: 'flex-end' }} gap={{ xs: 2, sm: 3 }} sx={{ width: { xs: '100%', sm: 'auto' } }}>
-            <Typography variant="body1">
-              <span className="font-semibold">{course.noOfClasses}</span> Classes 
-            </Typography>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<PlusCircle size={18} />}
-              onClick={handleOpenModal}
-            >
-              Add Classes
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
-
-
-      {/* === MAIN COURSE DETAILS SECTION === */}
-<Box
-  sx={{
-    display: "flex",
-    flexDirection: { xs: "column", md: "row" },
-    gap: { xs: 3, md: 4 },
-    mt: 2,
-  }}
->
-  {/* === LEFT SECTION === */}
-  <Box flex={1}>
-    <Paper
-      elevation={0}
-      className="border-blue-500 border"
-      sx={{
-        p: { xs: 2, sm: 3, md: 4 },
-        borderRadius: 4,
-        bgcolor: '#1f2937',
-      }}
-    >
-      {/* STATUS CHIP */}
-      <Chip
-        label={course.noOfClasses > 0 ? "RUNNING" : "PENDING"}
-        size="small"
-        color={
-          course.noOfClasses > 0
-            ? "success"
-            : "warning"
-        }
-        sx={{ mb: 2 }}
-      />
-
-      {/* COURSE TITLE & GRADE */}
-      <Typography
-        variant="h4"
-        fontWeight="bold"
-        gutterBottom
-        sx={{ color: "text.primary", fontSize: { xs: '1.75rem', sm: '2.125rem' } }}
-      >
-        {course.title}
-      </Typography>
-      <Typography variant="h6" color="text.secondary" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
-        Grade {course.grade}
-      </Typography>
-
-      <Divider sx={{ my: 3 }} />
-
-      {/* COURSE DETAILS */}
-      <Box
-        component="ul"
-        sx={{
-          p: 0,
-          m: 0,
-          listStyle: "none",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-        }}
-      >
-        {/* Per Class Price */}
-        <Box
-          component="li"
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            p: 1,
-            borderRadius: 2,
-            bgcolor: "action.hover",
-          }}
-        >
-          <IndianRupee size={20} className="text-gray-500" />
-          <Typography variant="body2">
-            ₹{course.perClassPrice.toFixed(2)} per class
-          </Typography>
-        </Box>
-
-        {/* Class Days */}
-        {course.classDays && (
-          <Box
-            component="li"
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 2,
-              p: 1,
-              borderRadius: 2,
-              bgcolor: "action.hover",
-              flexWrap: "wrap",
-            }}
-          >
-            <CalendarIcon size={20} className="text-gray-500" />
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-              {course.classDays.map((day) => (
-                <Chip
-                  key={day}
-                  label={day}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    borderRadius: "8px",
-                    fontWeight: 500,
-                  }}
-                />
-              ))}
-            </Box>
-          </Box>
-        )}
-      </Box>
-
-      <Divider sx={{ my: 3 }} />
-
-      {/* COURSE DESCRIPTION */}
-      <Typography variant="h6" fontWeight="medium" gutterBottom>
-        Description
-      </Typography>
-      <Typography
-        variant="body1"
-        color="text.secondary"
-        sx={{ whiteSpace: "pre-line", lineHeight: 1.6 }}
-      >
-        {course.description}
-      </Typography>
-    </Paper>
-  </Box>
-
-  {/* === RIGHT SECTION === */}
-  <Box
-    flexBasis={{ xs: "100%", md: "35%" }}
-    sx={{ display: "flex", flexDirection: "column" }}
-  >
-    <Paper
-      elevation={0}
-      className="border-blue-500 border"
-      sx={{
-        p: { xs: 2, sm: 3 },
-        borderRadius: 4,
-        flexGrow: 1,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between", 
-        bgcolor: '#1f2937'
-      }}
-    >
-      {/* SCHEDULE & INSTRUCTOR */}
-      <Box>
-        <Typography variant="h6" fontWeight="bold" gutterBottom>
-          Schedule & Instructor
-        </Typography>
-
-        <Box
-          component="ul"
-          sx={{
-            p: 0,
-            m: 0,
-            mt: 2,
-            listStyle: "none",
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          {course.teacherName && (
-            <Box
-              component="li"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                p: 1.5,
-                borderRadius: 2,
-                bgcolor: "action.hover",
-              }}
-            >
-              <Typography
-                variant="body2"
-                fontWeight="medium"
-                sx={{ flexShrink: 0, width: 80 }}
-              >
-                Teacher:
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.primary"
-                fontWeight="medium"
-              >
-                {course.teacherName}
-              </Typography>
-            </Box>
-          )}
-
-          {course.classTime && (
-            <Box
-              component="li"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-                p: 1,
-                borderRadius: 2,
-                bgcolor: "action.hover",
-              }}
-            >
-              <Clock size={20} className="text-gray-500" />
-              <Typography variant="body2">{course.classTime}</Typography>
-            </Box>
-          )}
-        </Box>
-      </Box>
-
-      <Divider sx={{ my: 3 }} />
-
-      {/* ACTION BUTTONS */}
-      <Box display="flex" flexDirection="column" gap={2}>
-        {/* New Message Button */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 py-8 md:py-12 px-4 selection:bg-indigo-500/30">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Navigation */}
         <Button
-          size="large"
-          variant="outlined"
-          color="primary"
-          startIcon={<MessageSquare />}
-          onClick={() => setIsMessageModalOpen(true)} // Open the message modal
+          variant="ghost"
+          onClick={() => router.back()}
+          className="group hover:bg-slate-900 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
         >
-          Send Message
+          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+          Back to Courses
         </Button>
 
-        {/* Existing Join Class Button */}
-        <Button
-          size="large"
-          {...(course.joinLink ? { href: course.joinLink, target: "_blank" } : {})}
-          rel="noopener noreferrer"
-          variant="contained"
-          startIcon={<Video />}
-          disabled={!course.joinLink || course.noOfClasses <= 0}
-        >
-          Join Class
-        </Button>
+        {/* Management Bar */}
+        <div className="relative group overflow-hidden bg-slate-900/50 backdrop-blur-xl border-4 border-slate-800 p-6 md:p-8 rounded-[2rem] shadow-2xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-indigo-500/10 transition-colors"></div>
+          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/30">
+                <Layout className="h-8 w-8 text-indigo-400" />
+              </div>
+              <div>
+                <h3 className="text-xl md:text-2xl font-black tracking-tight">Course Management</h3>
+                <p className="text-slate-400 text-sm font-medium">Manage your enrollment and progress.</p>
+              </div>
+            </div>
+            
+            <div className="flex flex-wrap items-center justify-center gap-4">
+              <div className="text-center px-6 py-2 bg-slate-950/50 rounded-2xl border border-slate-800">
+                <p className="text-[10px] uppercase font-black tracking-widest text-slate-500">Remaining</p>
+                <p className="text-2xl font-black text-indigo-400">{remainingClassesCount}</p>
+              </div>
+              
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button className="h-14 sm:h-16 px-6 sm:px-10 text-base sm:text-lg rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-[0_6px_0_rgba(67,56,202,1)] hover:shadow-[0_3px_0_rgba(67,56,202,1)] hover:translate-y-[3px] transition-all border-2 border-indigo-400">
+                    <PlusCircle className="mr-3 h-5 w-5 sm:h-6 sm:w-6" />
+                    Add More Classes
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="bg-slate-900 border-4 border-slate-800 rounded-[2.5rem] p-8 max-w-md sm:rounded-[3rem] animate-in zoom-in-95 duration-200">
+                  <DialogHeader className="space-y-4 text-center">
+                    <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto border border-indigo-500/30">
+                      <Plus className="h-8 w-8 text-indigo-400" />
+                    </div>
+                    <DialogTitle className="text-3xl font-black text-slate-100 italic">Add Classes</DialogTitle>
+                    <DialogDescription className="text-slate-400 text-lg font-medium">
+                      Extend your learning period for {course.title}.
+                    </DialogDescription>
+                  </DialogHeader>
 
-        <Button
-          variant="outlined"
-          color="secondary"
-          size="large"
-          {...(course.classroomLink ? { href: course.classroomLink, target: "_blank" } : {})}
-          disabled={!course.classroomLink || course.noOfClasses <= 0}
-        >
-          Visit Classroom
-        </Button>
-      </Box>
-    </Paper>
-  </Box>
-</Box>
+                  <div className="py-10 space-y-8">
+                    <div className="flex items-center justify-center gap-8">
+                      <Button onClick={handleDecrease} className="h-14 w-14 rounded-full bg-slate-950 border-2 border-slate-800 hover:border-red-500/50 hover:bg-red-500/10 text-slate-100 transition-all">
+                        <Minus className="h-6 w-6" />
+                      </Button>
+                      <div className="text-center">
+                        <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-t from-indigo-400 to-cyan-400 leading-none">
+                          {classesToAdd}
+                        </span>
+                        <p className="text-xs uppercase font-black tracking-[0.3em] text-slate-500 mt-2">Classes</p>
+                      </div>
+                      <Button onClick={handleIncrease} className="h-14 w-14 rounded-full bg-slate-950 border-2 border-slate-800 hover:border-green-500/50 hover:bg-green-100/10 text-slate-100 transition-all">
+                        <Plus className="h-6 w-6" />
+                      </Button>
+                    </div>
 
+                    <div className="bg-slate-950/50 p-6 rounded-3xl border-2 border-indigo-500/20 text-center">
+                      <p className="text-xs font-black text-indigo-300 uppercase tracking-widest mb-1">Total Payment</p>
+                      <p className="text-3xl font-black text-white">₹{totalPrice.toLocaleString()}</p>
+                    </div>
+                  </div>
 
-      {/* === PROGRESS SECTION === */}
-      <Box mt={4}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            gap: 3,
-            alignItems: "stretch", // Use stretch to make children fill the height
-          }}
-        >
-          {/* Left: Two progress circles */}
-          <Paper
-            elevation={0}
-            className="border-blue-500 border"
-            sx={{
-              flex: 1,
-              p: { xs: 2, sm: 3 },
-              borderRadius: 4,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2,
-              bgcolor: '#1f2937'
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold">
-              Classes Status <Info size={14} className="inline ml-1 text-gray-500" />
-            </Typography>
-            <Divider />
-            <Box sx={{ 
-              display: 'flex', 
-              flexDirection: { xs: 'column', sm: 'row' }, 
-              justifyContent: 'space-around', 
-              alignItems: 'center', 
-              flexGrow: 1,
-              gap: { xs: 4, sm: 2 }
-            }}>
-              {/* Circle 1 */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  <CircularProgress
-                    variant="determinate"
-                    value={completionPercentage}
-                    size={100}
-                    thickness={4}
-                    sx={{ color: 'success.main' }}
-                  />
-                  <Box
-                    sx={{
-                      top: 0,
-                      left: 0,
-                      bottom: 0,
-                      right: 0,
-                      position: 'absolute',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Typography variant="h5" component="div" fontWeight="bold">
-                      {completedClassesCount}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Typography variant="body1" color="text.secondary">
-                  Classes Completed
-                </Typography>
-              </Box>
-
-              <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
-              <Divider sx={{ width: '80%', display: { xs: 'block', sm: 'none' } }} />
-
-              {/* Circle 2 */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                  <CircularProgress
-                    variant="determinate"
-                    value={100}
-                    size={100}
-                    thickness={4}
-                    sx={{ color: 'warning.main' }}
-                  />
-                  <Box
-                    sx={{
-                      top: 0, left: 0, bottom: 0, right: 0,
-                      position: 'absolute',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}
-                  >
-                    <Typography variant="h5" component="div" fontWeight="bold">
-                      {remainingClasses}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Typography variant="body1" color="text.secondary">
-                  Remaining Classes
-                </Typography>
-              </Box>
-            </Box>
-          </Paper>
-
-          {/* Right: Monthly Progress calendar */}
-          <Paper
-            elevation={0}
-            className="border-blue-500 border"
-            sx={{
-              flexBasis: { xs: "100%", md: "40%" },
-              p: { xs: 2, sm: 3 },
-              borderRadius: 4,
-              textAlign: "center",
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              bgcolor: '#1f2937',
-              overflowX: 'auto',
-              maxWidth: '100%'
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Monthly Progress <Info size={14} className="inline ml-1 text-gray-500" />
-            </Typography>
-            <Calendar
-              mode="multiple"
-              month={calendarMonth}
-              onMonthChange={setCalendarMonth}
-              modifiers={{ completed: completedDays }}
-              modifiersStyles={{
-                completed: { color: "white", backgroundColor: '#22c55e', borderRadius: '50%' },
-              }}
-            />
-          </Paper>
-        </Box>
-      </Box>
-
-      
-      {/* === COMPLETED CLASSES SECTION === */}
-      <Box mt={4}>
-        <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-          Completed Class History
-        </Typography>
-        <div className="space-y-4">
-          {completedClasses.length > 0 ? (
-            completedClasses.map((c) => (
-              <Paper key={c._id} className="border-blue-500 border" sx={{ 
-                p: 2, 
-                borderRadius: 2, 
-                display: 'flex', 
-                flexDirection: { xs: 'column', sm: 'row' }, 
-                alignItems: { xs: 'flex-start', sm: 'center' }, 
-                justifyContent: 'space-between', bgcolor: '#1f2937' 
-              }}>
-                <Box>
-                  <Typography variant="body1" fontWeight="medium">{c.topic}</Typography>
-                  {c.homeworkFile && (
-                    <Button
-                      variant="text"
-                      size="small"
-                      startIcon={<Download size={16} />}
-                      href={c.homeworkFile}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                      sx={{
-                        mt: 1,
-                        p: 0.5,
-                        color: 'primary.light',
-                        textTransform: 'none'
-                      }}
-                    >View Homework</Button>
-                  )}
-                </Box>
-                <Box textAlign={{ xs: 'left', sm: 'right' }} sx={{ flexShrink: 0, ml: { xs: 0, sm: 2 }, mt: { xs: 1, sm: 0 } }}>
-                  <Typography variant="body2" color="text.secondary">{new Date(c.completedAt).toLocaleDateString()}</Typography>
-                  {c.duration && <Typography variant="caption" display="block" color="text.secondary">{c.duration} mins</Typography>}
-                </Box>
-              </Paper>
-            ))
-          ) : (
-            <Alert severity="info">No classes have been marked as complete for this course yet.</Alert>
-          )}
+                  <DialogFooter>
+                    <Button 
+                      disabled={isProcessing}
+                      onClick={handleProcessPayment}
+                      className="w-full text-xl py-8 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-[0_8px_0_rgba(67,56,202,1)] hover:translate-y-[4px] active:translate-y-[8px] active:shadow-none transition-all border-2 border-indigo-400"
+                    >
+                      {isProcessing ? "Processing..." : "Confirm Payment"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
         </div>
-      </Box>
 
+        {/* Main Information Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column: Details */}
+          <div className="lg:col-span-2 space-y-8">
+            <div className="bg-slate-900 border-4 border-slate-800 p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+              <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full -mb-48 -mr-48 blur-3xl"></div>
+              
+              <div className="relative z-10 space-y-8">
+                <div className="space-y-4">
+                  <Badge className={`px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest border-2 ${
+                    remainingClassesCount > 0 ? "bg-green-500/10 text-green-400 border-green-500/30" : "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
+                  }`}>
+                    {remainingClassesCount > 0 ? "Status: Active" : "Status: Inactive"}
+                  </Badge>
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400">
+                    {course.title}
+                  </h1>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-950/50 border border-slate-800 rounded-lg">
+                    <ShieldCheck className="h-4 w-4 text-cyan-400" />
+                    <span className="text-sm font-black text-slate-300">Grade {course.grade}</span>
+                  </div>
+                </div>
 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-6 bg-slate-950/50 rounded-3xl border border-slate-800 transition-colors hover:border-indigo-500/30 group">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/30 group-hover:scale-110 transition-transform">
+                        <IndianRupee className="h-5 w-5 text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Pricing</p>
+                        <p className="text-lg font-black tracking-tight text-white">₹{course.perClassPrice} <span className="text-xs text-slate-500">/ Class</span></p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6 bg-slate-950/50 rounded-3xl border border-slate-800 transition-colors hover:border-purple-500/30 group">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 bg-purple-500/10 rounded-2xl border border-purple-500/30 group-hover:scale-110 transition-transform">
+                        <CalendarIcon className="h-5 w-5 text-purple-400" />
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {course.classDays?.map(day => (
+                          <span key={day} className="text-[10px] font-black uppercase italic text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">{day}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-      {/* === ADD CLASSES MODAL === */}
-      <Dialog open={isModalOpen} onClose={handleCloseModal} PaperProps={{ sx: { borderRadius: 4, bgcolor: '#1f2937' } }}>
-        <DialogTitle fontWeight="bold">Add More Classes</DialogTitle>
-        <DialogContent dividers sx={{ p: 3 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 2,
-              my: 2,
-            }}
-          >
-            <IconButton onClick={handleDecrease} aria-label="decrease classes">
-              <Minus />
-            </IconButton>
-            <Typography variant="h4" component="span" sx={{ minWidth: "60px", textAlign: "center" }}>
-              {classesToAdd}
-            </Typography>
-            <IconButton onClick={handleIncrease} aria-label="increase classes">
-              <Plus />
-            </IconButton>
-          </Box>
-          <Divider sx={{ my: 2 }}>Summary</Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography color="text.secondary">Course:</Typography>
-              <Typography fontWeight="medium">{course.title}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography color="text.secondary">Price per Class:</Typography>
-              <Typography fontWeight="medium">₹{course.perClassPrice.toFixed(2)}</Typography>
-            </Box>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography color="text.secondary">Classes to Add:</Typography>
-              <Typography fontWeight="medium">{classesToAdd}</Typography>
-            </Box>
-            <Divider />
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="h6" fontWeight="bold">Total:</Typography>
-              <Typography variant="h6" fontWeight="bold">₹{totalPrice.toFixed(2)}</Typography>
-            </Box>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button onClick={handleCloseModal} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleProcessPayment}
-            variant="contained"
-            size="large"
-            disabled={isProcessing}
-            sx={{ flexGrow: 1, minWidth: { xs: 'auto', sm: '220px' } }}
-          >
-            {isProcessing ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : `Proceed to Pay ₹${totalPrice.toFixed(2)}`}
-          </Button>
-        </DialogActions>
-      </Dialog>
+                <div className="space-y-4">
+                  <h4 className="flex items-center gap-2 text-xl font-black italic text-slate-200">
+                    <Info className="h-5 w-5 text-indigo-400" />
+                    Course Description
+                  </h4>
+                  <p className="text-slate-400 font-medium leading-relaxed text-lg">
+                    {course.description}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-      {/* === MESSAGE MODAL === */}
-      {course && (
-        <CourseMessageModal
-          courseId={course._id}
-          open={isMessageModalOpen}
-          onClose={() => setIsMessageModalOpen(false)}
-        />
-      )}
-    </Box>
+            {/* Progress Circle - Moved from sidebar to fill gaps and show prominence */}
+            <div className="bg-slate-900 border-4 border-slate-800 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mt-16 -mr-16 blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-black italic text-slate-100 tracking-tight flex items-center justify-center md:justify-start gap-3">
+                    <Sparkles className="h-6 w-6 text-yellow-400" />
+                    Overall Progression
+                  </h3>
+                  <p className="text-slate-400 font-medium max-w-xs">Track your journey through this course. Each lesson brings you closer to mastery.</p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 text-center">
+                      <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Completed</p>
+                      <p className="text-2xl font-black text-green-400">{completedClassesCount}</p>
+                    </div>
+                    <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 text-center">
+                      <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Total</p>
+                      <p className="text-2xl font-black text-indigo-400">{totalCourseClasses}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="relative inline-flex items-center justify-center w-40 h-40 rounded-full border-[10px] border-slate-800 border-t-indigo-500 border-l-indigo-500 -rotate-45 shadow-[0_0_30px_rgba(99,102,241,0.2)]">
+                  <div className="rotate-45 flex flex-col items-center">
+                    <span className="text-4xl font-black text-white">{Math.round(completionPercentage)}%</span>
+                    <span className="text-xs font-black uppercase text-slate-500 tracking-tighter">Completed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Lesson History */}
+            <div className="space-y-6">
+              <h3 className="text-2xl font-black italic tracking-tight text-slate-100 flex items-center gap-3">
+                <TrendingUp className="h-6 w-6 text-green-400" />
+                Lesson History
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {completedClasses.length > 0 ? (
+                  completedClasses.map((c) => (
+                    <div key={c._id} className="p-6 bg-slate-900 border-4 border-slate-800 rounded-[2.5rem] hover:border-indigo-500/50 transition-all group overflow-hidden relative shadow-xl">
+                      <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-all group-hover:scale-110">
+                        <Layout className="h-20 w-20 text-indigo-400" />
+                      </div>
+                      <div className="relative z-10 space-y-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                             <div className="h-1 w-4 bg-indigo-500 rounded-full"></div>
+                             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">
+                               {new Date(c.completedAt).toLocaleDateString()}
+                             </p>
+                          </div>
+                          <h4 className="text-lg font-bold text-slate-100">{c.topic}</h4>
+                        </div>
+                        {c.homeworkFile && (
+                          <Button 
+                            variant="ghost" 
+                            className="w-full h-10 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-indigo-400 font-bold italic rounded-xl flex items-center justify-center gap-2"
+                            asChild
+                          >
+                            <a href={c.homeworkFile} target="_blank" rel="noopener noreferrer">
+                              <Download className="h-3 w-3" />
+                              Homework
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="col-span-full p-12 text-center bg-slate-900/50 border-4 border-dashed border-slate-800 rounded-[2.5rem]">
+                    <Clock className="h-12 w-12 text-slate-700 mx-auto mb-4 opacity-50" />
+                    <p className="text-slate-500 font-bold italic">No lessons recorded yet.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Instructor & Actions */}
+          <div className="space-y-8">
+            <div className="bg-slate-900 border-4 border-slate-800 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group h-fit">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full -mt-16 -mr-16 blur-2xl"></div>
+              
+              <div className="relative z-10 space-y-8">
+                <div className="space-y-6">
+                  <h3 className="text-xl font-black italic text-slate-100 tracking-tight flex items-center gap-3">
+                    <Target className="h-6 w-6 text-purple-400" />
+                    Course Instructor
+                  </h3>
+                  
+                  <div className="p-6 bg-slate-950/50 rounded-3xl border border-slate-800 text-center space-y-3">
+                    <div className="w-20 h-20 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-3xl mx-auto flex items-center justify-center p-2">
+                       <div className="w-full h-full bg-slate-950 rounded-2xl flex items-center justify-center">
+                          <span className="text-3xl font-black text-white italic">{course.teacherName?.charAt(0) || "S"}</span>
+                       </div>
+                    </div>
+                    <div>
+                      <p className="text-lg font-black text-white">{course.teacherName || "Name Pending"}</p>
+                      <p className="text-xs font-black uppercase text-slate-500 tracking-widest mt-1">Lead Teacher</p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-slate-950/50 rounded-2xl border border-slate-800 flex items-center justify-center gap-3">
+                    <Clock className="h-5 w-5 text-cyan-400" />
+                    <span className="text-sm font-black text-slate-300">{course.classTime || "Time Pending"}</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setIsMessageModalOpen(true)}
+                    className="w-full h-14 bg-slate-950/50 border-2 border-slate-800 hover:border-indigo-500/50 text-slate-300 hover:text-white rounded-2xl transition-all font-black flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="h-5 w-5 text-indigo-400" />
+                    Send Message
+                  </Button>
+                  
+                  <Link href={course.joinLink || "#"} className={!course.joinLink || remainingClassesCount <= 0 ? 'pointer-events-none' : ''}>
+                    <Button 
+                      disabled={!course.joinLink || remainingClassesCount <= 0}
+                      className="w-full h-16 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-black shadow-[0_6px_0_rgba(16,185,129,0.5)] active:translate-y-[4px] active:shadow-none transition-all border-2 border-emerald-400/50 rounded-2xl flex items-center justify-center gap-3 text-lg"
+                    >
+                      <Video className="h-6 w-6" />
+                      Join Class
+                    </Button>
+                  </Link>
+
+                  <Link href={course.classroomLink || "#"} className={!course.classroomLink || remainingClassesCount <= 0 ? 'pointer-events-none' : ''}>
+                    <Button 
+                      variant="ghost"
+                      disabled={!course.classroomLink || remainingClassesCount <= 0}
+                      className="w-full h-14 bg-slate-800/20 border-2 border-slate-800/50 hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 rounded-2xl transition-all font-black flex items-center justify-center gap-2"
+                    >
+                      Course Materials
+                      <Layout className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Calendar - Moved from below progress to below instructor */}
+            <div className="bg-slate-900 border-4 border-slate-800 p-6 sm:p-8 rounded-[2.5rem] shadow-2xl space-y-6">
+              <h3 className="text-xl font-black italic text-slate-100 tracking-tight flex items-center gap-3">
+                <CalendarIcon className="h-6 w-6 text-cyan-400" />
+                Upcoming Classes
+              </h3>
+              
+              <div className="flex items-center justify-center overflow-hidden">
+                <div className="max-w-[280px] sm:max-w-md w-full">
+                  <Calendar
+                    mode="multiple"
+                    month={calendarMonth}
+                    onMonthChange={setCalendarMonth}
+                    modifiers={{ completed: completedDays }}
+                    className="p-0 border-none mx-auto w-full"
+                    modifiersStyles={{
+                      completed: { color: "#fff", backgroundColor: '#6366f1', borderRadius: '50%', fontWeight: 'bold' },
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <CourseMessageModal 
+        open={isMessageModalOpen} 
+        onClose={() => setIsMessageModalOpen(false)} 
+        courseId={course._id} 
+      />
+    </div>
   );
 }
