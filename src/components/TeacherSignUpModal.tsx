@@ -149,8 +149,8 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       return;
     }
 
-    if (!cvUrl.trim() || !cvUrl.includes('drive.google.com')) {
-      setError('A valid Google Drive link for your CV is required.');
+    if (cvUrl.trim() && !cvUrl.includes('drive.google.com')) {
+      setError('Please provide a valid Google Drive link for your CV.');
       setLoading(false);
       return;
     }
@@ -274,7 +274,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   />
                   <TextField label="Highest Qualification" variant="outlined" fullWidth value={qualification} onChange={(e) => setQualification(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Years of Experience" variant="outlined" fullWidth value={experiance} onChange={(e) => setExperiance(e.target.value)} sx={textFieldStyles} />
-                  <TextField label="Google Drive CV Link" placeholder="Paste your CV link here" variant="outlined" fullWidth required value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
+                  <TextField label="Google Drive CV Link (Optional)" placeholder="Paste your CV link here" variant="outlined" fullWidth value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Autocomplete
                       multiple
