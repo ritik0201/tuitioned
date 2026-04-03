@@ -178,7 +178,7 @@ export async function PUT(
     if (noOfClasses !== undefined) updateData.noOfClasses = noOfClasses;
     if (perClassPrice !== undefined) updateData.perClassPrice = perClassPrice;
     if (joinLink) updateData.joinLink = joinLink;
-    if (classroomLink) updateData.classroomLink = classroomLink;
+    if (classroomLink !== undefined) updateData.classroomLink = classroomLink;
     if (teacherPerClassPrice !== undefined) updateData.teacherPerClassPrice = teacherPerClassPrice;
     if (noOfclassTeacher !== undefined) updateData.noOfclassTeacher = noOfclassTeacher;
     if (paymentStatus) updateData.paymentStatus = paymentStatus;

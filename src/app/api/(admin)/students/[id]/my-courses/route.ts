@@ -71,7 +71,8 @@ export async function POST(
       !grade ||
       noOfClasses === undefined ||
       !perClassPrice ||
-      !teacherId) {
+      !teacherId ||
+      !joinLink) {
       return NextResponse.json(
         { message: 'Missing required course fields' },
         { status: 400 }

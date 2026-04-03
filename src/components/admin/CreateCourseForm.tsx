@@ -185,9 +185,13 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
         {/* Join & Classroom Links */}
         <div className="md:col-span-4 flex flex-col md:flex-row gap-x-6 gap-y-4">
           <div key="joinLink" className="flex-1">
-            <FormField control={form.control} name="joinLink" render={({ field }) => (
+            <FormField 
+              control={form.control} 
+              name="joinLink" 
+              rules={{ required: "Join Link is required" }}
+              render={({ field }) => (
               <FormItem>
-                <FormLabel>Join Link (Optional)</FormLabel>
+                <FormLabel>Join Link</FormLabel>
                 <FormControl>
                   <Input placeholder="e.g., https://meet.google.com/..." {...field} />
                 </FormControl>

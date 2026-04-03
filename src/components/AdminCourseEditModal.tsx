@@ -198,6 +198,7 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
           onChange={handleChange}
           fullWidth
           margin="normal"
+          required
         />
         <TextField
           label="Classroom Link (e.g., Google Classroom)"

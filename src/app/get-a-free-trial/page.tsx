@@ -2,31 +2,92 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import PhoneInput, { isPossiblePhoneNumber, getCountryCallingCode } from 'react-phone-number-input';
+import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './phone-input.css';
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { CountryDropdown } from 'react-country-region-selector';
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  User, 
+  BookOpen, 
+  Calendar, 
+  CheckCircle2, 
+  ChevronRight, 
+  ChevronLeft, 
+  Sparkles, 
+  Mail, 
+  Phone, 
+  GraduationCap, 
+  Globe, 
+  MapPin,
+  Rocket
+} from "lucide-react";
+import ReactConfetti from "react-confetti";
 
-const steps = ["Your Details", "Academic Details", "Schedule Demo"];
+function useWindowSize() {
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
+    height: typeof window !== 'undefined' ? window.innerHeight : 800,
+  });
+
+  useEffect(() => {
+    function handleResize() {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    }
+    
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return windowSize;
+}
+
+const steps = [
+  { title: "Details", icon: User },
+  { title: "Academic", icon: BookOpen },
+  { title: "Schedule", icon: Calendar }
+];
+
+const subjects = [
+  { id: "maths", name: "Maths" },
+  { id: "science", name: "Science" },
+  { id: "english", name: "English" },
+  { id: "physics", name: "Physics" },
+  { id: "chemistry", name: "Chemistry" },
+  { id: "biology", name: "Biology" },
+  { id: "history", name: "History" },
+  { id: "coding", name: "Coding" },
+  { id: "other", name: "Other" }
+];
 
 export default function FreeTrialPage() {
   const { data: session, status, update: updateSession } = useSession();
+  const { width, height } = useWindowSize();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const isUserAuthenticated = status === "authenticated" && session?.user?.role === 'student';
 
-  useEffect(() => { if (isUserAuthenticated) { setActiveStep(1); } }, [isUserAuthenticated]);
+  useEffect(() => {
+    if (isUserAuthenticated && activeStep === 0) {
+      setActiveStep(1);
+    }
+  }, [isUserAuthenticated, activeStep]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handlePhoneChange = (value: string | undefined) => {
@@ -37,7 +98,7 @@ export default function FreeTrialPage() {
     if (session?.user) {
       setFormData(prev => ({
         ...prev,
-        studentName: session.user.fullName || "",
+        fullName: session.user.fullName || "",
         email: session.user.email || "",
         mobile: session.user.mobile || "",
       }));
@@ -45,10 +106,13 @@ export default function FreeTrialPage() {
   }, [session]);
 
   const handleSendOtp = async () => {
+    if (!formData.email) {
+      toast.error("Please enter your email");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
-      // If user is not logged in, check their email and role before sending OTP
       if (!session) {
         const roleCheckRes = await fetch('/api/auth/check-role', {
           method: 'POST',
@@ -59,15 +123,10 @@ export default function FreeTrialPage() {
         if (roleCheckRes.ok) {
           const { role } = await roleCheckRes.json();
           if (role === 'teacher' || role === 'admin') {
-            throw new Error(`This email is registered as a ${role}. Please use a student account to book a demo.`);
+            throw new Error(`This email is registered as a ${role}. Please use a student account.`);
           }
-        } else if (roleCheckRes.status !== 404) { // 404 is OK (user not found), but other errors are not
-          const errorData = await roleCheckRes.json();
-          throw new Error(errorData.message || 'Failed to verify user role.');
         }
-        // If 404, it's a new user, so we can proceed.
       }
-
 
       const apiEndpoint = session ? "/api/auth/login" : "/api/auth/signup";
       const payload = session 
@@ -82,15 +141,20 @@ export default function FreeTrialPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Failed to send OTP.");
       setOtpSent(true);
-      toast.success("OTP has been sent to your email");
+      toast.success("OTP sent to " + formData.email);
     } catch (err: any) {
       setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyOtp = async () => {
+    if (!formData.otp) {
+      toast.error("Please enter the OTP");
+      return;
+    }
     setIsVerifying(true);
     setError("");
     try {
@@ -101,16 +165,14 @@ export default function FreeTrialPage() {
         role: 'student'
       });
 
-      if (result?.error) {
-        throw new Error(result.error);
-      }
-
+      if (result?.error) throw new Error(result.error);
       if (result?.ok) {
-        await updateSession(); // Refresh session data
+        await updateSession();
         handleNext();
       }
     } catch (err: any) {
       setError(err.message);
+      toast.error(err.message);
     } finally {
       setIsVerifying(false);
     }
@@ -127,6 +189,8 @@ export default function FreeTrialPage() {
     setActiveStep(0);
     setFormData({});
     setError("");
+    setOtpSent(false);
+    setShowConfetti(false);
   };
 
   const handleSubmit = async () => {
@@ -138,11 +202,15 @@ export default function FreeTrialPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Something went wrong.");
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Something went wrong.");
+      }
+      setShowConfetti(true);
       handleNext();
     } catch (err: any) {
       setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -152,165 +220,191 @@ export default function FreeTrialPage() {
     switch (step) {
       case 0:
         return (
-          <div className="flex flex-col gap-4 mt-4">
+          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
             {!session && (
-              <>
-                <input
-                  name="fullName"
-                  type="text"
-                  placeholder="Student Full Name"
-                  required
-                  value={formData.fullName || ""}
-                  onChange={handleChange}
-                  className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-                  disabled={otpSent}
-                />
-                <PhoneInput
-                  placeholder="Mobile Number"
-                  required
-                  value={formData.mobile}
-                  onChange={handlePhoneChange} 
-                  international
-                  countryCallingCodeEditable={false}
-                  disabled={otpSent}
-                  className="phone-input-container"
-                />
-              </>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative group">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                  <input
+                    name="fullName"
+                    type="text"
+                    placeholder="Full Name"
+                    required
+                    value={formData.fullName || ""}
+                    onChange={handleChange}
+                    className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:ring-0 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+                    disabled={otpSent}
+                  />
+                </div>
+                <div className="relative group overflow-hidden">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors z-10" />
+                  <div className="pl-10">
+                    <PhoneInput
+                      placeholder="Mobile No."
+                      required
+                      value={formData.mobile}
+                      onChange={handlePhoneChange} 
+                      international
+                      countryCallingCodeEditable={false}
+                      disabled={otpSent}
+                      className="phone-input-compact bg-slate-950 border-2 border-slate-800 rounded-xl py-0.5 px-2"
+                    />
+                  </div>
+                </div>
+              </div>
             )}
-            <input
-              name="email"
-              type="email"
-              placeholder="Email Address"
-              required
-              value={formData.email || ""}
-              onChange={handleChange}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-              disabled={otpSent || !!session}
-            />
-            {otpSent && (
+            <div className="relative group">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
               <input
-                name="otp"
-                type="text"
-                placeholder="Enter 6-digit OTP"
+                name="email"
+                type="email"
+                placeholder="Email Address"
                 required
-                maxLength={6}
-                value={formData.otp || ""}
+                value={formData.email || ""}
                 onChange={handleChange}
-                className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition text-center tracking-[0.5rem]"
+                className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:ring-0 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600 disabled:opacity-60"
+                disabled={otpSent || !!session}
               />
+            </div>
+            {otpSent && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-1">
+                <input
+                  name="otp"
+                  type="text"
+                  placeholder="6-digit OTP"
+                  required
+                  maxLength={6}
+                  value={formData.otp || ""}
+                  onChange={handleChange}
+                  className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 text-center text-2xl font-bold tracking-[0.5rem] focus:border-indigo-500 outline-none transition-all"
+                />
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         );
       case 1:
         return (
-          <div className="flex flex-col gap-4 mt-4">
-            <input
-              name="grade"
-              type="text"
-              placeholder="Grade / Class"
-              required
-              value={formData.grade || ""}
-              onChange={handleChange}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-            />
+          <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+            <div className="relative group">
+              <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              <input
+                name="grade"
+                type="text"
+                placeholder="Grade / Class (e.g., 10th Standard)"
+                required
+                value={formData.grade || ""}
+                onChange={handleChange}
+                className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Subject / Course
-              </label>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  "Maths",
-                  "Science",
-                  "English",
-                  "Physics",
-                  "Chemistry",
-                  "Biology",
-                  "History",
-                  "Coding",
-                  "Other",
-                ].map((subject) => (
-                  <label key={subject} className="flex items-center space-x-2">
-                    <input
-                      type="radio"
-                      name="subject"
-                      value={subject.toLowerCase()}
-                      checked={formData.subject === subject.toLowerCase()}
-                      onChange={handleChange}
-                      className="accent-blue-600"
-                    />
-                    <span>{subject}</span>
-                  </label>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center px-1">
+                <label className="text-xs font-bold text-slate-400 flex items-center gap-2 tracking-wider">
+                  <Sparkles className="w-3 h-3 text-yellow-500" /> SELECT SUBJECT
+                </label>
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {subjects.map((sub) => (
+                  <button
+                    key={sub.name}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, subject: sub.id })}
+                    className={`py-2 px-1 text-[10px] font-bold rounded-xl border-2 transition-all ${
+                      formData.subject === sub.id 
+                        ? "bg-indigo-600 text-white border-indigo-400 shadow-[0_3px_0_rgba(67,56,202,1)]" 
+                        : "bg-slate-950 text-slate-500 border-slate-800 hover:border-slate-700 hover:text-slate-300 shadow-[0_3px_0_rgba(30,41,59,1)]"
+                    }`}
+                  >
+                    {sub.name}
+                  </button>
                 ))}
               </div>
             </div>
 
-            {formData.subject === "other" && (
-              <input
-                name="otherSubject"
-                type="text"
-                placeholder="Please specify subject"
-                value={formData.otherSubject || ""}
-                onChange={handleChange}
-                className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-              />
-            )}
+            <AnimatePresence>
+              {formData.subject === "other" && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
+                  <input
+                    name="otherSubject"
+                    type="text"
+                    placeholder="Specify subject"
+                    value={formData.otherSubject || ""}
+                    onChange={handleChange}
+                    className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 px-4 focus:border-indigo-500 outline-none transition-all"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <input
-              name="topic"
-              type="text"
-              placeholder="Specific Demo Topic"
-              value={formData.topic || ""}
-              onChange={handleChange}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-            />
-          </div>
+            <div className="relative group">
+              <BookOpen className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              <input
+                name="topic"
+                type="text"
+                placeholder="Specific Topic (Optional)"
+                value={formData.topic || ""}
+                onChange={handleChange}
+                className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
+              />
+            </div>
+          </motion.div>
         );
 
       case 2:
         return (
-          <div className="flex flex-col gap-4 mt-4">
-            <input
-              name="fatherName"
-              type="text"
-              placeholder="Parent's Name"
-              required
-              value={formData.fatherName || ""}
-              onChange={handleChange}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-            />
-            <input
-              name="city"
-              type="text"
-              placeholder="City"
-              required
-              value={formData.city || ""}
-              onChange={handleChange}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-            />
-            <CountryDropdown
-              value={formData.country || ""}
-              onChange={(val) => setFormData({ ...formData, country: val })}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-              defaultOptionLabel="Select Country"
-            />
-            <input
-              name="bookingDateAndTime"
-              type="date"
-              required
-              value={formData.bookingDateAndTime || ""}
-              onChange={handleChange}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-            />
-            {/* <textarea
-              name="comment"
-              rows={4}
-              placeholder="Additional Comments"
-              value={formData.comment || ""}
-              onChange={handleChange}
-              className="bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none transition"
-            /> */}
-          </div>
+          <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+            <div className="relative group">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              <input
+                name="fatherName"
+                type="text"
+                placeholder="Parent's Name"
+                required
+                value={formData.fatherName || ""}
+                onChange={handleChange}
+                className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative group">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                <input
+                  name="city"
+                  type="text"
+                  placeholder="City"
+                  required
+                  value={formData.city || ""}
+                  onChange={handleChange}
+                  className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all"
+                />
+              </div>
+              <div className="relative group">
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none z-10" />
+                <div className="relative">
+                  <CountryDropdown
+                    value={formData.country || ""}
+                    onChange={(val) => setFormData({ ...formData, country: val })}
+                    className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 outline-none transition-all appearance-none text-sm"
+                    defaultOptionLabel="Country"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+              <input
+                name="bookingDateAndTime"
+                type="date"
+                required
+                value={formData.bookingDateAndTime || ""}
+                onChange={handleChange}
+                className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+          </motion.div>
         );
       default:
         return null;
@@ -318,117 +412,127 @@ export default function FreeTrialPage() {
   };
 
   const renderButtons = () => {
+    const nextBtnClass = "flex-[2] py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold border-2 border-indigo-400 shadow-[0_5px_0_rgba(67,56,202,1)] hover:shadow-[0_2px_0_rgba(67,56,202,1)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none";
+    const backBtnClass = "flex-1 py-4 rounded-xl font-bold border-2 border-slate-800 bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-100 shadow-[0_5px_0_rgba(30,41,59,1)] hover:shadow-[0_2px_0_rgba(30,41,59,1)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 flex items-center justify-center gap-2";
+
     if (activeStep === 0) {
       return (
-        <div className="flex justify-center mt-6">
+        <div className="mt-6">
           {!otpSent ? (
-            <button onClick={handleSendOtp} disabled={loading} className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-blue-500/50">
-              {loading ? "Sending OTP..." : "Send OTP & Proceed"}
+            <button onClick={handleSendOtp} disabled={loading} className={nextBtnClass}>
+              {loading ? "Sending..." : "SEND OTP & PROCEED"}
             </button>
           ) : (
-            <button onClick={handleVerifyOtp} disabled={isVerifying} className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-blue-500/50">
-              {isVerifying ? "Verifying..." : "Verify & Continue"}
+            <button onClick={handleVerifyOtp} disabled={isVerifying} className={nextBtnClass}>
+              {isVerifying ? "Verifying..." : "VERIFY & CONTINUE"}
             </button>
           )}
         </div>
       );
     }
 
-    // Buttons for other steps remain the same
     return (
-      <div className="flex justify-between mt-6">
-        <button onClick={handleBack} disabled={activeStep <= 1} className={`px-4 py-2 rounded-lg border transition ${activeStep <= 1 ? "opacity-50 cursor-not-allowed border-gray-600 text-gray-500" : "border-gray-600 hover:bg-gray-700"}`}>
-          Back
+      <div className="flex gap-4 mt-6">
+        <button onClick={handleBack} className={backBtnClass}>
+          BACK
         </button>
-        <button onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext} disabled={loading} className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:bg-blue-500/50">
-          {loading ? "Submitting..." : activeStep === steps.length - 1 ? "Finish" : "Next"}
+        <button onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext} disabled={loading} className={nextBtnClass}>
+          {loading ? "Working..." : activeStep === steps.length - 1 ? "FINISH BOOKING" : "NEXT STEP"}
         </button>
       </div>
     );
   };
 
   return (
-    <main className="min-h-screen bg-black text-white flex items-center justify-center p-4 sm:p-6 lg:p-8">
-      <div className="container mx-auto max-w-6xl">
-        <div className="bg-gray-800 rounded-2xl border-2 border-blue-500 shadow-2xl shadow-blue-500/20 overflow-hidden grid grid-cols-1 lg:grid-cols-2 items-stretch">
-          {/* Left side */}
-          <div className="hidden lg:flex flex-col justify-center items-center text-center p-8 bg-gray-900/50">
-            <Image src="/home2.png" alt="Demo class illustration" width={300} height={300} className="mb-4" />
-            <h1 className="text-3xl font-bold mb-3 text-blue-400">Unlock Your Potential</h1>
-            <p className="max-w-md text-gray-300">
-              Experience our interactive teaching methods firsthand. Our free demo class helps
-              you understand our curriculum, meet expert tutors, and see how we make learning
-              engaging and effective.
-            </p>
-            <p className="mt-4 text-sm text-gray-400">
-              Just a few details and you'll be on your way to a brighter academic future!
-            </p>
-          </div>
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 selection:bg-indigo-500/30 font-sans overflow-hidden">
+      {/* Subtle Background Accent */}
+      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full -mr-40 -mt-40 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-cyan-500/5 rounded-full -ml-30 -mb-30 blur-[80px] pointer-events-none" />
 
-          {/* Right side */}
-          <div className="p-6 sm:p-8">
-            <h2 className="text-3xl font-bold text-center text-white">
-              Book Your Free Trial Class
-            </h2>
+      <div className="w-full max-w-xl relative z-10">
+        {showConfetti && <ReactConfetti width={width} height={height} numberOfPieces={150} recycle={false} />}
 
-            {/* Stepper */}
-            <div className="flex justify-center mt-6 mb-8">
-              <div className="flex space-x-8">
-                {steps.map((label, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <div
-                      className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors
-                        ${index <= activeStep ? "border-blue-500 bg-blue-500 text-white" : "border-gray-600 text-gray-400"}`}
-                    >
-                      {index + 1}
-                    </div>
-                    <span
-                      className={`text-sm mt-2 ${
-                        index <= activeStep ? "text-blue-400" : "text-gray-400"
-                      }`}
-                    >
-                      {label}
-                    </span>
-                  </div>
-                ))}
+        <AnimatePresence mode="wait">
+          {activeStep === steps.length ? (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+              className="bg-slate-900/50 p-6 sm:p-10 rounded-[2.5rem] border-4 border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-center space-y-6"
+            >
+              <div className="w-20 h-20 bg-indigo-500/10 rounded-[2rem] flex items-center justify-center mx-auto border-4 border-indigo-500/30">
+                <CheckCircle2 className="w-10 h-10 text-indigo-400" />
               </div>
-            </div>
-
-            {/* Success */}
-            {activeStep === steps.length ? (
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black tracking-tight">CONFIRMED!</h2>
+                <p className="text-slate-400 font-medium">Your trial for {new Date(formData.bookingDateAndTime + 'T00:00').toDateString()} is set.</p>
+              </div>
+              <div className="flex flex-col gap-3">
+                <Link href="/dashboard" className="w-full py-5 bg-indigo-600 text-white rounded-2xl font-black shadow-[0_8px_0_rgba(67,56,202,1)] hover:translate-y-1 hover:shadow-[0_4px_0_rgba(67,56,202,1)] transition-all">
+                  GO TO DASHBOARD
+                </Link>
+                <button onClick={handleReset} className="w-full py-4 text-slate-500 font-bold hover:text-slate-300 transition-colors">
+                  Book Another
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <div className="space-y-4">
+              {/* Tightened Header */}
               <div className="text-center">
-                <h3 className="text-xl font-semibold mb-2">🎉 Demo Class Confirmed!</h3>
-                <p className="text-gray-300 mb-1">
-                  Your demo class for{" "}
-                  <strong>{new Date(formData.bookingDateAndTime + 'T00:00').toDateString()}</strong> has been booked.
-                </p>
-                <p className="text-gray-400 mb-4">
-                  A confirmation email has been sent to <strong>{formData.email}</strong>.
-                </p>
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={handleReset}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                  >
-                    Book Another Demo
-                  </button>
-                  <Link
-                    href="/dashboard"
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center"
-                  >
-                    Go to Dashboard
-                  </Link>
+                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                  <div className="inline-flex items-center gap-2 py-1 px-3 bg-indigo-500/10 border-2 border-indigo-500/20 rounded-full text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-2">
+                    <Rocket className="w-3 h-3" /> Start Your Journey
+                  </div>
+                  <h1 className="text-3xl sm:text-4xl font-black tracking-tighter leading-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-100 to-slate-400">
+                    BOOK FREE TRIAL
+                  </h1>
+                </motion.div>
+              </div>
+
+              {/* Compact Stepper */}
+              <div className="relative max-w-xs mx-auto py-2">
+                <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-800 -translate-y-1/2" />
+                <motion.div 
+                  className="absolute top-1/2 left-0 h-1 bg-indigo-500 -translate-y-1/2"
+                  animate={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
+                />
+                <div className="relative flex justify-between">
+                  {steps.map((step, idx) => (
+                    <div key={idx} className={`w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-all duration-300 ${
+                      idx <= activeStep ? "bg-indigo-600 border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.4)]" : "bg-slate-900 border-slate-800 text-slate-700"
+                    }`}>
+                      {idx < activeStep ? <CheckCircle2 className="w-4 h-4 text-white" /> : <step.icon className={`w-3.5 h-3.5 ${idx === activeStep ? "text-white" : ""}`} />}
+                    </div>
+                  ))}
                 </div>
               </div>
-            ) : (
-              <>
-                {error && <p className="text-red-600 text-center mt-2">{error}</p>}
-                {renderStep(activeStep)}
+
+              {/* Main Card - Compacted */}
+              <motion.div layout className="bg-slate-900 border-4 border-slate-800 p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl pointer-events-none" />
+                
+                {error && (
+                  <div className="mb-4 p-2 bg-red-500/10 border-2 border-red-500/20 rounded-xl text-red-500 text-[11px] font-black tracking-wide text-center">
+                    {error}
+                  </div>
+                )}
+
+                <div className="min-h-[180px] flex flex-col justify-center">
+                  {renderStep(activeStep)}
+                </div>
+
                 {renderButtons()}
-              </>
-            )}
-          </div>
-        </div>
+              </motion.div>
+
+              <div className="flex items-center justify-center gap-4 text-[10px] font-bold text-slate-600 uppercase tracking-widest leading-none">
+                <span>Safe</span>
+                <div className="w-1 h-1 bg-slate-800 rounded-full" />
+                <span>Secure</span>
+                <div className="w-1 h-1 bg-slate-800 rounded-full" />
+                <span>Private</span>
+              </div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );
