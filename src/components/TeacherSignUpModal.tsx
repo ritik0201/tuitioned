@@ -25,15 +25,17 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', md: 'auto' },
+  width: { xs: '95%', sm: '90%', md: 'auto' },
   maxWidth: 800,
+  maxHeight: '95vh',
   bgcolor: '#1f2937', // bg-gray-800
   boxShadow: 24,
   p: 0,
   borderRadius: 2,
   display: 'flex',
   flexDirection: { xs: 'column', md: 'row' },
-  overflow: 'hidden',
+  overflowY: 'auto',
+  overflowX: 'hidden',
 };
 
 const textFieldStyles = {
@@ -255,7 +257,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
             Share your knowledge and inspire the next generation of learners.
           </Typography>
         </Box>
-        <Box sx={{ p: 4, position: 'relative', width: { xs: '100%', md: 500 }, color: '#fff' }}>
+        <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, position: 'relative', width: { xs: '100%', md: 500 }, color: '#fff' }}>
           <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}><X /></IconButton>
           {step === 'details' && (
             <Box component="form" sx={{ mt: 4 }}>
