@@ -86,6 +86,7 @@ export default function CourseDetailsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [completedAt, setCompletedAt] = useState(new Date().toISOString().split('T')[0]);
 
   // Fetch data
   const fetchCourseDetails = async () => {
@@ -129,6 +130,9 @@ export default function CourseDetailsPage() {
       }
       if (homeworkFile) {
         formData.append('homeworkFile', homeworkFile);
+      }
+      if (completedAt) {
+        formData.append('completedAt', completedAt);
       }
 
       const response = await fetch("/api/classCompleted", {
@@ -520,6 +524,15 @@ export default function CourseDetailsPage() {
                 onChange={(e) => setDuration(e.target.value)}
                 fullWidth
                 inputProps={{ step: 0.5, min: 0 }}
+              />
+              <TextField
+                label="Date of Class"
+                type="date"
+                value={completedAt}
+                onChange={(e) => setCompletedAt(e.target.value)}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                required
               />
               <Button
                 variant="outlined"

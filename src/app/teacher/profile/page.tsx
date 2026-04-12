@@ -14,7 +14,7 @@ import {
   Autocomplete,
   Chip,
 } from '@mui/material';
-import { Save } from 'lucide-react';
+import { Save, Video } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface ProfileData {
@@ -30,6 +30,7 @@ interface ProfileData {
   qualification: string;
   experience: string;
   listOfSubjects: string[];
+  joinLink: string;
 }
 
 const TeacherProfilePage = () => {
@@ -173,6 +174,23 @@ const TeacherProfilePage = () => {
 
         {renderField('Highest Qualification', 'qualification', profile.qualification)}
         {renderField('Years of Experience', 'experience', profile.experience)}
+        
+        <Box sx={{ p: 1.5, width: '100%' }}>
+          <TextField
+            label={profile.joinLink ? "Edit Meeting Link (G-Meet/Zoom)" : "Add Personal Meeting Link"}
+            name="joinLink"
+            value={profile.joinLink || ''}
+            onChange={handleInputChange}
+            fullWidth
+            variant="filled"
+            placeholder="https://meet.google.com/..."
+            helperText="This link will be automatically used when admins assign you new courses."
+            InputProps={{
+              startAdornment: <Video className="mr-2 text-blue-400" size={20} />,
+            }}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Box>
 
         <Box sx={{ p: 1.5, width: '100%' }}>
           <Autocomplete

@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
     const topic = formData.get('topic') as string;
     const duration = formData.get('duration') as string | null;
     const homeworkFile = formData.get('homeworkFile') as File | null;
+    const completedAt = formData.get('completedAt') as string | null;
 
     if (!courseId || !topic) {
       return NextResponse.json({ message: 'Course ID and topic are required' }, { status: 400 });
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
         topic,
         duration: duration ? Number(duration) : undefined,
         homeworkFile: homeworkFileUrl,
+        completedAt: completedAt ? new Date(completedAt) : undefined,
       });
 
       await newCompletedClass.save({ session: dbSession });

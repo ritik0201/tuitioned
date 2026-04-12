@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const teacher = await User.findById(session.user.id)
-      .select('fullName email mobile dateOfBirth address qualification experience listOfSubjects')
+      .select('fullName email mobile dateOfBirth address qualification experience listOfSubjects joinLink')
       .lean();
 
     if (!teacher) {
@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
       qualification: teacher.qualification || '',
       experience: teacher.experiance || '',
       listOfSubjects: teacher.listOfSubjects || [],
+      joinLink: teacher.joinLink || '',
     };
 
     return NextResponse.json({ success: true, profile });
@@ -99,10 +100,19 @@ export async function PUT(request: NextRequest) {
     const body = await request.json();
 
     // email is intentionally omitted to prevent it from being updated
-    const { fullName, mobile, dateOfBirth, address, qualification, experience, listOfSubjects } = body;
+    const { fullName, mobile, dateOfBirth, address, qualification, experience, listOfSubjects, joinLink } = body;
 
     const updatedUser = await User.findByIdAndUpdate(teacherId, {
-      $set: { fullName, mobile, dateOfBirth, address, qualification, experience, listOfSubjects },
+      $set: { 
+        fullName, 
+        mobile, 
+        dateOfBirth, 
+        address, 
+        qualification, 
+        experiance: experience, // Fixed typo from model
+        listOfSubjects, 
+        joinLink 
+      },
     }, { new: true, runValidators: true });
 
     return NextResponse.json({ success: true, message: 'Profile updated successfully.', user: updatedUser });

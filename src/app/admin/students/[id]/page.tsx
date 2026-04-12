@@ -256,7 +256,7 @@ export default function StudentDetailPage({
                     <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">Create New Course</DialogTitle>
                     <p className="text-sm text-gray-400">Configure the course details for <span className="text-white font-medium">{student.name}</span> below.</p>
                   </DialogHeader>
-                  <div className="p-6 overflow-y-auto">
+                  <div className="p-6 overflow-y-auto scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                     <CreateCourseForm
                       studentId={student._id}
                       onCourseCreated={() => setIsDialogOpen(false)}

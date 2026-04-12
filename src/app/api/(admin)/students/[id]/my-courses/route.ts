@@ -67,7 +67,6 @@ export async function POST(
 
     if (
       !title ||
-      !description ||
       !grade ||
       noOfClasses === undefined ||
       !perClassPrice ||
@@ -93,7 +92,7 @@ export async function POST(
 
     const newCourse = new Course({
       title,
-      description,
+      description: description || '',
       grade,
       noOfClasses,
       noOfclassTeacher: 0, // Explicitly set to 0 on creation

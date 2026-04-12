@@ -22,7 +22,7 @@ export interface ICourse extends Document {
 
 const CourseSchema: Schema = new Schema({
   title: { type: String, required: true }, // Renamed from Subject for consistency
-  description: { type: String, required: true },
+  description: { type: String, default: '' },
   grade: { type: String, required: true },
   classTime: { type: String },
   classDays: { type: [String] },
@@ -37,4 +37,5 @@ const CourseSchema: Schema = new Schema({
   paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
 }, { timestamps: true });
 
+// Check if model already exists to avoid OverwriteModelError in development
 export default mongoose.models.Course || mongoose.model<ICourse>('Course', CourseSchema);

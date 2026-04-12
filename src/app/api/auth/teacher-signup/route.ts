@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
       profileImage,
       cvUrl,
       aboutTeacher,
+      joinLink,
     } = body;
 
     // Ensure listOfSubjects is an array. If it's a string, split it by commas.
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
       profileImage,
       cvUrl,
       aboutTeacher,
+      joinLink,
       isVerified: false,
       role: "teacher",
       teacherStatus: "pending",

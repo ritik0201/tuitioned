@@ -22,6 +22,7 @@ export interface IUser extends Document {
   qualification?: string;
   experiance?: string;
   listOfSubjects?: string[];
+  joinLink?: string;
   profileImage?: string;
   cvUrl?: string;
   aboutTeacher?: string;
@@ -57,6 +58,7 @@ const UserSchema: Schema<IUser> = new Schema({
   profileImage: { type: String },
   cvUrl: { type: String },
   aboutTeacher: { type: String },
+  joinLink: { type: String },
   studentStatus: { 
     type: String, 
     enum: ['pending', 'approved', 'rejected'], 

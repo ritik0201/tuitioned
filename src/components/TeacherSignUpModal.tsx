@@ -58,6 +58,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   const [mobile, setMobile] = useState('');
   const [qualification, setQualification] = useState('');
   const [experiance, setExperiance] = useState('');
+  const [joinLink, setJoinLink] = useState('');
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [cvUrl, setCvUrl] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -200,7 +201,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName, email, mobile, qualification, experiance, listOfSubjects: finalSubjects, profileImage: profileImageUrl, cvUrl, aboutTeacher
+          fullName, email, mobile, qualification, experiance, listOfSubjects: finalSubjects, profileImage: profileImageUrl, cvUrl, aboutTeacher, joinLink
         }),
       });
       const data = await res.json();
@@ -274,6 +275,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   />
                   <TextField label="Highest Qualification" variant="outlined" fullWidth value={qualification} onChange={(e) => setQualification(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Years of Experience" variant="outlined" fullWidth value={experiance} onChange={(e) => setExperiance(e.target.value)} sx={textFieldStyles} />
+                  <TextField label="Default Meeting Link (e.g. G-Meet)" placeholder="https://meet.google.com/..." variant="outlined" fullWidth value={joinLink} onChange={(e) => setJoinLink(e.target.value)} sx={textFieldStyles} />
                   <TextField label="Google Drive CV Link (Optional)" placeholder="Paste your CV link here" variant="outlined" fullWidth value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Autocomplete

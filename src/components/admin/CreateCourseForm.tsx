@@ -1,20 +1,36 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { 
+  Loader2, 
+  BookText, 
+  GraduationCap, 
+  User, 
+  Clock, 
+  CalendarDays, 
+  Hash, 
+  IndianRupee, 
+  Link as LinkIcon, 
+  Video,
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle2,
+  Rocket
+} from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface CourseFormValues {
   title: string;
@@ -31,14 +47,30 @@ interface CourseFormValues {
   classroomLink?: string;
 }
 
-interface CreateCourseFormProps {
-  studentId: string;
-  onCourseCreated: () => void; // Callback to close dialog or refresh data
+interface Teacher {
+  id: string;
+  name: string;
+  email: string;
 }
 
+interface CreateCourseFormProps {
+  studentId: string;
+  onCourseCreated: () => void;
+}
+
+const STEPS = [
+  { id: 'details', title: 'Details', icon: BookText },
+  { id: 'teacher', title: 'Faculty', icon: User },
+  { id: 'schedule', title: 'Timing', icon: Clock },
+  { id: 'launch', title: 'Launch', icon: Rocket },
+];
+
 export default function CreateCourseForm({ studentId, onCourseCreated }: CreateCourseFormProps) {
+  const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
 
   const form = useForm<CourseFormValues>({
     defaultValues: {
@@ -57,6 +89,39 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
     },
   });
 
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      setIsLoadingTeachers(true);
+      try {
+        const response = await fetch('/api/teachers?status=approved');
+        if (response.ok) {
+          const data = await response.json();
+          setTeachers(data);
+        }
+      } catch (error) {
+        console.error("Error fetching teachers:", error);
+      } finally {
+        setIsLoadingTeachers(false);
+      }
+    };
+    fetchTeachers();
+  }, []);
+
+  const teacherIdWatch = form.watch('teacherId');
+
+  useEffect(() => {
+    if (teacherIdWatch && teacherIdWatch.length === 24) {
+      fetch(`/api/teachers/${teacherIdWatch}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data?.teacher?.joinLink) {
+            form.setValue('joinLink', data.teacher.joinLink, { shouldValidate: true });
+          }
+        })
+        .catch(err => console.error('Failed to fetch teacher details:', err));
+    }
+  }, [teacherIdWatch, form]);
+
   const toggleDay = (day: string) => {
     const newSelectedDays = selectedDays.includes(day)
       ? selectedDays.filter((d) => d !== day)
@@ -65,7 +130,24 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
     form.setValue('classDays', newSelectedDays, { shouldValidate: true });
   };
 
+  const nextStep = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1));
+  };
+
+  const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 0));
+
   const onSubmit: SubmitHandler<CourseFormValues> = async (data) => {
+    // This should only be reachable from the "Launch Course" button on Step 3
+    if (currentStep !== STEPS.length - 1) {
+      return;
+    }
+
+    // Final validation - only runs on the very last step
+    if (!data.perClassPrice || !data.joinLink) {
+      toast.message("Please fill the Price and Meeting Link.");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const payload = {
@@ -82,19 +164,15 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
         body: JSON.stringify(payload),
       });
 
-      // Handle non-JSON responses, which often indicate an auth redirect (HTML page)
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Received an invalid response from the server. Your session may have expired.');
+        throw new Error('Server response error.');
       }
 
       const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to create course');
-      }
+      if (!response.ok) throw new Error(result.message || 'Failed to create course');
 
-      toast.success('Course created and assigned successfully.');
+      toast.success('Course launched successfully!');
       onCourseCreated();
     } catch (error: any) {
       toast.error(error.message || 'An unexpected error occurred.');
@@ -106,120 +184,242 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
   const availableDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
-    <Form {...form} >
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid md:grid-cols-4 gap-x-6 gap-y-4 backdrop-blur-3xl text-gray-300">
-        {/* Course Title */}
-        <div key="title" className="md:col-span-2">
-          <FormField control={form.control} name="title" render={({ field }) => (<FormItem><FormLabel>Title</FormLabel><FormControl><Input placeholder="e.g., Mathematics" {...field} /></FormControl><FormMessage /></FormItem>)} />
-        </div>
-
-        {/* Grade */}
-        <div key="grade" className="md:col-span-2">
-          <FormField control={form.control} name="grade" render={({ field }) => (<FormItem><FormLabel>Grade</FormLabel><FormControl><Input placeholder="e.g., 10th" {...field} /></FormControl><FormMessage /></FormItem>)} />
-        </div>
-
-        {/* Teacher Name */}
-        <div key="teacherId" className="md:col-span-2">
-          <FormField control={form.control} name="teacherId" render={({ field }) => (
-            <FormItem>
-              <FormLabel>Teacher ID</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter Teacher ID"
-                  {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>)} />
-        </div>
-
-        {/* Class Time */}
-        <div key="classTime" className="md:col-span-2">
-          <FormField control={form.control} name="classTime" render={({ field }) => (<FormItem><FormLabel>Class Time</FormLabel><FormControl><Input placeholder="e.g., 5:00 PM - 6:00 PM" {...field} /></FormControl><FormMessage /></FormItem>)} />
-        </div>
-
-        {/* Description */}
-        <div key="description" className="md:col-span-4">
-          <FormField control={form.control} name="description" render={({ field }) => (<FormItem><FormLabel>Description</FormLabel><FormControl><Textarea placeholder="Course details..." {...field} /></FormControl><FormMessage /></FormItem>)} />
-        </div>
-
-        {/* Class Days */}
-        <div key="classDays" className="md:col-span-4">
-          <FormItem>
-            <FormLabel>Class Days</FormLabel>
-            <FormControl>
-              <div className="flex flex-wrap gap-2 pt-2">
-                {availableDays.map((day) => (
-                  <Button
-                    key={day}
-                    type="button"
-                    variant="outline"
-                    onClick={() => toggleDay(day)}
-                    className={`rounded-full ${
-                      selectedDays.includes(day)
-                        ? "!bg-blue-600 !text-white !border-blue-600 hover:!bg-blue-700 hover:!text-white"
-                        : ""
-                    }`}
-                  >
-                    {day}
-                  </Button>
-                ))}
+    <div className="flex flex-col h-full bg-[#0a0c10] text-gray-100 overflow-hidden">
+      {/* progress */}
+      <div className="px-6 py-4 border-b border-gray-800/50 bg-[#0d0f14] shrink-0">
+        <div className="flex justify-between items-center max-w-sm mx-auto">
+          {STEPS.map((step, idx) => {
+            const Icon = step.icon;
+            const isActive = idx === currentStep;
+            const isCompleted = idx < currentStep;
+            return (
+              <div key={step.id} className="flex flex-col items-center gap-1.5 relative z-10">
+                <div className={`
+                  w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-500 border
+                  ${isActive ? 'bg-blue-600 border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 
+                    isCompleted ? 'bg-emerald-500 border-emerald-400' : 'bg-gray-800 border-gray-700'}
+                `}>
+                  {isCompleted ? <CheckCircle2 className="w-4 h-4 text-white" /> : <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-500'}`} />}
+                </div>
+                <span className={`text-[8px] uppercase font-black tracking-tighter ${isActive ? 'text-blue-400' : isCompleted ? 'text-emerald-400' : 'text-gray-600'}`}>
+                  {step.title}
+                </span>
+                {idx < STEPS.length - 1 && (
+                  <div className={`absolute top-4 left-8 w-[calc(400px/4)] h-[1px] -z-10 transition-colors duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-gray-800'}`} />
+                )}
               </div>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
+            );
+          })}
         </div>
+      </div>
 
-        {/* Number of Classes, Prices */}
-        <div className="md:col-span-4 grid md:grid-cols-3 gap-x-6 gap-y-4">
-          <div key="noOfClasses">
-            <FormField control={form.control} name="noOfClasses" render={({ field }) => (<FormItem><FormLabel>Number of Classes</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
-          </div>
-          <div key="perClassPrice">
-            <FormField control={form.control} name="perClassPrice" render={({ field }) => (<FormItem><FormLabel>Price per Class</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
-          </div>
-          <div key="teacherPerClassPrice">
-            <FormField control={form.control} name="teacherPerClassPrice" render={({ field }) => (<FormItem><FormLabel>Teacher's Price/Class</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
-          </div>
-        </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col grow h-full overflow-hidden">
+          <div className="p-6 grow overflow-hidden flex flex-col items-stretch">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-4"
+              >
+                {currentStep === 0 && (
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-black text-white px-1">Course Identity</h2>
+                    </div>
+                    <FormField control={form.control} name="title" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Subject</FormLabel>
+                        <FormControl>
+                          <div className="relative group">
+                            <Input placeholder="e.g. Physics Core" {...field} className="bg-gray-900 border-gray-800 h-12 pl-10 rounded-xl focus:border-blue-500 transition-all" />
+                            <BookText className="absolute left-3 top-3.5 h-4.5 w-4.5 text-gray-600 group-focus-within:text-blue-500" />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="grade" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Grade</FormLabel>
+                        <FormControl>
+                          <div className="relative group">
+                            <Input placeholder="e.g. 12th Standard" {...field} className="bg-gray-900 border-gray-800 h-12 pl-10 rounded-xl focus:border-blue-500 transition-all" />
+                            <GraduationCap className="absolute left-3 top-3.5 h-4.5 w-4.5 text-gray-600 group-focus-within:text-blue-500" />
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )} />
+                  </div>
+                )}
 
-        {/* Join & Classroom Links */}
-        <div className="md:col-span-4 flex flex-col md:flex-row gap-x-6 gap-y-4">
-          <div key="joinLink" className="flex-1">
-            <FormField 
-              control={form.control} 
-              name="joinLink" 
-              rules={{ required: "Join Link is required" }}
-              render={({ field }) => (
-              <FormItem>
-                <FormLabel>Join Link</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., https://meet.google.com/..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>)} />
+                {currentStep === 1 && (
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-black text-white px-1">Educator Assignment</h2>
+                    </div>
+                    <FormField control={form.control} name="teacherId" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Faculty Member</FormLabel>
+                        <Select disabled={isLoadingTeachers} onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-gray-900 border-gray-800 h-14 pl-10 rounded-xl focus:border-blue-500 text-left">
+                              <User className="absolute left-3 top-4.5 h-5 w-5 text-gray-600" />
+                              <SelectValue placeholder={isLoadingTeachers ? "Retrieving experts..." : "Choose educator"} />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent className="bg-[#121417] border-gray-800 z-[9999] rounded-xl p-1 w-full max-w-[400px]">
+                            {teachers.length > 0 ? teachers.map((teacher) => (
+                              <SelectItem key={teacher.id} value={teacher.id} className="cursor-pointer rounded-lg py-2 focus:bg-blue-600/10 mb-0.5 last:mb-0">
+                                <div className="flex items-center gap-2.5">
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-gray-200 text-sm">{teacher.name}</span>
+                                    <span className="text-[9px] text-gray-500">{teacher.email}</span>
+                                  </div>
+                                </div>
+                              </SelectItem>
+                            )) : (
+                              <div className="p-4 text-center text-gray-600 text-xs italic">No approved educators</div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )} />
+                  </div>
+                )}
+
+                {currentStep === 2 && (
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-black text-white px-1">Class Schedule</h2>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <FormField control={form.control} name="classTime" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Timing</FormLabel>
+                          <FormControl>
+                            <Input placeholder="05:00 PM" {...field} className="bg-gray-900 border-gray-800 h-12 rounded-xl" />
+                          </FormControl>
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="noOfClasses" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Sessions</FormLabel>
+                          <FormControl>
+                            <Input type="number" {...field} className="bg-gray-900 border-gray-800 h-12 rounded-xl" />
+                          </FormControl>
+                        </FormItem>
+                      )} />
+                    </div>
+                    <div className="space-y-2">
+                       <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Weekly Cadence</FormLabel>
+                      <div className="flex flex-wrap gap-1.5">
+                        {availableDays.map((day) => (
+                          <button
+                            key={day}
+                            type="button"
+                            onClick={() => toggleDay(day)}
+                            className={`flex-1 h-10 rounded-lg text-[9px] font-black uppercase border transition-all ${
+                              selectedDays.includes(day)
+                                ? "bg-blue-600 border-blue-400 text-white"
+                                : "bg-gray-900 border-gray-800 text-gray-600"
+                            }`}
+                          >
+                            {day}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {currentStep === 3 && (
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-black text-white px-1">Final Launch</h2>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <FormField control={form.control} name="perClassPrice" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-emerald-500 text-[9px] font-black uppercase ml-1">Price / Class</FormLabel>
+                          <FormControl>
+                            <Input type="number" {...field} className="bg-gray-900 border-emerald-500/20 h-11 rounded-lg" />
+                          </FormControl>
+                        </FormItem>
+                      )} />
+                      <FormField control={form.control} name="teacherPerClassPrice" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-emerald-500 text-[9px] font-black uppercase ml-1">Expert Pay</FormLabel>
+                          <FormControl>
+                            <Input type="number" {...field} className="bg-gray-900 border-emerald-500/20 h-11 rounded-lg" />
+                          </FormControl>
+                        </FormItem>
+                      )} />
+                    </div>
+                    <FormField control={form.control} name="joinLink" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-500 text-[9px] font-black uppercase ml-1">G-Meet / Zoom Link</FormLabel>
+                        <FormControl>
+                          <Input placeholder="URL..." {...field} className="bg-gray-900 border-gray-800 h-10 rounded-lg text-xs" />
+                        </FormControl>
+                      </FormItem>
+                    )} />
+                    <FormField control={form.control} name="classroomLink" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-gray-500 text-[9px] font-black uppercase ml-1">Classroom URL (Optional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="URL..." {...field} className="bg-gray-900 border-gray-800 h-10 rounded-lg text-xs" />
+                        </FormControl>
+                      </FormItem>
+                    )} />
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
-          <div key="classroomLink" className="flex-1">
-            <FormField control={form.control} name="classroomLink" render={({ field }) => (
-              <FormItem>
-                <FormLabel>Classroom Link (Optional)</FormLabel>
-                <FormControl>
-                  <Input placeholder="e.g., https://classroom.google.com/..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>)} />
+
+          <div className="p-4 bg-[#0d0f14] border-t border-gray-800/20 flex gap-3 shrink-0">
+            {currentStep > 0 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={prevStep}
+                className="h-10 px-5 border-gray-800 text-gray-500 hover:text-white rounded-xl"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+            )}
+            
+            {currentStep < STEPS.length - 1 ? (
+              <Button
+                type="button"
+                onClick={nextStep}
+                className="grow h-10 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all"
+              >
+                <span className="uppercase tracking-widest text-[10px]">Continue</span>
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="grow h-10 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Rocket className="w-4 h-4" />
+                    <span className="uppercase tracking-widest text-[10px]">Launch Course</span>
+                  </>
+                )}
+              </Button>
+            )}
           </div>
-        </div>
-        {/* Submit Button */}
-        <div key="submit" className="md:col-span-4 pt-2">
-          <Button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold">
-          {isSubmitting ? (
-            <> <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating... </>
-          ) : (
-            'Create and Assign Course'
-          )}
-        </Button>
-        </div>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 }
