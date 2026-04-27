@@ -1,232 +1,64 @@
 /* Custom styles for react-phone-number-input */
-.phone-input-container {
+.PhoneInput {
     display: flex;
-    width: 100%;                /* fill the available width like the Full Name input */
-    max-width: none;            /* remove previous constrain so it matches full width */
-    background-color: #374151 !important; /* bg-gray-700 */
-    border: 1px solid #4b5563 !important; /* border-gray-600 */
-    border-radius: 0.5rem !important;     /* rounded-lg */
-    transition: border-color 0.2s, box-shadow 0.2s;
     align-items: center;
     gap: 0.5rem;
-    padding-right: 0.25rem;
-    box-sizing: border-box;
-}
-
-.phone-input-container:focus-within {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 2px rgba(59,130,246,0.12) !important;
 }
 
 /* Input itself */
-.phone-input-container .PhoneInputInput,
-.phone-input-container input[type="tel"],
-.phone-input-container .PhoneInput {
+.PhoneInputInput {
     background: transparent !important;
-    color: #ffffff !important;
+    color: #f1f5f9 !important; /* slate-100 */
     border: none !important;
-    padding: 0.75rem !important;
-    height: 48px !important;
     outline: none !important;
     width: 100% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    font-size: 1rem !important;
+    font-family: inherit !important;
+    font-size: 0.875rem !important; /* text-sm */
+}
+
+.PhoneInputInput::placeholder {
+    color: #475569 !important; /* slate-500 or slate-600 to match */
 }
 
 /* Country selector / flag area */
-.phone-input-container .PhoneInputCountrySelect,
-.phone-input-container .PhoneInputCountry {
-    background: transparent !important;
-    border: none !important;
-    color: #ffffff !important;
-    max-width: 88px !important;
+.PhoneInputCountry {
     display: flex !important;
     align-items: center !important;
-    padding-left: 0.5rem !important;
+    gap: 0.25rem !important;
 }
 
-/* Vertical separator between country area and phone input + info icon */
-.phone-input-container .PhoneInputCountry {
-    position: relative !important;
-    padding-right: 0.75rem !important;
+.PhoneInputCountrySelect {
+    cursor: pointer;
 }
 
-.phone-input-container .PhoneInputCountry::after {
-    /* thin vertical line placed at the right edge of the country area */
-    content: "" !important;
-    position: absolute !important;
-    right: -6px !important;
-    top: 18% !important;
-    bottom: 18% !important;
-    width: 1px !important;
-    background: rgba(255,255,255,0.14) !important;
-    border-radius: 1px !important;
+.PhoneInputCountryIcon {
+    width: 20px !important;
+    height: auto !important;
+    border-radius: 2px !important;
+    overflow: hidden !important;
 }
 
-.phone-input-container .PhoneInputCountry::before {
-    /* small circular info icon; use 'i' as text so no extra assets required */
-    content: "i" !important;
-    position: absolute !important;
-    right: 2px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 18px !important;
-    height: 18px !important;
-    font-size: 11px !important;
-    color: #ffffff !important;
-    background: rgba(255,255,255,0.06) !important;
-    border: 1px solid rgba(255,255,255,0.08) !important;
-    border-radius: 50% !important;
-    cursor: help !important;
+.PhoneInputCountrySelectArrow {
+    display: block !important;
+    opacity: 0.5 !important;
+    border-left: 5px solid transparent !important;
+    border-right: 5px solid transparent !important;
+    border-top: 5px solid currentColor !important;
 }
 
-/* Make sure the input has enough spacing so the icon/line don't overlap text */
-.phone-input-container .PhoneInputInput,
-.phone-input-container input[type="tel"] {
-    padding-left: 0.5rem !important;
+/* Dropdown menu styling */
+.PhoneInputCountrySelectSelect {
+    background-color: #020617 !important; /* slate-950 */
+    color: #f1f5f9 !important;
+    border: 1px solid #1e293b !important;
 }
 
-/* If the country element contains a flag/icon, hide the info "i" */
-/* Use :has() to detect presence of common flag/icon classes from the library */
-.phone-input-container .PhoneInputCountry:has(.PhoneInputCountryIcon)::before,
-.phone-input-container .PhoneInputCountry:has(.PhoneInputCountryIconImg)::before,
-.phone-input-container .PhoneInputCountry:has(img)::before {
-    display: none !important;
-}
-
-/* Arrow */
-.PhoneInputCountrySelect-arrow,
-[class*="PhoneInputCountrySelect-arrow"] {
-    opacity: 0.85 !important;
-    color: #ffffff !important;
-}
-
-/* Broad selectors to catch portal/variant classnames the library may emit */
-/* Target menu, options and any classname containing PhoneInput or PhoneInputCountrySelect */
-[class*="PhoneInputCountrySelect-menu"],
-.phone-input-container [class*="PhoneInputCountrySelect-menu"],
-[class*="PhoneInputCountrySelect-option"],
-[class*="PhoneInputCountrySelect"],
-[class*="PhoneInputCountry"] {
-    background-color: #1f2937 !important;  /* bg-gray-800 */
-    color: #ffffff !important;
-}
-
-/* Menu appearance (constrain width/height) */
-.PhoneInputCountrySelect-menu,
-.phone-input-container .PhoneInputCountrySelect-menu,
-[class*="PhoneInputCountrySelect-menu"],
-/* library variants */
-.react-phone-number-input__country-select__menu,
-.ReactPhoneInput__Dropdown,
-.react-phone-number-input__country-select {
-    max-width: 360px !important;
-    width: auto !important;
-    min-width: 140px !important;
-    border: 1px solid #4b5563 !important;
+/* When using the library's built-in dropdown */
+.react-phone-number-input__country-select-dropdown {
+    background-color: #0f172a !important; /* slate-900 */
+    border: 1px solid #1e293b !important;
+    color: #f1f5f9 !important;
+    padding: 0.5rem !important;
     border-radius: 0.5rem !important;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.45) !important;
-    overflow: auto !important;
-    max-height: 320px !important;
-    padding: 0.25rem 0 !important;
-    box-sizing: border-box !important;
-    z-index: 9999 !important;
-}
-
-/* Options */
-.PhoneInputCountrySelect-option,
-.phone-input-container .PhoneInputCountrySelect-option,
-[class*="PhoneInputCountrySelect-option"],
-.react-phone-number-input__country {
-    padding: 0.5rem 0.75rem !important;
-    color: #ffffff !important;
-    background: transparent !important;
-    white-space: nowrap !important;
-}
-
-/* Hover / focused option states */
-.PhoneInputCountrySelect-option:hover,
-.PhoneInputCountrySelect-option--focus,
-[class*="PhoneInputCountrySelect-option"]:hover,
-[class*="PhoneInputCountrySelect-option--focus"],
-.react-phone-number-input__country:hover {
-    background-color: #374151 !important; /* slightly lighter */
-    color: #ffffff !important;
-}
-
-/* Option contents (names/dial codes) */
-.PhoneInputCountrySelect-option .PhoneInputCountrySelect-name,
-.PhoneInputCountrySelect-option .PhoneInputCountrySelect-dialCode,
-[class*="PhoneInputCountrySelect-name"],
-[class*="PhoneInputCountrySelect-dialCode"],
-.react-phone-number-input__country-name,
-.react-phone-number-input__country-dial-code {
-    color: #ffffff !important;
-}
-
-/* Ensure portal-rendered dropdowns appended to body are targeted */
-body .PhoneInputCountrySelect-menu,
-body [class*="PhoneInputCountrySelect-menu"],
-body .react-phone-number-input__country-select__menu,
-body .ReactPhoneInput__Dropdown {
-    background-color: #1f2937 !important;
-    color: #fff !important;
-}
-
-/* Fallback target for other variants */
-.phone-input-container .ReactPhoneInput,
-.phone-input-container .react-phone-input,
-.phone-input-container .react-phone-number-input {
-    width: 100% !important;
-}
-
-/* Prevent stray margins/paddings from breaking layout */
-.phone-input-container * {
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
-}
-
-/* --- Native select / option styling for country selector --- */
-/* Helper class applied via countrySelectProps.className */
-.phone-country-select,
-.phone-input-container select,
-.phone-input-container select.phone-country-select {
-  background-color: #1f2937 !important; /* bg-gray-800 */
-  color: #ffffff !important;
-  border: none !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
-  max-width: 88px !important; /* constrain the select control */
-  padding: 0.375rem 0.5rem !important;
-  box-sizing: border-box !important;
-}
-
-/* Style native option entries (works in most browsers) */
-.phone-country-select option,
-.phone-input-container select option {
-  background-color: #1f2937 !important;
-  color: #ffffff !important;
-}
-
-/* Remove MS expand caret (IE/Edge) and give some padding */
-.phone-input-container select::-ms-expand {
-  display: none;
-}
-
-/* Ensure portal appended dropdowns are also targeted by class names if present */
-body .phone-country-select,
-body .phone-country-select option {
-  background-color: #1f2937 !important;
-  color: #ffffff !important;
-}
-
-/* Ensure select has a sensible z-index when dropdown opens */
-.phone-country-select,
-.phone-input-container select {
-  z-index: 9999 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }

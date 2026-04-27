@@ -236,20 +236,18 @@ export default function FreeTrialPage() {
                     disabled={otpSent}
                   />
                 </div>
-                <div className="relative group overflow-hidden">
+                <div className="relative group">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors z-10" />
-                  <div className="pl-10">
-                    <PhoneInput
-                      placeholder="Mobile No."
-                      required
-                      value={formData.mobile}
-                      onChange={handlePhoneChange} 
-                      international
-                      countryCallingCodeEditable={false}
-                      disabled={otpSent}
-                      className="phone-input-compact bg-slate-950 border-2 border-slate-800 rounded-xl py-0.5 px-2"
-                    />
-                  </div>
+                  <PhoneInput
+                    placeholder="Mobile No."
+                    required
+                    value={formData.mobile}
+                    onChange={handlePhoneChange} 
+                    international
+                    countryCallingCodeEditable={false}
+                    disabled={otpSent}
+                    className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus-within:border-indigo-500 transition-all placeholder:text-slate-600"
+                  />
                 </div>
               </div>
             )}
@@ -412,7 +410,7 @@ export default function FreeTrialPage() {
   };
 
   const renderButtons = () => {
-    const nextBtnClass = "flex-[2] py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold border-2 border-indigo-400 shadow-[0_5px_0_rgba(67,56,202,1)] hover:shadow-[0_2px_0_rgba(67,56,202,1)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none";
+    const nextBtnClass = "w-full flex-[2] py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold border-2 border-indigo-400 shadow-[0_5px_0_rgba(67,56,202,1)] hover:shadow-[0_2px_0_rgba(67,56,202,1)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 flex items-center justify-center gap-2 group disabled:opacity-50 disabled:translate-y-0 disabled:shadow-none";
     const backBtnClass = "flex-1 py-4 rounded-xl font-bold border-2 border-slate-800 bg-slate-900 text-slate-400 hover:bg-slate-800 hover:text-slate-100 shadow-[0_5px_0_rgba(30,41,59,1)] hover:shadow-[0_2px_0_rgba(30,41,59,1)] hover:translate-y-1 transition-all active:shadow-none active:translate-y-2 flex items-center justify-center gap-2";
 
     if (activeStep === 0) {
@@ -444,7 +442,7 @@ export default function FreeTrialPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 selection:bg-indigo-500/30 font-sans overflow-hidden">
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 selection:bg-indigo-500/30 font-sans overflow-x-hidden relative">
       {/* Subtle Background Accent */}
       <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full -mr-40 -mt-40 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-cyan-500/5 rounded-full -ml-30 -mb-30 blur-[80px] pointer-events-none" />
