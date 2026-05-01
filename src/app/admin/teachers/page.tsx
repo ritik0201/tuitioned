@@ -2,41 +2,34 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table"
+import { 
+  ArrowUpDown, 
+  MoreHorizontal, 
+  Trash2, 
+  Eye, 
+  Copy,
+  School,
+  Mail,
+  Phone,
+  ShieldCheck,
+  ShieldAlert,
+  Clock,
+  BookOpen
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { AdminDataTable } from "@/components/admin/DataTable";
 
 export type Teacher = {
   id: string
@@ -45,50 +38,14 @@ export type Teacher = {
   mobile: string
   listOfSubjects?: string[]
   teacherStatus?: 'pending' | 'approved' | 'rejected'
-}
-
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = React.useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mediaQueryList = window.matchMedia(query);
-    const listener = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    setMatches(mediaQueryList.matches);
-
-    mediaQueryList.addEventListener('change', listener);
-    return () => {
-      mediaQueryList.removeEventListener('change', listener);
-    };
-  }, [query]);
-
-  return matches;
+  profileImage?: string
 }
 
 export default function TeacherDataTable() {
   const router = useRouter()
   const [data, setData] = React.useState<Teacher[]>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
-
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  React.useEffect(() => {
-    setColumnVisibility(isDesktop ? {} : { id: false, listOfSubjects: false, mobile: false, teacherStatus: false });
-  }, [isDesktop]);
 
   const handleStatusUpdate = async (id: string, newStatus: Teacher['teacherStatus']) => {
     try {
@@ -97,29 +54,20 @@ export default function TeacherDataTable() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, teacherStatus: newStatus }),
       });
-
       if (!response.ok) throw new Error('Failed to update status');
-
       toast.success(`Teacher status updated to ${newStatus}`);
-      setData((prev) =>
-        prev.map((teacher) => (teacher.id === id ? { ...teacher, teacherStatus: newStatus } : teacher))
-      );
+      setData((prev) => prev.map((t) => (t.id === id ? { ...t, teacherStatus: newStatus } : t)));
     } catch (error: any) {
       toast.error(error.message || "Failed to update status");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this teacher? This action cannot be undone.")) return;
-
+    if (!confirm("Are you sure you want to delete this teacher?")) return;
     try {
-      const response = await fetch(`/api/teachers/${id}`, {
-        method: "DELETE",
-      });
-
+      const response = await fetch(`/api/teachers/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete teacher");
-
-      setData((prev) => prev.filter((teacher) => teacher.id !== id));
+      setData((prev) => prev.filter((t) => t.id !== id));
       toast.success("Teacher deleted successfully");
     } catch (error) {
       toast.error("Failed to delete teacher");
@@ -129,97 +77,102 @@ export default function TeacherDataTable() {
   const columns: ColumnDef<Teacher>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => <div>{row.getValue("name")}</div>,
-    },
-    {
-      accessorKey: "id",
-      header: "Teacher ID",
-    },    
-    {
-      accessorKey: "listOfSubjects",
-      header: "Subjects",
-      cell: ({ row }) => {
-        const subjects = row.getValue("listOfSubjects");
-        return <div>{Array.isArray(subjects) && subjects.length > 0 ? subjects.join(", ") : "N/A"}</div>
-      },
-      filterFn: (row, id, value) => {
-        const subjects = row.getValue(id) as string[] | undefined;
-        if (!Array.isArray(subjects)) return false;
-        return subjects.join(", ").toLowerCase().includes((value as string).toLowerCase());
-      },
+      header: ({ column }) => (
+        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Teacher Profile <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12 border border-white/10 shadow-lg ring-2 ring-emerald-500/10">
+            <AvatarImage src={row.original.profileImage} />
+            <AvatarFallback className="bg-emerald-600 text-sm text-white font-black">{row.original.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+             <span className="font-black text-base text-white tracking-tight">{row.original.name}</span>
+             <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mt-0.5">{row.original.id}</span>
+          </div>
+        </div>
+      ),
     },
     {
       accessorKey: "teacherStatus",
-      header: "Status",
+      header: "Security Status",
       cell: ({ row }) => {
         const status = row.getValue("teacherStatus") as string;
-        const color = 
-          status === "approved" ? "text-green-400" :
-          status === "rejected" ? "text-red-400" :
-          "text-yellow-400";
-        return <div className={`capitalize font-medium ${color}`}>{status || 'pending'}</div>
+        const config = {
+          approved: { color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", icon: <ShieldCheck size={12} /> },
+          rejected: { color: "bg-rose-500/10 text-rose-500 border-rose-500/20", icon: <ShieldAlert size={12} /> },
+          pending: { color: "bg-orange-500/10 text-orange-500 border-orange-500/20", icon: <Clock size={12} /> },
+        }[status || 'pending'] || { color: "bg-gray-500/10 text-gray-500 border-gray-500/20", icon: <Clock size={12} /> };
+
+        return (
+          <Badge className={`${config.color} border flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider`}>
+            {config.icon}
+            {status || 'pending'}
+          </Badge>
+        );
       },
     },
     {
-      accessorKey: "mobile",
-      header: "Mobile No.",
+      accessorKey: "listOfSubjects",
+      header: "Expertise",
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1 max-w-[200px]">
+          {row.original.listOfSubjects?.slice(0, 3).map((sub, i) => (
+            <Badge key={i} variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+              {sub}
+            </Badge>
+          ))}
+          {(row.original.listOfSubjects?.length || 0) > 3 && (
+            <Badge variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+              +{(row.original.listOfSubjects?.length || 0) - 3}
+            </Badge>
+          )}
+        </div>
+      )
     },
     {
       id: "actions",
-      enableHiding: false,
+      header: "Management",
       cell: ({ row }) => {
         const teacher = row.original
-  
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
-              <DropdownMenuLabel>Update Status</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleStatusUpdate(teacher.id, 'approved')}>
-                Mark as Approved
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleStatusUpdate(teacher.id, 'rejected')}>
-                Mark as Rejected
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleStatusUpdate(teacher.id, 'pending')}>
-                Mark as Pending
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => handleDelete(teacher.id)}
-                className="text-red-500 focus:text-red-500 cursor-pointer"
-              >Delete</DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(teacher.id)}
-                className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"
-              >
-                Copy teacher ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
+          <div className="flex items-center gap-3">
+             <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-xl border-white/5 bg-white/5 hover:bg-emerald-600 hover:text-white transition-all font-bold px-4 h-9"
                 onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
-                className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"
-              >
-                View teacher details
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+             >
+                <Eye size={14} className="mr-2" /> View
+             </Button>
+             <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10"><MoreHorizontal size={18} /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
+                  <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-3 py-2">Account Control</DropdownMenuLabel>
+                  <DropdownMenuItem className="rounded-xl focus:bg-emerald-500/10 focus:text-emerald-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'approved')}>
+                    <ShieldCheck size={16} className="mr-3" /> Approve Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-xl focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'rejected')}>
+                    <ShieldAlert size={16} className="mr-3" /> Reject Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-xl focus:bg-orange-500/10 focus:text-orange-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'pending')}>
+                    <Clock size={16} className="mr-3" /> Set to Pending
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5 my-1" />
+                  <DropdownMenuItem className="rounded-xl focus:bg-white/5 focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(teacher.id)}>
+                    <Copy size={16} className="mr-3 text-gray-400" /> Copy System ID
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5 my-1" />
+                  <DropdownMenuItem onClick={() => handleDelete(teacher.id)} className="rounded-xl text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer py-2.5">
+                    <Trash2 size={16} className="mr-3" /> Remove Record
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+             </DropdownMenu>
+          </div>
         )
       },
     },
@@ -230,9 +183,7 @@ export default function TeacherDataTable() {
       try {
         setLoading(true)
         const response = await fetch('/api/teachers')
-        if (!response.ok) {
-          throw new Error('Failed to fetch teachers')
-        }
+        if (!response.ok) throw new Error('Failed to retrieve teacher data');
         const teachers = await response.json()
         setData(teachers)
       } catch (err: any) {
@@ -244,149 +195,20 @@ export default function TeacherDataTable() {
     fetchTeachers()
   }, [])
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-    },
-  })
-
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <Card className="w-full">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl md:text-2xl">Teacher Management</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row items-center py-3 md:py-4 gap-3 md:gap-4">
-            <Input
-              placeholder="Filter by teacher name..."
-              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm w-full"
-            />
-            <Input
-              placeholder="Filter by subject..."
-              value={
-                (table.getColumn("listOfSubjects")?.getFilterValue() as string) ?? ""
-              }
-              onChange={(event) =>
-                table.getColumn("listOfSubjects")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm w-full"
-            />
-            <Input
-              placeholder="Filter by status..."
-              value={(table.getColumn("teacherStatus")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("teacherStatus")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm w-full"
-            />
-          </div>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  Array.from({ length: 10 }).map((_, i) => (
-                    <TableRow key={`skeleton-row-${i}`}>
-                      {table.getVisibleLeafColumns().map(column => (
-                        <TableCell key={column.id}>
-                          <Skeleton className="h-6 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : error ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">{error}</TableCell>
-                  </TableRow>
-                ) : table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      className="hover:bg-muted/50 even:bg-muted/20"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-20 md:h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 py-3 md:py-4">
-            <div className="text-xs md:text-sm text-muted-foreground order-2 sm:order-1">
-              {table.getFilteredRowModel().rows.length} teacher(s) total
-            </div>
-            <div className="flex gap-2 order-1 sm:order-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="text-xs md:text-sm"
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="text-xs md:text-sm"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="p-4 md:p-8">
+      <AdminDataTable
+        columns={columns}
+        data={data}
+        title="Teacher Faculty"
+        subtitle="Full directory of educators and subject experts"
+        icon={<School size={28} />}
+        filterColumn="name"
+        filterPlaceholder="Search faculty by name..."
+        loading={loading}
+        error={error}
+        mobileHiddenColumns={["listOfSubjects"]}
+      />
     </div>
   )
 }

@@ -1,31 +1,22 @@
 "use client"
 
 import * as React from "react"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  VisibilityState,
-  useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table"
+import { 
+  ArrowUpDown, 
+  Receipt, 
+  CheckCircle2, 
+  XCircle, 
+  Clock, 
+  DollarSign, 
+  CreditCard,
+  Calendar,
+  User,
+  ExternalLink
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { AdminDataTable } from "@/components/admin/DataTable";
 
 export type Transaction = {
   id: string;
@@ -36,87 +27,96 @@ export type Transaction = {
   date: string;
 }
 
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = React.useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mediaQueryList = window.matchMedia(query);
-    const listener = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    setMatches(mediaQueryList.matches);
-
-    mediaQueryList.addEventListener('change', listener);
-    return () => {
-      mediaQueryList.removeEventListener('change', listener);
-    };
-  }, [query]);
-
-  return matches;
-}
-
 export default function TransactionDataTable() {
   const [data, setData] = React.useState<Transaction[]>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
-
-  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const columns: ColumnDef<Transaction>[] = [
     {
       accessorKey: "paymentId",
-      header: "Payment ID",
+      header: "Reference ID",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+           <div className="p-2 rounded-lg bg-white/5 text-gray-400 group-hover:text-white transition-colors">
+              <CreditCard size={14} />
+           </div>
+           <span className="font-mono text-xs text-gray-500 tracking-tight">{row.original.paymentId}</span>
+        </div>
+      )
     },
     {
       accessorKey: "studentName",
       header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Student Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Payer Name <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
-      cell: ({ row }) => <div>{row.getValue("studentName")}</div>,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+           <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-500 border border-blue-500/20 font-black text-xs">
+              {row.original.studentName.charAt(0)}
+           </div>
+           <span className="font-bold text-white text-sm">{row.original.studentName}</span>
+        </div>
+      ),
     },
     {
       accessorKey: "amount",
-      header: "Amount",
-      cell: ({ row }) => `₹${row.getValue("amount")}`,
+      header: "Value",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-1.5 font-black text-white text-lg tracking-tighter">
+           <span className="text-xs text-gray-500 font-normal">₹</span>
+           {row.original.amount.toLocaleString()}
+        </div>
+      ),
     },
     {
       accessorKey: "status",
-      header: "Status",
+      header: "Fulfillment",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string;
+        const config = {
+          completed: { color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", icon: <CheckCircle2 size={12} />, label: "Success" },
+          failed: { color: "bg-rose-500/10 text-rose-500 border-rose-500/20", icon: <XCircle size={12} />, label: "Failed" },
+          pending: { color: "bg-orange-500/10 text-orange-500 border-orange-500/20", icon: <Clock size={12} />, label: "Processing" },
+        }[status] || { color: "bg-gray-500/10 text-gray-500 border-gray-500/20", icon: <Clock size={12} />, label: status };
+
+        return (
+          <Badge className={`${config.color} border flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest`}>
+            {config.icon}
+            {config.label}
+          </Badge>
+        );
+      },
     },
     {
       accessorKey: "date",
-      header: "Date",
-      cell: ({ row }) => new Date(row.getValue("date")).toLocaleString(),
+      header: "Timestamp",
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+           <span className="text-xs text-gray-300 font-medium">{new Date(row.original.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+           <span className="text-[10px] text-gray-500">{new Date(row.original.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>
+      ),
     },
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => (
+        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-600/10 hover:text-blue-500 transition-all rounded-lg">
+           <ExternalLink size={16} />
+        </Button>
+      )
+    }
   ]
-
-  React.useEffect(() => {
-    setColumnVisibility(isDesktop ? {} : { studentName: false, amount: false, status: false, date: false });
-  }, [isDesktop]);
 
   React.useEffect(() => {
     const fetchTransactions = async () => {
       try {
         setLoading(true)
         const response = await fetch('/api/transaction')
-        if (!response.ok) {
-          throw new Error('Failed to fetch transactions');
-        }
+        if (!response.ok) throw new Error('System error: Failed to retrieve ledger');
         const transactions = await response.json()
         setData(transactions)
       } catch (err: any) {
@@ -128,93 +128,20 @@ export default function TransactionDataTable() {
     fetchTransactions()
   }, [])
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-    },
-  })
-
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <Card className="w-full">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl md:text-2xl">Transactions</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center py-3 md:py-4">
-            <Input
-              placeholder="Filter by student name..."
-              value={(table.getColumn("studentName")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("studentName")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm w-full"
-            />
-          </div>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  Array.from({ length: 10 }).map((_, i) => (
-                    <TableRow key={`skeleton-row-${i}`}>
-                      {table.getVisibleLeafColumns().map(column => (
-                        <TableCell key={column.id}>
-                          <Skeleton className="h-6 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : error ? (
-                  <TableRow><TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">{error}</TableCell></TableRow>
-                ) : table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} className="hover:bg-muted/50 even:bg-muted/20">
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow><TableCell colSpan={columns.length} className="h-20 md:h-24 text-center">No transactions found.</TableCell></TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 py-3 md:py-4">
-            <div className="text-xs md:text-sm text-muted-foreground order-2 sm:order-1">
-              {table.getFilteredRowModel().rows.length} transaction(s) total
-            </div>
-            <div className="flex gap-2 order-1 sm:order-2">
-              <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} className="text-xs md:text-sm">Previous</Button>
-              <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} className="text-xs md:text-sm">Next</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="p-4 md:p-8">
+      <AdminDataTable
+        columns={columns}
+        data={data}
+        title="Financial Ledger"
+        subtitle="Global transaction history and payment processing records"
+        icon={<Receipt size={28} />}
+        filterColumn="studentName"
+        filterPlaceholder="Search by payer name..."
+        loading={loading}
+        error={error}
+        mobileHiddenColumns={["paymentId", "date"]}
+      />
     </div>
   )
 }

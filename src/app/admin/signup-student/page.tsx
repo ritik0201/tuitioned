@@ -2,19 +2,22 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal, Loader2 } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table";
+import { 
+  ArrowUpDown, 
+  MoreHorizontal, 
+  Loader2, 
+  Users, 
+  Trash2, 
+  Eye, 
+  Copy,
+  ShieldCheck,
+  ShieldAlert,
+  Clock,
+  Mail,
+  Phone,
+  Database
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,18 +27,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input" 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { AdminDataTable } from "@/components/admin/DataTable";
 
 export type Student = {
   id: string
@@ -43,63 +38,21 @@ export type Student = {
   email: string
   mobile: string,
   studentStatus: 'pending' | 'approved' | 'rejected'
-}
-
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = React.useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mediaQueryList = window.matchMedia(query);
-    const listener = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    setMatches(mediaQueryList.matches);
-
-    mediaQueryList.addEventListener('change', listener);
-    return () => {
-      mediaQueryList.removeEventListener('change', listener);
-    };
-  }, [query]);
-
-  return matches;
+  profileImage?: string
 }
 
 export default function SignupStudentDataTable() {
   const router = useRouter()
   const [data, setData] = React.useState<Student[]>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
   const [isMigrating, setIsMigrating] = React.useState(false);
 
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  React.useEffect(() => {
-    setColumnVisibility(isDesktop ? {} : { id: false, email: false, mobile: false, studentStatus: false });
-  }, [isDesktop]);
-
   const fetchStudents = React.useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
-      // const response = await fetch('/api/signup-std');
       const response = await fetch('/api/signup-std', { cache: 'no-store' });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to fetch students');
-      }
+      if (!response.ok) throw new Error('Failed to retrieve signup records');
       const students = await response.json();
       setData(students);
     } catch (err: any) {
@@ -114,21 +67,16 @@ export default function SignupStudentDataTable() {
   }, [fetchStudents]);
 
   const handleMigration = async () => {
-    if (!confirm("This will update all existing students without a status to 'pending'. This is a one-time operation. Are you sure?")) return;
-
+    if (!confirm("This will update all existing students without a status to 'pending'. Are you sure?")) return;
     setIsMigrating(true);
     try {
-      const response = await fetch('/api/migrate-student-status', {
-        method: 'POST',
-      });
+      const response = await fetch('/api/migrate-student-status', { method: 'POST' });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || 'Migration failed');
-      toast.success(result.message, {
-        description: `${result.updatedCount} student(s) updated. The list will now refresh.`,
-      });
-      fetchStudents(); // Refresh data
+      toast.success(result.message);
+      fetchStudents();
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during migration.");
+      toast.error(error.message || "Migration failed");
     } finally {
       setIsMigrating(false);
     }
@@ -141,35 +89,20 @@ export default function SignupStudentDataTable() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, status: newStatus }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to update status');
-      }
-
+      if (!response.ok) throw new Error('Failed to update status');
       toast.success(`Student status updated to ${newStatus}`);
-      setData((prev) =>
-        prev.map((student) => (student.id === id ? { ...student, studentStatus: newStatus } : student))
-      );
-      fetchStudents(); // Refetch data to ensure consistency
+      setData((prev) => prev.map((s) => (s.id === id ? { ...s, studentStatus: newStatus } : s)));
     } catch (error: any) {
       toast.error(error.message || "Failed to update status");
     }
   };
 
   const handleDelete = async (id: string) => {
-    // Assuming a delete endpoint exists for students.
-    // This might need to be adjusted based on actual API.
-    if (!confirm("Are you sure you want to delete this student? This action cannot be undone.")) return;
-
+    if (!confirm("Are you sure you want to delete this student?")) return;
     try {
-      const response = await fetch(`/api/students/${id}`, {
-        method: "DELETE",
-      });
-
+      const response = await fetch(`/api/students/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete student");
-
-      setData((prev) => prev.filter((student) => student.id !== id));
+      setData((prev) => prev.filter((s) => s.id !== id));
       toast.success("Student deleted successfully");
     } catch (error) {
       toast.error("Failed to delete student");
@@ -179,223 +112,123 @@ export default function SignupStudentDataTable() {
   const columns: ColumnDef<Student>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => <div>{row.getValue("name")}</div>,
-    },
-    {
-      accessorKey: "id",
-      header: "Student ID",
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
-      accessorKey: "mobile",
-      header: "Mobile No.",
+      header: ({ column }) => (
+        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Full Name <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12 border border-white/10 shadow-lg ring-2 ring-blue-500/10">
+            <AvatarImage src={row.original.profileImage} />
+            <AvatarFallback className="bg-blue-600 text-sm text-white font-black">{row.original.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+             <span className="font-black text-base text-white tracking-tight">{row.original.name}</span>
+             <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mt-0.5">{row.original.id}</span>
+          </div>
+        </div>
+      ),
     },
     {
       accessorKey: "studentStatus",
-      header: "Status",
+      header: "Enrollment Status",
       cell: ({ row }) => {
         const status = row.getValue("studentStatus") as string;
-        const color = 
-          status === "approved" ? "text-green-400" :
-          status === "rejected" ? "text-red-400" :
-          "text-yellow-400";
-        return <div className={`capitalize font-medium ${color}`}>{status || 'pending'}</div>
+        const config = {
+          approved: { color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", icon: <ShieldCheck size={12} /> },
+          rejected: { color: "bg-rose-500/10 text-rose-500 border-rose-500/20", icon: <ShieldAlert size={12} /> },
+          pending: { color: "bg-orange-500/10 text-orange-500 border-orange-500/20", icon: <Clock size={12} /> },
+        }[status || 'pending'] || { color: "bg-gray-500/10 text-gray-500 border-gray-500/20", icon: <Clock size={12} /> };
+
+        return (
+          <Badge className={`${config.color} border flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider`}>
+            {config.icon}
+            {status || 'pending'}
+          </Badge>
+        );
       },
     },
     {
+      accessorKey: "email",
+      header: "Contact Info",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1">
+           <div className="flex items-center gap-2 text-xs text-gray-300">
+              <Mail size={12} className="text-blue-400" />
+              {row.original.email}
+           </div>
+           <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Phone size={12} className="text-emerald-400" />
+              {row.original.mobile}
+           </div>
+        </div>
+      )
+    },
+    {
       id: "actions",
-      enableHiding: false,
+      header: "Actions",
       cell: ({ row }) => {
         const student = row.original
-  
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
-              <DropdownMenuLabel>Update Status</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleStatusUpdate(student.id, 'approved')}>
-                Mark as Approved
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleStatusUpdate(student.id, 'rejected')}>
-                Mark as Rejected
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleStatusUpdate(student.id, 'pending')}>
-                Mark as Pending
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                onClick={() => handleDelete(student.id)}
-                className="text-red-500 focus:text-red-500 cursor-pointer"
-              >Delete</DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(student.id)}
-                className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"
-              >
-                Copy student ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
+          <div className="flex items-center gap-3">
+             <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-xl border-white/5 bg-white/5 hover:bg-blue-600 hover:text-white transition-all font-bold px-4 h-9"
                 onClick={() => router.push(`/admin/students/${student.id}`)}
-                className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"
-              >
-                View student details
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+             >
+                <Eye size={14} className="mr-2" /> View
+             </Button>
+             <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10"><MoreHorizontal size={18} /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
+                  <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-3 py-2">Lifecycle Management</DropdownMenuLabel>
+                  <DropdownMenuItem className="rounded-xl focus:bg-emerald-500/10 focus:text-emerald-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(student.id, 'approved')}>
+                    <ShieldCheck size={16} className="mr-3" /> Approve Signup
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="rounded-xl focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(student.id, 'rejected')}>
+                    <ShieldAlert size={16} className="mr-3" /> Reject Signup
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5 my-1" />
+                  <DropdownMenuItem className="rounded-xl focus:bg-white/5 focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(student.id)}>
+                    <Copy size={16} className="mr-3 text-gray-400" /> Copy System ID
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5 my-1" />
+                  <DropdownMenuItem onClick={() => handleDelete(student.id)} className="rounded-xl text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer py-2.5">
+                    <Trash2 size={16} className="mr-3" /> Remove Record
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+             </DropdownMenu>
+          </div>
         )
       },
     },
   ]
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-    },
-  })
-
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <Card className="w-full">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl md:text-2xl">All Students</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between py-3 md:py-4 gap-4">
-            <Input
-              placeholder="Filter by student name..."
-              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm"
-            />
-            <Button onClick={handleMigration} disabled={isMigrating} variant="outline">
-              {isMigrating ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Migrating...</>
-              ) : "Migrate Old Students"}
-            </Button>
-          </div>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  Array.from({ length: 10 }).map((_, i) => (
-                    <TableRow key={`skeleton-row-${i}`}>
-                      {table.getVisibleLeafColumns().map(column => (
-                        <TableCell key={column.id}>
-                          <Skeleton className="h-6 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : error ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">{error}</TableCell>
-                  </TableRow>
-                ) : table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      className="hover:bg-muted/50 even:bg-muted/20"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-20 md:h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 py-3 md:py-4">
-            <div className="text-xs md:text-sm text-muted-foreground order-2 sm:order-1">
-              {table.getFilteredRowModel().rows.length} student(s) total
-            </div>
-            <div className="flex gap-2 order-1 sm:order-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="text-xs md:text-sm"
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="text-xs md:text-sm"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="p-4 md:p-8">
+      <div className="flex justify-end mb-6">
+        <Button onClick={handleMigration} disabled={isMigrating} variant="outline" className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold h-12 px-6">
+          {isMigrating ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing Migration...</>
+          ) : <><Database size={18} className="mr-2" /> Sync Legacy Data</>}
+        </Button>
+      </div>
+      <AdminDataTable
+        columns={columns}
+        data={data}
+        title="Signup Registrations"
+        subtitle="Manage new student signups and account approvals"
+        icon={<Users size={28} />}
+        filterColumn="name"
+        filterPlaceholder="Search registrations by name..."
+        loading={loading}
+        error={error}
+        mobileHiddenColumns={["email"]}
+      />
     </div>
   )
 }

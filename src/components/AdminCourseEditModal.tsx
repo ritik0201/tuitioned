@@ -10,8 +10,16 @@ import {
   CircularProgress,
   Alert,
   Select,
+  Autocomplete,
 } from "@mui/material";
 import { CourseDetails } from "@/types/admin";
+
+interface Teacher {
+  _id: string;
+  name: string;
+  email: string;
+  listOfSubjects?: string[];
+}
 
 interface AdminCourseEditModalProps {
   open: boolean;
@@ -56,6 +64,26 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      setIsLoadingTeachers(true);
+      try {
+        const response = await fetch('/api/teachers?status=approved');
+        if (response.ok) {
+          const data = await response.json();
+          setTeachers(data);
+        }
+      } catch (error) {
+        console.error("Error fetching teachers:", error);
+      } finally {
+        setIsLoadingTeachers(false);
+      }
+    };
+    fetchTeachers();
+  }, []);
 
   useEffect(() => {
     // Reset form data when course prop changes (e.g., modal opens for a different course)
@@ -208,14 +236,32 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
           fullWidth
           margin="normal"
         />
-        <TextField
-          label="Assigned Teacher ID"
-          name="teacherId"
-          value={formData.teacherId}
-          onChange={handleChange}
+        <Autocomplete
+          options={teachers}
+          getOptionLabel={(option) => `${option.name} (${option.listOfSubjects?.join(", ") || option.email})`}
+          value={teachers.find(t => t._id === formData.teacherId) || null}
+          onChange={(_, newValue) => {
+            setFormData(prev => ({ ...prev, teacherId: newValue?._id || "" }));
+          }}
+          loading={isLoadingTeachers}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Assigned Teacher"
+              margin="normal"
+              required
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <React.Fragment>
+                    {isLoadingTeachers ? <CircularProgress color="inherit" size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </React.Fragment>
+                ),
+              }}
+            />
+          )}
           fullWidth
-          margin="normal"
-          required
         />
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2, mt: 3 }}>

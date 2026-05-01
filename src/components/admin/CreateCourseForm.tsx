@@ -21,8 +21,10 @@ import {
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
-  Rocket
+  Rocket,
+  Search
 } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Select,
   SelectContent,
@@ -51,6 +53,8 @@ interface Teacher {
   id: string;
   name: string;
   email: string;
+  listOfSubjects?: string[];
+  profileImage?: string;
 }
 
 interface CreateCourseFormProps {
@@ -71,6 +75,8 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [isLoadingTeachers, setIsLoadingTeachers] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isTeacherDropdownOpen, setIsTeacherDropdownOpen] = useState(false);
 
   const form = useForm<CourseFormValues>({
     defaultValues: {
@@ -108,6 +114,13 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
   }, []);
 
   const teacherIdWatch = form.watch('teacherId');
+  const selectedTeacher = teachers.find(t => t.id === teacherIdWatch);
+
+  const filteredTeachers = teachers.filter(teacher => 
+    teacher.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    teacher.listOfSubjects?.some(sub => sub.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   useEffect(() => {
     if (teacherIdWatch && teacherIdWatch.length === 24) {
@@ -261,30 +274,95 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                       <h2 className="text-xl font-black text-white px-1">Educator Assignment</h2>
                     </div>
                     <FormField control={form.control} name="teacherId" render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="relative">
                         <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Faculty Member</FormLabel>
-                        <Select disabled={isLoadingTeachers} onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="bg-gray-900 border-gray-800 h-14 pl-10 rounded-xl focus:border-blue-500 text-left">
-                              <User className="absolute left-3 top-4.5 h-5 w-5 text-gray-600" />
-                              <SelectValue placeholder={isLoadingTeachers ? "Retrieving experts..." : "Choose educator"} />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent className="bg-[#121417] border-gray-800 z-[9999] rounded-xl p-1 w-full max-w-[400px]">
-                            {teachers.length > 0 ? teachers.map((teacher) => (
-                              <SelectItem key={teacher.id} value={teacher.id} className="cursor-pointer rounded-lg py-2 focus:bg-blue-600/10 mb-0.5 last:mb-0">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="flex flex-col">
-                                    <span className="font-bold text-gray-200 text-sm">{teacher.name}</span>
-                                    <span className="text-[9px] text-gray-500">{teacher.email}</span>
-                                  </div>
+                        <div className="relative">
+                          <div 
+                            onClick={() => !isLoadingTeachers && setIsTeacherDropdownOpen(!isTeacherDropdownOpen)}
+                            className={`
+                              bg-gray-900 border-gray-800 h-14 pl-10 pr-10 rounded-xl border flex items-center cursor-pointer transition-all
+                              ${isTeacherDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/10' : 'hover:border-gray-700'}
+                              ${isLoadingTeachers ? 'opacity-50 cursor-wait' : ''}
+                            `}
+                          >
+                            <User className="absolute left-3 h-5 w-5 text-gray-600" />
+                            <div className="flex flex-col">
+                              <span className={selectedTeacher ? "text-gray-100 font-bold text-sm" : "text-gray-500 text-sm"}>
+                                {isLoadingTeachers ? "Retrieving experts..." : (selectedTeacher ? selectedTeacher.name : "Choose educator")}
+                              </span>
+                              {selectedTeacher && (
+                                <span className="text-[9px] text-gray-500 truncate max-w-[250px]">
+                                  {selectedTeacher.listOfSubjects?.join(", ") || selectedTeacher.email}
+                                </span>
+                              )}
+                            </div>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                               <ChevronRight className={`w-4 h-4 text-gray-600 transition-transform ${isTeacherDropdownOpen ? 'rotate-90' : ''}`} />
+                            </div>
+                          </div>
+
+                          <AnimatePresence>
+                            {isTeacherDropdownOpen && (
+                              <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 10 }}
+                                className="absolute top-full left-0 right-0 z-[999] mt-2 bg-[#121417] border border-gray-800 rounded-2xl shadow-2xl overflow-hidden"
+                              >
+                                <div className="p-3 border-b border-gray-800/50">
+                                   <div className="relative">
+                                      <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-600" />
+                                      <Input 
+                                        placeholder="Search name or subject..." 
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="bg-gray-950 border-gray-800 h-9 pl-9 text-xs rounded-lg focus:ring-1 focus:ring-blue-500"
+                                        autoFocus
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                   </div>
                                 </div>
-                              </SelectItem>
-                            )) : (
-                              <div className="p-4 text-center text-gray-600 text-xs italic">No approved educators</div>
+                                <div className="max-h-[250px] overflow-y-auto p-1 scrollbar-hide">
+                                  {filteredTeachers.length > 0 ? filteredTeachers.map((teacher) => (
+                                    <div 
+                                      key={teacher.id} 
+                                      onClick={() => {
+                                        field.onChange(teacher.id);
+                                        setIsTeacherDropdownOpen(false);
+                                        setSearchTerm('');
+                                      }}
+                                      className={`
+                                        flex items-center gap-3 p-3 cursor-pointer rounded-xl transition-colors mb-0.5 last:mb-0
+                                        ${field.value === teacher.id ? 'bg-blue-600/20 border border-blue-500/30' : 'hover:bg-white/5 border border-transparent'}
+                                      `}
+                                    >
+                                      <Avatar className="h-9 w-9 border border-white/5">
+                                        <AvatarImage src={teacher.profileImage} />
+                                        <AvatarFallback className="bg-blue-600 text-[10px] text-white font-bold">{teacher.name.charAt(0)}</AvatarFallback>
+                                      </Avatar>
+                                      <div className="flex flex-col min-w-0">
+                                        <span className={`font-bold text-sm ${field.value === teacher.id ? 'text-blue-400' : 'text-gray-200'}`}>{teacher.name}</span>
+                                        <div className="flex flex-wrap gap-1 mt-1">
+                                           {teacher.listOfSubjects?.slice(0, 2).map((sub, i) => (
+                                             <span key={i} className="text-[8px] bg-white/5 px-1.5 py-0.5 rounded text-gray-500 uppercase font-black tracking-tighter">{sub}</span>
+                                           ))}
+                                           {(teacher.listOfSubjects?.length || 0) > 2 && (
+                                             <span className="text-[8px] text-gray-600">+{(teacher.listOfSubjects?.length || 0) - 2}</span>
+                                           )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )) : (
+                                    <div className="py-10 text-center flex flex-col items-center gap-2">
+                                       <Search size={24} className="text-gray-800" />
+                                       <p className="text-xs text-gray-600 italic font-medium">No educators match your search</p>
+                                    </div>
+                                  )}
+                                </div>
+                              </motion.div>
                             )}
-                          </SelectContent>
-                        </Select>
+                          </AnimatePresence>
+                        </div>
                       </FormItem>
                     )} />
                   </div>

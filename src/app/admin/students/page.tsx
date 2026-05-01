@@ -2,19 +2,17 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ColumnDef } from "@tanstack/react-table"
+import { 
+  ArrowUpDown, 
+  MoreHorizontal, 
+  Trash2, 
+  Eye, 
+  Copy,
+  GraduationCap,
+  Mail,
+  Phone
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,78 +22,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input" 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AdminDataTable } from "@/components/admin/DataTable";
 
 export type Student = {
   id: string
   name: string
   email: string
   mobile: string
-}
-
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = React.useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mediaQueryList = window.matchMedia(query);
-    const listener = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    setMatches(mediaQueryList.matches);
-
-    mediaQueryList.addEventListener('change', listener);
-    return () => {
-      mediaQueryList.removeEventListener('change', listener);
-    };
-  }, [query]);
-
-  return matches;
+  profileImage?: string
 }
 
 export default function StudentDataTable() {
   const router = useRouter()
   const [data, setData] = React.useState<Student[]>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
 
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  React.useEffect(() => {
-    setColumnVisibility(isDesktop ? {} : { id: false, email: false, mobile: false });
-  }, [isDesktop]);
-
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this student? This action cannot be undone.")) return;
-
+    if (!confirm("Are you sure you want to delete this student?")) return;
     try {
-      const response = await fetch(`/api/students/${id}`, {
-        method: "DELETE",
-      });
-
+      const response = await fetch(`/api/students/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Failed to delete student");
-
       setData((prev) => prev.filter((student) => student.id !== id));
       toast.success("Student deleted successfully");
     } catch (error) {
@@ -106,65 +55,71 @@ export default function StudentDataTable() {
   const columns: ColumnDef<Student>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => <div>{row.getValue("name")}</div>,
-    },
-    {
-      accessorKey: "id",
-      header: "Student ID",
+      header: ({ column }) => (
+        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Student Name <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12 border border-white/10 shadow-lg ring-2 ring-blue-500/10">
+            <AvatarImage src={row.original.profileImage} />
+            <AvatarFallback className="bg-blue-600 text-sm text-white font-black">{row.original.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+             <span className="font-black text-base text-white tracking-tight">{row.original.name}</span>
+             <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mt-0.5">{row.original.id}</span>
+          </div>
+        </div>
+      ),
     },
     {
       accessorKey: "email",
-      header: "Email",
-    },
-    {
-      accessorKey: "mobile",
-      header: "Mobile No.",
+      header: "Contact Channels",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1.5">
+           <div className="flex items-center gap-2.5 text-xs text-gray-300 font-medium">
+              <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400"><Mail size={12} /></div>
+              {row.original.email}
+           </div>
+           <div className="flex items-center gap-2.5 text-xs text-gray-400 font-medium">
+              <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400"><Phone size={12} /></div>
+              {row.original.mobile}
+           </div>
+        </div>
+      )
     },
     {
       id: "actions",
-      enableHiding: false,
+      header: "Management",
       cell: ({ row }) => {
         const student = row.original
-  
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
-              <DropdownMenuItem 
-                onClick={() => handleDelete(student.id)}
-                className="text-red-500 focus:text-red-500 cursor-pointer"
-              >Delete</DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(student.id)}
-                className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"
-              >
-                Copy student ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
+          <div className="flex items-center gap-3">
+             <Button 
+                variant="outline" 
+                size="sm" 
+                className="rounded-xl border-white/5 bg-white/5 hover:bg-blue-600 hover:text-white transition-all font-bold px-4 h-9"
                 onClick={() => router.push(`/admin/students/${student.id}`)}
-                className="cursor-pointer data-[highlighted]:bg-transparent data-[highlighted]:text-purple-400"
-              >
-                View student details
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+             >
+                <Eye size={14} className="mr-2" /> View
+             </Button>
+             <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10"><MoreHorizontal size={18} /></Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
+                  <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-3 py-2">Quick Actions</DropdownMenuLabel>
+                  <DropdownMenuItem className="rounded-xl focus:bg-white/5 focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(student.id)}>
+                    <Copy size={16} className="mr-3 text-gray-400" /> Copy System ID
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-white/5 my-1" />
+                  <DropdownMenuItem onClick={() => handleDelete(student.id)} className="rounded-xl text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer py-2.5">
+                    <Trash2 size={16} className="mr-3" /> Remove Record
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+             </DropdownMenu>
+          </div>
         )
       },
     },
@@ -175,15 +130,7 @@ export default function StudentDataTable() {
       try {
         setLoading(true)
         const response = await fetch('/api/students?status=confirmed')
-
-        const contentType = response.headers.get('content-type');
-        if (!response.ok) {
-          if (contentType && contentType.includes('application/json')) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch students');
-          }
-          throw new Error('Your session may have expired. Please log in again.');
-        }
+        if (!response.ok) throw new Error('System error: Failed to retrieve student data');
         const students = await response.json()
         setData(students)
       } catch (err: any) {
@@ -195,131 +142,20 @@ export default function StudentDataTable() {
     fetchStudents()
   }, [])
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-    },
-  })
-
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
-      <Card className="w-full">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl md:text-2xl">Confirmed Students</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center py-3 md:py-4">
-            <Input
-              placeholder="Filter by student name..."
-              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("name")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm w-full"
-            />
-          </div>
-          <div className="rounded-md border overflow-x-auto">
-            <Table>
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  Array.from({ length: 10 }).map((_, i) => (
-                    <TableRow key={`skeleton-row-${i}`}>
-                      {table.getVisibleLeafColumns().map(column => (
-                        <TableCell key={column.id}>
-                          <Skeleton className="h-6 w-full" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : error ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-20 md:h-24 text-center text-red-500">{error}</TableCell>
-                  </TableRow>
-                ) : table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      className="hover:bg-muted/50 even:bg-muted/20"
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-20 md:h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4 py-3 md:py-4">
-            <div className="text-xs md:text-sm text-muted-foreground order-2 sm:order-1">
-              {table.getFilteredRowModel().rows.length} student(s) total
-            </div>
-            <div className="flex gap-2 order-1 sm:order-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="text-xs md:text-sm"
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="text-xs md:text-sm"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="p-4 md:p-8">
+      <AdminDataTable
+        columns={columns}
+        data={data}
+        title="Student Directory"
+        subtitle="Complete database of all confirmed students on the platform"
+        icon={<GraduationCap size={28} />}
+        filterColumn="name"
+        filterPlaceholder="Search students by name..."
+        loading={loading}
+        error={error}
+        mobileHiddenColumns={["email"]}
+      />
     </div>
   )
 }

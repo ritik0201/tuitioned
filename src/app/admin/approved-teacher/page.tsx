@@ -2,38 +2,31 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  useReactTable,
-  SortingState,
-  ColumnFiltersState,
-  VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ColumnDef } from "@tanstack/react-table"
+import { 
+  ArrowUpDown, 
+  MoreHorizontal, 
+  CheckCircle2, 
+  School, 
+  Mail, 
+  Phone, 
+  Copy, 
+  Eye,
+  ShieldCheck,
+  BookOpen
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Paper, Typography } from "@mui/material"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { AdminDataTable } from "@/components/admin/DataTable"
 
 export type ApprovedTeacher = {
   id: string
@@ -42,51 +35,25 @@ export type ApprovedTeacher = {
   mobile: string
   listOfSubjects: string[]
   teacherStatus: string
-}
-
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = React.useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia(query).matches;
-  });
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const mediaQueryList = window.matchMedia(query);
-    const listener = (event: MediaQueryListEvent) => {
-      setMatches(event.matches);
-    };
-
-    setMatches(mediaQueryList.matches);
-
-    mediaQueryList.addEventListener('change', listener);
-    return () => {
-      mediaQueryList.removeEventListener('change', listener);
-    };
-  }, [query]);
-
-  return matches;
+  profileImage?: string
 }
 
 export default function ApprovedTeachersPage() {
   const router = useRouter()
   const [data, setData] = React.useState<ApprovedTeacher[]>([])
   const [loading, setLoading] = React.useState(true)
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  const [error, setError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     const fetchTeachers = async () => {
       try {
+        setLoading(true)
         const res = await fetch('/api/approve-teacher')
-        if (res.ok) {
-          const teachers = await res.json()
-          setData(teachers)
-        }
-      } catch (error) {
-        console.error("Failed to fetch approved teachers", error)
+        if (!res.ok) throw new Error('Network response was not ok');
+        const teachers = await res.json()
+        setData(teachers)
+      } catch (error: any) {
+        setError(error.message)
       } finally {
         setLoading(false)
       }
@@ -94,190 +61,114 @@ export default function ApprovedTeachersPage() {
     fetchTeachers()
   }, [])
 
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  React.useEffect(() => {
-    setColumnVisibility(isDesktop ? {} : { email: false, mobile: false, listOfSubjects: false, teacherStatus: false });
-  }, [isDesktop]);
-
   const columns: ColumnDef<ApprovedTeacher>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
-      accessorKey: "mobile",
-      header: "Mobile",
-    },
-    {
-      accessorKey: "listOfSubjects",
-      header: "Subjects",
-      cell: ({ row }) => {
-        const subjects = row.getValue("listOfSubjects") as string[]
-        return Array.isArray(subjects) ? subjects.join(", ") : "N/A"
-      }
-    },
-    {
-      accessorKey: "teacherStatus",
-      header: "Status",
+      header: ({ column }) => (
+        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Teacher Profile <ArrowUpDown className="ml-2 h-3 w-3" />
+        </Button>
+      ),
       cell: ({ row }) => (
-        <span className="text-green-400 font-medium capitalize">
-          {row.getValue("teacherStatus")}
-        </span>
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12 border border-white/10 shadow-lg ring-2 ring-emerald-500/10">
+            <AvatarImage src={row.original.profileImage} />
+            <AvatarFallback className="bg-emerald-600 text-sm text-white font-black">{row.original.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+             <span className="font-black text-base text-white tracking-tight">{row.original.name}</span>
+             <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mt-0.5">{row.original.id}</span>
+          </div>
+        </div>
       ),
     },
     {
+      accessorKey: "teacherStatus",
+      header: "Trust Status",
+      cell: ({ row }) => (
+        <Badge className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+          <ShieldCheck size={12} />
+          Verified Account
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "listOfSubjects",
+      header: "Departments",
+      cell: ({ row }) => (
+        <div className="flex flex-wrap gap-1 max-w-[220px]">
+          {row.original.listOfSubjects?.slice(0, 3).map((sub, i) => (
+            <Badge key={i} variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+              {sub}
+            </Badge>
+          ))}
+          {(row.original.listOfSubjects?.length || 0) > 3 && (
+            <Badge variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+              +{(row.original.listOfSubjects?.length || 0) - 3}
+            </Badge>
+          )}
+        </div>
+      )
+    },
+    {
+      accessorKey: "email",
+      header: "Contact",
+      cell: ({ row }) => (
+        <div className="flex flex-col gap-1">
+           <div className="flex items-center gap-2 text-xs text-gray-300">
+              <Mail size={12} className="text-blue-400" />
+              {row.original.email}
+           </div>
+           <div className="flex items-center gap-2 text-xs text-gray-400">
+              <Phone size={12} className="text-emerald-400" />
+              {row.original.mobile}
+           </div>
+        </div>
+      )
+    },
+    {
       id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const teacher = row.original
- 
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="backdrop-blur-sm bg-popover/80">
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(teacher.id)}
-              >
-                Copy teacher ID
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
-              >
-                View teacher details
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      },
+      header: "Ops",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+           <Button 
+              variant="outline" 
+              size="sm" 
+              className="rounded-xl border-white/5 bg-white/5 hover:bg-emerald-600 hover:text-white transition-all font-bold px-4 h-9"
+              onClick={() => router.push(`/admin/teachers/${row.original.id}`)}
+           >
+              <Eye size={14} className="mr-2" /> Profile
+           </Button>
+           <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10"><MoreHorizontal size={18} /></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-3 py-2">Quick Access</DropdownMenuLabel>
+                <DropdownMenuItem className="rounded-xl focus:bg-white/5 focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(row.original.id)}>
+                  <Copy size={16} className="mr-3 text-gray-400" /> Copy System ID
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+           </DropdownMenu>
+        </div>
+      ),
     },
   ]
 
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-    },
-  })
-
   return (
-    <Paper elevation={0} sx={{ p: 4, bgcolor: '#1f2937', color: 'white', borderRadius: 2 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">Approved Teachers</Typography>
-      
-      <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter by name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm bg-gray-800 text-white border-gray-700"
-        />
-      </div>
-
-      <div className="rounded-md border border-gray-700">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-gray-700 hover:bg-gray-800/50">
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-gray-400">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              Array.from({ length: 10 }).map((_, i) => (
-                <TableRow key={`skeleton-row-${i}`} className="border-gray-700">
-                  {table.getVisibleLeafColumns().map(column => (
-                    <TableCell key={column.id}>
-                      <Skeleton className="h-6 w-full bg-gray-700" />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="border-gray-700 hover:bg-gray-800/50"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-gray-300">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-gray-400">
-                  No approved teachers found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-          className="bg-transparent text-white border-gray-600 hover:bg-gray-800"
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-          className="bg-transparent text-white border-gray-600 hover:bg-gray-800"
-        >
-          Next
-        </Button>
-      </div>
-    </Paper>
+    <div className="p-4 md:p-8">
+      <AdminDataTable
+        columns={columns}
+        data={data}
+        title="Verified Educators"
+        subtitle="Full directory of teachers who have successfully passed the verification process"
+        icon={<CheckCircle2 size={28} />}
+        filterColumn="name"
+        filterPlaceholder="Search verified teachers..."
+        loading={loading}
+        error={error}
+        mobileHiddenColumns={["email"]}
+      />
+    </div>
   )
 }

@@ -15,7 +15,7 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { LayoutDashboard, Users, School, LogOut, Menu, Sparkles, Receipt, UserCheck } from 'lucide-react';
+import { LayoutDashboard, Users, School, LogOut, Menu, Sparkles, Receipt, UserCheck, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
@@ -30,6 +30,7 @@ const navItems = [
   { text: 'Trial Classes', icon: <Sparkles size={20} />, href: '/admin/democlass-student' },
   { text: 'Teachers', icon: <School size={20} />, href: '/admin/teachers' },
   { text: 'Signup Students', icon: <Users size={20} />, href: '/admin/signup-student' },
+  { text: 'Bulk Mail', icon: <Mail size={20} />, href: '/admin/mail' },
   { text: 'Transactions', icon: <Receipt size={20} />, href: '/admin/transaction' },
 ];
 
@@ -78,8 +79,17 @@ export default function AdminLayout({
                   borderRadius: 2,
                 }}
               >
-                <ListItemIcon sx={{ color: isActive ? 'primary.main' : 'rgba(255, 255, 255, 0.7)' }}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} sx={{ color: isActive ? 'white' : 'rgba(255, 255, 255, 0.7)' }} />
+                <ListItemIcon sx={{ color: isActive ? '#3b82f6' : 'rgba(255, 255, 255, 0.5)', minWidth: 40 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText 
+                  primary={item.text} 
+                  primaryTypographyProps={{ 
+                    fontSize: '0.875rem', 
+                    fontWeight: isActive ? 600 : 400,
+                    color: isActive ? 'white' : 'rgba(255, 255, 255, 0.6)'
+                  }} 
+                />
               </ListItemButton>
             </ListItem>
           );
@@ -161,6 +171,8 @@ export default function AdminLayout({
             color: 'white',
             width: drawerWidth,
             boxSizing: 'border-box',
+            borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+            boxShadow: '4px 0 24px rgba(0,0,0,0.5)'
           },
         }}
       >
@@ -201,8 +213,17 @@ export default function AdminLayout({
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: '#030712', p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{ 
+          flexGrow: 1, 
+          bgcolor: '#030712', 
+          p: 3, 
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
       >
+        <Toolbar /> {/* This acts as a spacer for the fixed AppBar */}
         {children}
       </Box>
     </Box>
