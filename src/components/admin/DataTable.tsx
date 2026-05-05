@@ -14,12 +14,9 @@ import {
   VisibilityState,
 } from "@tanstack/react-table"
 import { 
-  ArrowUpDown, 
   Search, 
   ChevronLeft, 
   ChevronRight,
-  Filter,
-  ArrowRight
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input" 
@@ -31,9 +28,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { motion, AnimatePresence } from "framer-motion"
+import { Box, Typography } from "@mui/material"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -102,132 +99,158 @@ export function AdminDataTable<TData, TValue>({
   })
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full">
-      <Card className="bg-[#111827] border-white/5 shadow-2xl rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden">
-        <CardHeader className="p-5 md:p-10 border-b border-white/5 bg-gradient-to-r from-white/[0.02] to-transparent">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6">
-            <div className="flex items-center gap-3 md:gap-5">
-              {icon && (
-                <div className="p-2.5 md:p-4 rounded-xl md:rounded-2xl bg-blue-600/10 text-blue-500 border border-blue-500/20 shadow-inner">
-                   {React.cloneElement(icon as React.ReactElement, { size: 20 })}
-                </div>
-              )}
-              <div>
-                <CardTitle className="text-xl md:text-3xl font-black text-white tracking-tight">{title}</CardTitle>
-                {subtitle && <p className="text-gray-500 text-[10px] md:text-sm mt-0.5 md:mt-1 font-medium line-clamp-1">{subtitle}</p>}
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              {filterColumn && (
-                <div className="relative group w-full sm:w-auto">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-500 transition-colors" size={16} />
-                  <Input
-                    placeholder={filterPlaceholder}
-                    value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
-                    onChange={(event) => table.getColumn(filterColumn)?.setFilterValue(event.target.value)}
-                    className="pl-9 w-full sm:w-[250px] md:w-[300px] bg-white/5 border-white/10 text-white rounded-xl md:rounded-2xl h-10 md:h-12 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-sm"
-                  />
-                </div>
-              )}
-            </div>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full">
+      {/* Integrated Header */}
+      <Box sx={{ mb: 6, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { md: 'center' }, justifyContent: 'space-between', gap: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+          {icon && (
+            <Box sx={{ 
+              p: 2, 
+              borderRadius: 4, 
+              bgcolor: 'rgba(99, 102, 241, 0.1)', 
+              color: '#818cf8',
+              border: '1px solid rgba(99, 102, 241, 0.2)',
+            }}>
+              {React.cloneElement(icon as React.ReactElement, { size: 24 })}
+            </Box>
+          )}
+          <Box>
+            <Typography variant="h3" fontWeight="900" sx={{ color: 'white', tracking: '-0.02em', mb: 0.5 }}>
+              {title}
+            </Typography>
+            {subtitle && (
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
+        </Box>
+        
+        {filterColumn && (
+          <div className="relative group w-full md:w-80">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-500 transition-colors" size={18} />
+            <Input
+              placeholder={filterPlaceholder}
+              value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
+              onChange={(event) => table.getColumn(filterColumn)?.setFilterValue(event.target.value)}
+              className="pl-12 w-full bg-white/5 border-white/10 text-white rounded-2xl h-14 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-base placeholder:text-gray-600"
+            />
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto scrollbar-hide">
-            <Table>
-              <TableHeader className="bg-white/[0.01]">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="border-b border-white/5 hover:bg-transparent">
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="text-gray-500 font-bold uppercase text-[9px] md:text-[10px] tracking-[0.1em] md:tracking-[0.2em] py-4 md:py-6 px-4 md:px-8">
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
+        )}
+      </Box>
+
+      {/* Modern Integrated Table */}
+      <Box sx={{ 
+        borderRadius: 6, 
+        overflow: 'hidden', 
+        bgcolor: 'rgba(255, 255, 255, 0.02)', 
+        border: '1px solid rgba(255, 255, 255, 0.05)',
+        backdropFilter: 'blur(20px)'
+      }}>
+        <div className="overflow-x-auto scrollbar-hide">
+          <Table>
+            <TableHeader className="bg-white/[0.03]">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="border-b border-white/5 hover:bg-transparent">
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} className="text-gray-400 font-bold uppercase text-[11px] tracking-[0.15em] py-6 px-8">
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <TableRow key={`skeleton-${i}`} className="border-b border-white/5">
+                    {columns.filter(c => table.getColumn(c.id || (c as any).accessorKey)?.getIsVisible() !== false).map((_, j) => (
+                      <TableCell key={`cell-${j}`} className="py-8 px-8">
+                        <Skeleton className="h-10 w-full bg-white/5 rounded-2xl" />
+                      </TableCell>
                     ))}
                   </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={`skeleton-${i}`} className="border-b border-white/5">
-                      {columns.filter(c => table.getColumn(c.id || (c as any).accessorKey)?.getIsVisible() !== false).map((_, j) => (
-                        <TableCell key={`cell-${j}`} className="py-4 md:py-8 px-4 md:px-8">
-                          <Skeleton className="h-8 md:h-10 w-full bg-white/5 rounded-xl md:rounded-2xl" />
+                ))
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-80 text-center">
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, color: '#f87171', p: 4 }}>
+                      <Typography variant="h5" fontWeight="bold">System Error</Typography>
+                      <Typography variant="body2" sx={{ opacity: 0.7 }}>{error}</Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
+                <AnimatePresence mode="popLayout">
+                  {table.getRowModel().rows.map((row, idx) => (
+                    <motion.tr
+                      key={row.id}
+                      layout
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                      transition={{ delay: idx * 0.01 }}
+                      className="border-b border-white/5 hover:bg-white/[0.04] transition-all group"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="py-6 px-8">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
-                    </TableRow>
-                  ))
-                ) : error ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-40 md:h-60 text-center">
-                       <div className="flex flex-col items-center gap-2 text-red-400 p-4">
-                          <span className="text-base md:text-lg font-bold">Error loading data</span>
-                          <span className="text-xs md:text-sm opacity-70">{error}</span>
-                       </div>
-                    </TableCell>
-                  </TableRow>
-                ) : table.getRowModel().rows?.length ? (
-                  <AnimatePresence mode="popLayout">
-                    {table.getRowModel().rows.map((row, idx) => (
-                      <motion.tr
-                        key={row.id}
-                        layout
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 10 }}
-                        transition={{ delay: idx * 0.02 }}
-                        className="border-b border-white/5 hover:bg-white/[0.03] transition-all group"
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id} className="py-4 md:py-6 px-4 md:px-8">
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        ))}
-                      </motion.tr>
-                    ))}
-                  </AnimatePresence>
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="h-40 md:h-60 text-center">
-                       <div className="flex flex-col items-center gap-3 text-gray-600 p-4">
-                          <Search size={32} className="opacity-20" />
-                          <span className="text-base md:text-lg font-medium">No records found</span>
-                       </div>
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-          
-          <div className="p-5 md:p-10 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 md:gap-6 bg-white/[0.01]">
-            <div className="flex items-center gap-2 md:gap-3 text-[10px] md:text-sm text-gray-500 font-semibold bg-white/5 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-white/5">
-              Showing <span className="text-white">{table.getRowModel().rows.length}</span> of <span className="text-white">{data.length}</span>
-            </div>
-            <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto">
-              <Button 
-                 variant="outline" 
-                 size="sm" 
-                 onClick={() => table.previousPage()} 
-                 disabled={!table.getCanPreviousPage()}
-                 className="flex-1 sm:flex-none bg-white/5 border-white/10 text-white rounded-xl px-4 md:px-6 h-9 md:h-11 hover:bg-white/10 hover:border-white/20 disabled:opacity-20 transition-all font-bold text-xs md:text-sm"
-              >
-                <ChevronLeft size={16} className="mr-1 md:mr-2" /> Prev
-              </Button>
-              <Button 
-                 variant="outline" 
-                 size="sm" 
-                 onClick={() => table.nextPage()} 
-                 disabled={!table.getCanNextPage()}
-                 className="flex-1 sm:flex-none bg-white/5 border-white/10 text-white rounded-xl px-4 md:px-6 h-9 md:h-11 hover:bg-white/10 hover:border-white/20 disabled:opacity-20 transition-all font-bold text-xs md:text-sm"
-              >
-                Next <ChevronRight size={16} className="ml-1 md:ml-2" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-80 text-center">
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textSecondary: 'gray.600', p: 4 }}>
+                      <Search size={48} className="opacity-10 text-white" />
+                      <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>No matches found</Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        
+        {/* Integrated Pagination */}
+        <Box sx={{ 
+          p: 4, 
+          px: 8,
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)', 
+          display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' }, 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          gap: 4, 
+          bg: 'rgba(255, 255, 255, 0.01)' 
+        }}>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600 }}>
+            Showing <span className="text-white">{table.getRowModel().rows.length}</span> of <span className="text-white">{data.length}</span> records
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, w: { xs: '100%', sm: 'auto' } }}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => table.previousPage()} 
+              disabled={!table.getCanPreviousPage()}
+              className="flex-1 sm:flex-none bg-white/5 border-white/10 text-white rounded-xl px-6 h-11 hover:bg-white/10 hover:border-white/20 disabled:opacity-20 transition-all font-bold"
+            >
+              <ChevronLeft size={18} className="mr-2" /> Previous
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => table.nextPage()} 
+              disabled={!table.getCanNextPage()}
+              className="flex-1 sm:flex-none bg-white/5 border-white/10 text-white rounded-xl px-6 h-11 hover:bg-white/10 hover:border-white/20 disabled:opacity-20 transition-all font-bold"
+            >
+              Next <ChevronRight size={18} className="ml-2" />
+            </Button>
+          </Box>
+        </Box>
+      </Box>
     </motion.div>
   )
 }

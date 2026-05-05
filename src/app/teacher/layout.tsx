@@ -225,10 +225,17 @@ export default function TeacherLayout({
       </Box>
       <Box
         component="main"
-        sx={{ flexGrow: 1, bgcolor: '#030712', p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
+        sx={{ 
+          flexGrow: 1, 
+          bgcolor: '#030712', 
+          p: 3, 
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          minHeight: '100vh'
+        }}
       >
+        <Toolbar />
         {loadingStatus ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh', color: 'white' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 'calc(100vh - 100px)', color: 'white' }}>
             <Typography>Loading...</Typography>
           </Box>
         ) : teacherStatus === 'approved' ? (

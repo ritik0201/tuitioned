@@ -209,20 +209,29 @@ export default function SignupStudentDataTable() {
   ]
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="flex justify-end mb-6">
-        <Button onClick={handleMigration} disabled={isMigrating} variant="outline" className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-bold h-12 px-6">
+    <div className="p-4 md:p-8 max-w-[1600px] mx-auto">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10">
+        <div className="flex items-center gap-4">
+          <div className="p-3.5 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <Users size={28} />
+          </div>
+          <div>
+            <h1 className="text-3xl font-black text-white tracking-tight">Signup Registrations</h1>
+            <p className="text-gray-500 font-medium mt-1">Manage new student signups and account approvals</p>
+          </div>
+        </div>
+        <Button onClick={handleMigration} disabled={isMigrating} variant="outline" className="rounded-2xl border-white/10 bg-white/5 hover:bg-white/10 text-white font-black h-14 px-8 shadow-xl shadow-black/20">
           {isMigrating ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing Migration...</>
+            <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Processing...</>
           ) : <><Database size={18} className="mr-2" /> Sync Legacy Data</>}
         </Button>
       </div>
+
       <AdminDataTable
         columns={columns}
         data={data}
-        title="Signup Registrations"
-        subtitle="Manage new student signups and account approvals"
-        icon={<Users size={28} />}
+        title="" // Empty title because we have a custom header
+        subtitle=""
         filterColumn="name"
         filterPlaceholder="Search registrations by name..."
         loading={loading}
