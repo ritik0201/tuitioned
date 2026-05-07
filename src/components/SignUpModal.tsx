@@ -14,6 +14,7 @@ import { Stack } from '@mui/material';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../app/get-a-free-trial/phone-input.css';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface SignUpModalProps {
     open: boolean;
@@ -44,6 +45,7 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
     const [otp, setOtp] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
     const textFieldStyles = {
         '& .MuiInputBase-input': {
@@ -72,11 +74,18 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
     const handleVerify = async () => {
         setLoading(true);
         setError('');
+
+        if (!recaptchaToken) {
+            setError('Please complete the reCAPTCHA verification.');
+            setLoading(false);
+            return;
+        }
+
         try {
             const res = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ fullName, email, mobile }),
+                body: JSON.stringify({ fullName, email, mobile, recaptchaToken }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Failed to send OTP.');
@@ -126,18 +135,44 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
         >
             <Box sx={style}>
                 {/* Left Side */}
-                <Box sx={{ width: { xs: '100%', md: 300 }, p: 4, bgcolor: 'primary.main', color: 'primary.contrastText', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-                    <UserPlus size={64} />
-                    <Typography variant="h5" component="h2" sx={{ mt: 2, fontWeight: 'bold' }}>
-                        Create Your Account
-                    </Typography>
-                    <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
-                        Start your learning journey with us.
-                    </Typography>
+                <Box sx={{ 
+                    width: { xs: '100%', md: 300 }, 
+                    p: 4, 
+                    background: 'linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)', 
+                    color: 'primary.contrastText', 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    textAlign: 'center',
+                    position: 'relative',
+                    overflow: 'hidden'
+                }}>
+                    <Box sx={{ position: 'absolute', top: -20, left: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(20px)' }} />
+                    <Box sx={{ position: 'absolute', bottom: -30, right: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(30px)' }} />
+                    
+                    <Box sx={{ position: 'relative', zIndex: 1 }}>
+                        <UserPlus size={80} strokeWidth={1.5} />
+                        <Typography variant="h4" component="h2" sx={{ mt: 3, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                            Create Your Account
+                        </Typography>
+                        <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: 3, mx: 'auto', borderRadius: 2 }} />
+                        <Typography variant="body1" sx={{ mt: 1, opacity: 0.9, fontWeight: 500 }}>
+                            Start your learning journey with us.
+                        </Typography>
+                    </Box>
                 </Box>
 
                 {/* Right Side */}
-                <Box sx={{ p: 4, position: 'relative', width: { xs: '100%', md: 450 }, bgcolor: '#1f2937', color: '#fff' }}>
+                <Box sx={{ 
+                    p: { xs: 3, sm: 4 }, 
+                    position: 'relative', 
+                    width: { xs: '100%', md: 450 }, 
+                    bgcolor: '#1f2937', 
+                    color: '#fff',
+                    overflowY: 'auto',
+                    maxHeight: '95vh'
+                }}>
                     <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}>
                         <X />
                     </IconButton>
@@ -154,14 +189,34 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                                 international
                                 className="phone-input-container"
                             />
+                            <Box sx={{ 
+                                display: 'flex', 
+                                justifyContent: 'center', 
+                                my: 3,
+                                '& > div': { 
+                                    borderRadius: '4px',
+                                    overflow: 'hidden'
+                                }
+                            }}>
+                                <ReCAPTCHA
+                                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                                    onChange={(token) => setRecaptchaToken(token)}
+                                    theme="dark"
+                                />
+                            </Box>
                             <Button
                                 variant="contained"
                                 onClick={handleVerify}
                                 disabled={loading}
                                 sx={{
                                     mt: 2,
+                                    mb: 4,
+                                    py: 1.8,
                                     bgcolor: 'primary.main',
                                     color: 'primary.contrastText',
+                                    fontWeight: 'bold',
+                                    fontSize: '1rem',
+                                    borderRadius: 2,
                                     '&:hover': { bgcolor: 'primary.dark' }
                                 }}
                             >
@@ -190,8 +245,13 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                                 disabled={loading}
                                 sx={{
                                     mt: 2,
+                                    mb: 4,
+                                    py: 1.8,
                                     bgcolor: 'primary.main',
                                     color: 'primary.contrastText',
+                                    fontWeight: 'bold',
+                                    fontSize: '1rem',
+                                    borderRadius: 2,
                                     '&:hover': { bgcolor: 'primary.dark' }
                                 }}
                             >

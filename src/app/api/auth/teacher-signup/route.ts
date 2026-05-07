@@ -1,13 +1,19 @@
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 import { sendOtpEmail } from "@/lib/sendOtp";
+import { verifyRecaptcha } from "@/lib/verifyRecaptcha";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     await dbConnect();
     const body = await request.json();
-    // console.log("Teacher Signup Request Body:", body); // Debugging: Check server logs to see received data
+    const { recaptchaToken } = body;
+
+    const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+    if (!recaptchaResult.success) {
+      return NextResponse.json({ message: recaptchaResult.message }, { status: 400 });
+    }
 
     let {
       fullName,

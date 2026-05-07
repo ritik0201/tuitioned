@@ -20,6 +20,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../app/get-a-free-trial/phone-input.css';
+import ReCAPTCHA from 'react-google-recaptcha';
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
@@ -34,8 +35,9 @@ const style = {
   borderRadius: 2,
   display: 'flex',
   flexDirection: { xs: 'column', md: 'row' },
-  overflowY: 'auto',
-  overflowX: 'hidden',
+  overflow: 'hidden', // Changed from overflowY: 'auto' to handle scrolling internally if needed
+  // But wait, the user wants the whole thing to scroll if needed.
+  // Let's use a better approach: the container handles the layout, and we allow scrolling.
 };
 
 const textFieldStyles = {
@@ -71,6 +73,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePhoneChange = (value: string | undefined) => {
@@ -146,6 +149,12 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
     setLoading(true);
     setError('');
 
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA verification.');
+      setLoading(false);
+      return;
+    }
+
     if (!profileImageFile) {
       setError('Profile photo is required.');
       setLoading(false);
@@ -203,7 +212,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName, email, mobile, qualification, experiance, listOfSubjects: finalSubjects, profileImage: profileImageUrl, cvUrl, aboutTeacher, joinLink
+          fullName, email, mobile, qualification, experiance, listOfSubjects: finalSubjects, profileImage: profileImageUrl, cvUrl, aboutTeacher, joinLink, recaptchaToken
         }),
       });
       const data = await res.json();
@@ -248,16 +257,42 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="teacher-signup-modal-title">
       <Box sx={style}>
-        <Box sx={{ width: { xs: '100%', md: 300 }, p: 4, bgcolor: 'primary.main', color: 'primary.contrastText', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-          <School size={64} />
-          <Typography variant="h5" component="h2" sx={{ mt: 2, fontWeight: 'bold' }}>
-            Join Our Team
-          </Typography>
-          <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
-            Share your knowledge and inspire the next generation of learners.
-          </Typography>
+        <Box sx={{ 
+          width: { xs: '100%', md: 300 }, 
+          p: 4, 
+          background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', 
+          color: 'primary.contrastText', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* Subtle background decoration */}
+          <Box sx={{ position: 'absolute', top: -20, left: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(20px)' }} />
+          <Box sx={{ position: 'absolute', bottom: -30, right: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(30px)' }} />
+          
+          <Box sx={{ position: 'relative', zIndex: 1 }}>
+            <School size={80} strokeWidth={1.5} />
+            <Typography variant="h4" component="h2" sx={{ mt: 3, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+              Join Our Team
+            </Typography>
+            <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: 3, mx: 'auto', borderRadius: 2 }} />
+            <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+              Share your knowledge and inspire the next generation of learners.
+            </Typography>
+          </Box>
         </Box>
-        <Box sx={{ p: { xs: 2, sm: 3, md: 4 }, position: 'relative', width: { xs: '100%', md: 500 }, color: '#fff' }}>
+        <Box sx={{ 
+          p: { xs: 3, sm: 4, md: 5 }, 
+          position: 'relative', 
+          width: { xs: '100%', md: 500 }, 
+          color: '#fff',
+          overflowY: 'auto',
+          maxHeight: '95vh'
+        }}>
           <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}><X /></IconButton>
           {step === 'details' && (
             <Box component="form" sx={{ mt: 4 }}>
@@ -368,7 +403,23 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   </Button>
                 </Stack>
               </Box>
-              <Button variant="contained" onClick={handleVerify} disabled={loading} fullWidth sx={{ mt: 3, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'center', 
+                my: 4,
+                '& > div': { 
+                  borderRadius: '4px',
+                  overflow: 'hidden',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                }
+              }}>
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                  onChange={(token) => setRecaptchaToken(token)}
+                  theme="dark"
+                />
+              </Box>
+              <Button variant="contained" onClick={handleVerify} disabled={loading} fullWidth sx={{ mt: 3, mb: 4, py: 1.8, bgcolor: 'primary.main', color: 'primary.contrastText', fontWeight: 'bold', fontSize: '1rem', '&:hover': { bgcolor: 'primary.dark' }, borderRadius: 2 }}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Get OTP'}
               </Button>
             </Box>

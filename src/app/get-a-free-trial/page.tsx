@@ -26,6 +26,7 @@ import {
   Rocket
 } from "lucide-react";
 import ReactConfetti from "react-confetti";
+import ReCAPTCHA from "react-google-recaptcha";
 
 function useWindowSize() {
   const [windowSize, setWindowSize] = useState({
@@ -77,6 +78,7 @@ export default function FreeTrialPage() {
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const isUserAuthenticated = status === "authenticated" && session?.user?.role === 'student';
 
@@ -110,6 +112,10 @@ export default function FreeTrialPage() {
       toast.error("Please enter your email");
       return;
     }
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA verification.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -130,8 +136,8 @@ export default function FreeTrialPage() {
 
       const apiEndpoint = session ? "/api/auth/login" : "/api/auth/signup";
       const payload = session 
-        ? { email: formData.email } 
-        : { fullName: formData.fullName, email: formData.email, mobile: formData.mobile };
+        ? { email: formData.email, recaptchaToken } 
+        : { fullName: formData.fullName, email: formData.email, mobile: formData.mobile, recaptchaToken };
 
       const response = await fetch(apiEndpoint, {
         method: "POST",
@@ -277,6 +283,15 @@ export default function FreeTrialPage() {
                   className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 text-center text-2xl font-bold tracking-[0.5rem] focus:border-indigo-500 outline-none transition-all"
                 />
               </motion.div>
+            )}
+            {!otpSent && (
+              <div className="flex justify-center py-6">
+                <ReCAPTCHA
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                  onChange={(token) => setRecaptchaToken(token)}
+                  theme="dark"
+                />
+              </div>
             )}
           </motion.div>
         );

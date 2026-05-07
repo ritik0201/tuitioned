@@ -53,6 +53,16 @@
     border: 1px solid #1e293b !important;
 }
 
+.PhoneInputCountrySelectSelect option {
+    background-color: #1f2937 !important; /* Matches modal background */
+    color: #ffffff !important;
+}
+
+/* Ensure the select itself has white text for the selected value */
+.PhoneInputCountrySelectSelect {
+    color: #ffffff !important;
+}
+
 /* When using the library's built-in dropdown */
 .react-phone-number-input__country-select-dropdown {
     background-color: #0f172a !important; /* slate-900 */
@@ -61,4 +71,39 @@
     padding: 0.5rem !important;
     border-radius: 0.5rem !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.phone-input-container {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px; /* Slightly smaller padding to match other fields */
+    border: 1px solid rgba(255, 255, 255, 0.23);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    background: transparent;
+    width: 100%;
+}
+
+.phone-input-container:hover {
+    border-color: #fff;
+}
+
+.phone-input-container:focus-within {
+    border-color: #fff;
+    border-width: 2px;
+    padding: 11px 13px; /* Adjust padding for 2px border */
+}
+
+.phone-input-container input {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    color: #fff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    padding-left: 10px !important;
+}
+
+.phone-input-container .PhoneInputCountry {
+    margin-right: 8px;
 }

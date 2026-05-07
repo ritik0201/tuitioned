@@ -1,12 +1,20 @@
 import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 import { sendOtpEmail } from "@/lib/sendOtp";
+import { verifyRecaptcha } from "@/lib/verifyRecaptcha";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
     await dbConnect();
-    const { email } = await req.json();
+    const { email, recaptchaToken } = await req.json();
+
+    if (recaptchaToken) {
+      const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+      if (!recaptchaResult.success) {
+        return NextResponse.json({ message: recaptchaResult.message }, { status: 400 });
+      }
+    }
 
     if (!email) {
       return NextResponse.json({ message: "Email is required" }, { status: 400 });
