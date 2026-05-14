@@ -63,15 +63,22 @@ Do not include any other text, just the JSON array.`;
 
       const data = await response.json();
       if (data.text) {
-        const parsedQuestions = JSON.parse(data.text);
-        if (Array.isArray(parsedQuestions) && parsedQuestions.length > 0) {
-          setQuestions(parsedQuestions);
-          setAnswers(new Array(parsedQuestions.length).fill(-1));
-        } else {
-          setError('Failed to generate questions. Please try again.');
+        // Clean markdown code blocks if present
+        const cleanText = data.text.replace(/```json\n?|```/g, "").trim();
+        try {
+          const parsedQuestions = JSON.parse(cleanText);
+          if (Array.isArray(parsedQuestions) && parsedQuestions.length > 0) {
+            setQuestions(parsedQuestions);
+            setAnswers(new Array(parsedQuestions.length).fill(-1));
+          } else {
+            setError('Failed to generate questions. The AI returned an unexpected format.');
+          }
+        } catch (parseErr) {
+          console.error('Error parsing AI response:', parseErr);
+          setError('Failed to understand the AI response. Please try again.');
         }
       } else {
-        setError('Failed to generate questions. Please try again.');
+        setError(data.error || 'Failed to generate questions. Please try again.');
       }
     } catch (err) {
       console.error('Error generating questions:', err);

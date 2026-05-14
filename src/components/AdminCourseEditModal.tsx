@@ -9,13 +9,12 @@ import {
   Button,
   CircularProgress,
   Alert,
-  Select,
   Autocomplete,
 } from "@mui/material";
 import { CourseDetails } from "@/types/admin";
 
 interface Teacher {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   listOfSubjects?: string[];
@@ -60,6 +59,8 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
     classroomLink: course.classroomLink || "",
     teacherId: course.teacherId?._id || "", // Store as string ID from populated object
     paymentStatus: course.paymentStatus || "pending",
+    teacherPerClassPrice: course.teacherPerClassPrice || 0,
+    noOfclassTeacher: course.noOfclassTeacher || 0,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -100,6 +101,8 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
         classroomLink: course.classroomLink || "",
         teacherId: course.teacherId?._id || "",
         paymentStatus: course.paymentStatus || "pending",
+        teacherPerClassPrice: course.teacherPerClassPrice || 0,
+        noOfclassTeacher: course.noOfclassTeacher || 0,
       });
     }
   }, [course]);
@@ -119,11 +122,13 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
         ...formData,
         noOfClasses: Number(formData.noOfClasses),
         perClassPrice: Number(formData.perClassPrice),
+        teacherPerClassPrice: Number(formData.teacherPerClassPrice),
+        noOfclassTeacher: Number(formData.noOfclassTeacher),
         classDays: formData.classDays.split(",").map((day) => day.trim()).filter(Boolean), // Convert back to array
       };
 
       const res = await fetch(`/api/course/${course._id}`, {
-        method: "PUT", // Or PATCH, depending on your API design
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -236,12 +241,34 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
           fullWidth
           margin="normal"
         />
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <TextField
+            label="Expert Pay (Teacher Price)"
+            name="teacherPerClassPrice"
+            type="number"
+            value={formData.teacherPerClassPrice}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            inputProps={{ min: 0 }}
+          />
+          <TextField
+            label="Expert Sessions"
+            name="noOfclassTeacher"
+            type="number"
+            value={formData.noOfclassTeacher}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            inputProps={{ min: 0 }}
+          />
+        </Box>
         <Autocomplete
           options={teachers}
           getOptionLabel={(option) => `${option.name} (${option.listOfSubjects?.join(", ") || option.email})`}
-          value={teachers.find(t => t._id === formData.teacherId) || null}
+          value={teachers.find(t => t.id === formData.teacherId) || null}
           onChange={(_, newValue) => {
-            setFormData(prev => ({ ...prev, teacherId: newValue?._id || "" }));
+            setFormData(prev => ({ ...prev, teacherId: newValue?.id || "" }));
           }}
           loading={isLoadingTeachers}
           renderInput={(params) => (

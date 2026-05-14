@@ -17,15 +17,16 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', md: 'auto' },
+  width: { xs: '95%', sm: '90%', md: 'auto' },
   maxWidth: 800,
+  maxHeight: '95vh',
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 0,
   borderRadius: 2,
   display: 'flex',
   flexDirection: { xs: 'column', md: 'row' },
-  overflow: 'hidden',
+  overflow: { xs: 'auto', md: 'hidden' },
 };
 
 interface TeacherSignInModalProps {
@@ -39,6 +40,28 @@ const TeacherSignInModal: React.FC<TeacherSignInModalProps> = ({ open, onClose }
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [timer, setTimer] = useState(0);
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const [width, setWidth] = React.useState<number | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth);
+      const handleResize = () => setWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   const textFieldStyles = {
     '& .MuiInputBase-input': { color: '#fff' },
@@ -77,6 +100,7 @@ const TeacherSignInModal: React.FC<TeacherSignInModalProps> = ({ open, onClose }
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to send OTP.');
       setStep('otp');
+      setTimer(30);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -116,16 +140,35 @@ const TeacherSignInModal: React.FC<TeacherSignInModalProps> = ({ open, onClose }
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="teacher-signin-modal-title">
       <Box sx={style}>
-        <Box sx={{ width: { xs: '100%', md: 300 }, p: 4, bgcolor: 'primary.main', color: 'primary.contrastText', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-          <LogIn size={64} />
-          <Typography variant="h5" component="h2" sx={{ mt: 2, fontWeight: 'bold' }}>
+        <Box sx={{ 
+          width: { xs: '100%', md: 300 }, 
+          p: { xs: 3, md: 4 }, 
+          bgcolor: 'primary.main', 
+          color: 'primary.contrastText', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          textAlign: 'center',
+          minHeight: { xs: '150px', md: 'auto' }
+        }}>
+          <LogIn size={width && width < 600 ? 40 : 64} />
+          <Typography variant={width && width < 600 ? "h5" : "h4"} component="h2" sx={{ mt: { xs: 1, md: 2 }, fontWeight: 'bold' }}>
             Welcome Back, Teacher
           </Typography>
-          <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
+          <Typography variant="body2" sx={{ mt: 1, opacity: 0.8, display: { xs: 'none', sm: 'block' } }}>
             Sign in to continue to your dashboard.
           </Typography>
         </Box>
-        <Box sx={{ p: 4, position: 'relative', width: { xs: '100%', md: 450 }, bgcolor: '#1f2937', color: '#fff' }}>
+        <Box sx={{ 
+          p: { xs: 3, sm: 4 }, 
+          position: 'relative', 
+          width: { xs: '100%', md: 450 }, 
+          bgcolor: '#1f2937', 
+          color: '#fff',
+          overflowY: { xs: 'visible', md: 'auto' },
+          maxHeight: { xs: 'none', md: '95vh' }
+        }}>
           <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}><X /></IconButton>
           {step === 'details' && (
             <Stack component="form" spacing={2.5} sx={{ mt: 4 }}>
@@ -156,6 +199,16 @@ const TeacherSignInModal: React.FC<TeacherSignInModalProps> = ({ open, onClose }
               <Button variant="contained" onClick={handleLogin} disabled={loading} sx={{ mt: 2, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
               </Button>
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Button 
+                  variant="text" 
+                  onClick={handleVerify} 
+                  disabled={timer > 0 || loading} 
+                  sx={{ color: 'primary.light', textTransform: 'none' }}
+                >
+                  {timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP'}
+                </Button>
+              </Box>
             </Box>
           )}
         </Box>

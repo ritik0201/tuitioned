@@ -15,15 +15,16 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '90%', md: 'auto' }, // Adjusted for flex layout
+  width: { xs: '95%', sm: '90%', md: 'auto' }, // Adjusted for flex layout
   maxWidth: 800,
+  maxHeight: '95vh',
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 0, // Padding will be applied to inner boxes
   borderRadius: 2,
   display: 'flex',
   flexDirection: { xs: 'column', md: 'row' },
-  overflow: 'hidden',
+  overflow: { xs: 'auto', md: 'hidden' },
 };
 
 interface TeacherAuthModalProps {
@@ -33,6 +34,17 @@ interface TeacherAuthModalProps {
 
 const TeacherAuthModal: React.FC<TeacherAuthModalProps> = ({ open, onClose }) => {
   const { switchModal } = useUI();
+
+  const [width, setWidth] = React.useState<number | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth);
+      const handleResize = () => setWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   const handleSignInClick = () => {
     switchModal('teacherSignin');
@@ -46,18 +58,37 @@ const TeacherAuthModal: React.FC<TeacherAuthModalProps> = ({ open, onClose }) =>
     <Modal open={open} onClose={onClose} aria-labelledby="teacher-auth-modal-title">
       <Box sx={style}>
         {/* Left Side */}
-        <Box sx={{ width: { xs: '100%', md: 300 }, p: 4, bgcolor: 'primary.main', color: 'primary.contrastText', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-          <Briefcase size={64} />
-          <Typography variant="h5" component="h2" sx={{ mt: 2, fontWeight: 'bold' }}>
+        <Box sx={{ 
+          width: { xs: '100%', md: 300 }, 
+          p: { xs: 3, md: 4 }, 
+          bgcolor: 'primary.main', 
+          color: 'primary.contrastText', 
+          display: 'flex', 
+          flexDirection: 'column', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          textAlign: 'center',
+          minHeight: { xs: '150px', md: 'auto' }
+        }}>
+          <Briefcase size={width && width < 600 ? 40 : 64} />
+          <Typography variant={width && width < 600 ? "h5" : "h4"} component="h2" sx={{ mt: { xs: 1, md: 2 }, fontWeight: 'bold' }}>
             Teacher Portal
           </Typography>
-          <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
+          <Typography variant="body2" sx={{ mt: 1, opacity: 0.8, display: { xs: 'none', sm: 'block' } }}>
             Access your dashboard or join our team of educators.
           </Typography>
         </Box>
 
         {/* Right Side */}
-        <Box sx={{ p: 4, position: 'relative', width: { xs: '100%', md: 450 }, bgcolor: '#1f2937', color: '#fff' }}>
+        <Box sx={{ 
+          p: { xs: 3, sm: 4 }, 
+          position: 'relative', 
+          width: { xs: '100%', md: 450 }, 
+          bgcolor: '#1f2937', 
+          color: '#fff',
+          overflowY: { xs: 'visible', md: 'auto' },
+          maxHeight: { xs: 'none', md: '95vh' }
+        }}>
           <IconButton onClick={onClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}>
             <X />
           </IconButton>

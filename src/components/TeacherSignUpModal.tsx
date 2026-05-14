@@ -35,9 +35,7 @@ const style = {
   borderRadius: 2,
   display: 'flex',
   flexDirection: { xs: 'column', md: 'row' },
-  overflow: 'hidden', // Changed from overflowY: 'auto' to handle scrolling internally if needed
-  // But wait, the user wants the whole thing to scroll if needed.
-  // Let's use a better approach: the container handles the layout, and we allow scrolling.
+  overflow: { xs: 'auto', md: 'hidden' },
 };
 
 const textFieldStyles = {
@@ -74,7 +72,29 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [timer, setTimer] = useState(0);
+
+  React.useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [width, setWidth] = useState<number | undefined>(undefined);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setWidth(window.innerWidth);
+      const handleResize = () => setWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
+  }, []);
 
   const handlePhoneChange = (value: string | undefined) => {
     setMobile(value || '');
@@ -218,6 +238,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Failed to send OTP.');
       setStep('otp');
+      setTimer(30);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -259,7 +280,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       <Box sx={style}>
         <Box sx={{ 
           width: { xs: '100%', md: 300 }, 
-          p: 4, 
+          p: { xs: 3, md: 4 }, 
           background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', 
           color: 'primary.contrastText', 
           display: 'flex', 
@@ -268,19 +289,20 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
           alignItems: 'center', 
           textAlign: 'center',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          minHeight: { xs: '150px', md: 'auto' }
         }}>
           {/* Subtle background decoration */}
           <Box sx={{ position: 'absolute', top: -20, left: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(20px)' }} />
           <Box sx={{ position: 'absolute', bottom: -30, right: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(30px)' }} />
           
           <Box sx={{ position: 'relative', zIndex: 1 }}>
-            <School size={80} strokeWidth={1.5} />
-            <Typography variant="h4" component="h2" sx={{ mt: 3, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+            <School size={width && width < 600 ? 40 : 80} strokeWidth={1.5} />
+            <Typography variant={width && width < 600 ? "h5" : "h4"} component="h2" sx={{ mt: { xs: 1, md: 3 }, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               Join Our Team
             </Typography>
-            <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: 3, mx: 'auto', borderRadius: 2 }} />
-            <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+            <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: { xs: 1.5, md: 3 }, mx: 'auto', borderRadius: 2 }} />
+            <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, display: { xs: 'none', sm: 'block' } }}>
               Share your knowledge and inspire the next generation of learners.
             </Typography>
           </Box>
@@ -290,8 +312,8 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
           position: 'relative', 
           width: { xs: '100%', md: 500 }, 
           color: '#fff',
-          overflowY: 'auto',
-          maxHeight: '95vh'
+          overflowY: { xs: 'visible', md: 'auto' },
+          maxHeight: { xs: 'none', md: '95vh' }
         }}>
           <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}><X /></IconButton>
           {step === 'details' && (
@@ -439,6 +461,16 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
               <Button variant="contained" onClick={handleSignUp} disabled={loading} sx={{ mt: 2, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
               </Button>
+              <Box sx={{ mt: 2, textAlign: 'center' }}>
+                <Button 
+                  variant="text" 
+                  onClick={handleVerify} 
+                  disabled={timer > 0 || loading} 
+                  sx={{ color: 'primary.light', textTransform: 'none' }}
+                >
+                  {timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP'}
+                </Button>
+              </Box>
             </Box>
           )}
         </Box>

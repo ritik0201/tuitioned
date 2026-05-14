@@ -55,14 +55,20 @@ export async function POST(req: Request) {
 
         const isJsonMode = message.includes("Return the response as a valid JSON array");
 
-        if (!process.env.GEMINI_API_KEY) {
+        // Try to get the API key from multiple possible environment variables
+        const apiKey = process.env.GEMINI_API_KEY || 
+                       process.env.GOOGLE_API_KEY || 
+                       process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+
+        if (!apiKey) {
+            console.error(">>> AI API Error: No API key found in GEMINI_API_KEY, GOOGLE_API_KEY, or NEXT_PUBLIC_GOOGLE_API_KEY");
             return NextResponse.json(
-                { error: "Gemini API Key is not configured." },
+                { error: "AI configuration error: API key is missing." },
                 { status: 500 }
             );
         }
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const genAI = new GoogleGenerativeAI(apiKey);
 
         // Priority list: Put the fastest model (1.5-flash) and the last working one at the top
         const modelNames = Array.from(new Set([lastWorkingModel, "gemini-1.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]));
@@ -71,10 +77,16 @@ export async function POST(req: Request) {
         for (const modelName of modelNames) {
             try {
                 console.log(`>>> Attempting AI response with: ${modelName}`);
+                // Model configuration
                 const modelConfig: any = { model: modelName };
                 if (isJsonMode) {
                     modelConfig.systemInstruction = "You are a helpful assistant that generates educational multiple choice questions. Always respond with valid JSON only, no additional text, personality, or formatting.";
+                    // Some versions/models prefer this via generationConfig
+                    modelConfig.generationConfig = {
+                        responseMimeType: "application/json"
+                    };
                 }
+                
                 const model = genAI.getGenerativeModel(modelConfig);
 
                 let result;
@@ -96,14 +108,25 @@ export async function POST(req: Request) {
                             // Limit history to last 10 messages for maximum speed
                             ...(history || []).slice(-10).map((msg: any) => ({
                                 role: msg.role === "user" ? "user" : "model",
-                                parts: [{ text: msg.content }],
-                            })),
+                                parts: [{ text: msg.content || "" }],
+                            })).filter((msg: any) => msg.parts[0].text !== ""),
                         ],
                     });
                     result = await chat.sendMessage(message);
                 }
 
                 const response = await result.response;
+                
+                // Robust check for response text
+                if (!response.candidates || response.candidates.length === 0) {
+                    throw new Error("No response candidates returned from AI.");
+                }
+
+                const candidate = response.candidates[0];
+                if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'OTHER') {
+                    throw new Error(`AI response blocked: ${candidate.finishReason}`);
+                }
+
                 const text = response.text();
 
                 if (text) {
@@ -120,7 +143,7 @@ export async function POST(req: Request) {
 
         throw lastError || new Error("All AI models failed to respond. Please check your API key.");
     } catch (error: any) {
-        console.error("Chatbot API Final Error:", error);
+        console.error("AI API Final Error:", error);
         return NextResponse.json(
             { error: error.message || "Failed to get response from AI." },
             { status: 500 }

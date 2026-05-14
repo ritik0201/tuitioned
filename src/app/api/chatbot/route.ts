@@ -53,14 +53,20 @@ export async function POST(req: Request) {
     try {
         const { message, history } = await req.json();
 
-        if (!process.env.GEMINI_API_KEY) {
+        // Try to get the API key from multiple possible environment variables
+        const apiKey = process.env.GEMINI_API_KEY || 
+                       process.env.GOOGLE_API_KEY || 
+                       process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+
+        if (!apiKey) {
+            console.error(">>> Chatbot API Error: No API key found in GEMINI_API_KEY, GOOGLE_API_KEY, or NEXT_PUBLIC_GOOGLE_API_KEY");
             return NextResponse.json(
-                { error: "Gemini API Key is not configured." },
+                { error: "AI configuration error: API key is missing." },
                 { status: 500 }
             );
         }
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const genAI = new GoogleGenerativeAI(apiKey);
 
         // Priority list: Put the fasted model (1.5-flash) and the last working one at the top
         const modelNames = Array.from(new Set([lastWorkingModel, "gemini-1.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]));
@@ -84,13 +90,24 @@ export async function POST(req: Request) {
                         // Limit history to last 10 messages for maximum speed
                         ...(history || []).slice(-10).map((msg: any) => ({
                             role: msg.role === "user" ? "user" : "model",
-                            parts: [{ text: msg.content }],
-                        })),
+                            parts: [{ text: msg.content || "" }],
+                        })).filter((msg: any) => msg.parts[0].text !== ""),
                     ],
                 });
 
                 const result = await chat.sendMessage(message);
                 const response = await result.response;
+                
+                // Robust check for response text
+                if (!response.candidates || response.candidates.length === 0) {
+                    throw new Error("No response candidates returned from AI.");
+                }
+
+                const candidate = response.candidates[0];
+                if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'OTHER') {
+                    throw new Error(`AI response blocked: ${candidate.finishReason}`);
+                }
+
                 const text = response.text();
 
                 if (text) {
@@ -107,7 +124,7 @@ export async function POST(req: Request) {
 
         throw lastError || new Error("All AI models failed to respond. Please check your API key.");
     } catch (error: any) {
-        console.error("Chatbot API Final Error:", error);
+        console.error("AI Chatbot API Final Error:", error);
         return NextResponse.json(
             { error: error.message || "Failed to get response from AI." },
             { status: 500 }

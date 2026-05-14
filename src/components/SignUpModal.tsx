@@ -11,7 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import { UserPlus, X } from 'lucide-react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Stack } from '@mui/material';
-import PhoneInput from 'react-phone-number-input';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../app/get-a-free-trial/phone-input.css';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -26,15 +26,16 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: { xs: '90%', md: 'auto' },
+    width: { xs: '95%', sm: '90%', md: 'auto' },
     maxWidth: 800,
+    maxHeight: '95vh',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 0,
     borderRadius: 2,
     display: 'flex',
     flexDirection: { xs: 'column', md: 'row' },
-    overflow: 'hidden',
+    overflow: { xs: 'auto', md: 'hidden' },
 };
 
 const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
@@ -46,6 +47,28 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+    const [timer, setTimer] = useState(0);
+
+    React.useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => clearInterval(interval);
+    }, [timer]);
+
+    const [width, setWidth] = useState<number | undefined>(undefined);
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setWidth(window.innerWidth);
+            const handleResize = () => setWidth(window.innerWidth);
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }
+    }, []);
 
     const textFieldStyles = {
         '& .MuiInputBase-input': {
@@ -75,6 +98,12 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
         setLoading(true);
         setError('');
 
+        if (!mobile || mobile.length < 8 || mobile.length > 14) {
+            setError('Please enter a valid mobile number.');
+            setLoading(false);
+            return;
+        }
+
         if (!recaptchaToken) {
             setError('Please complete the reCAPTCHA verification.');
             setLoading(false);
@@ -90,6 +119,7 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
             const data = await res.json();
             if (!res.ok) throw new Error(data.message || 'Failed to send OTP.');
             setStep('otp');
+            setTimer(30);
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -137,7 +167,7 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                 {/* Left Side */}
                 <Box sx={{ 
                     width: { xs: '100%', md: 300 }, 
-                    p: 4, 
+                    p: { xs: 3, md: 4 }, 
                     background: 'linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)', 
                     color: 'primary.contrastText', 
                     display: 'flex', 
@@ -146,18 +176,19 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                     alignItems: 'center', 
                     textAlign: 'center',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    minHeight: { xs: '180px', md: 'auto' }
                 }}>
                     <Box sx={{ position: 'absolute', top: -20, left: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(20px)' }} />
                     <Box sx={{ position: 'absolute', bottom: -30, right: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(30px)' }} />
                     
                     <Box sx={{ position: 'relative', zIndex: 1 }}>
-                        <UserPlus size={80} strokeWidth={1.5} />
-                        <Typography variant="h4" component="h2" sx={{ mt: 3, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                        <UserPlus size={width && width < 600 ? 40 : 80} strokeWidth={1.5} />
+                        <Typography variant={width && width < 600 ? "h5" : "h4"} component="h2" sx={{ mt: { xs: 1, md: 3 }, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
                             Create Your Account
                         </Typography>
-                        <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: 3, mx: 'auto', borderRadius: 2 }} />
-                        <Typography variant="body1" sx={{ mt: 1, opacity: 0.9, fontWeight: 500 }}>
+                        <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: { xs: 1.5, md: 3 }, mx: 'auto', borderRadius: 2 }} />
+                        <Typography variant="body2" sx={{ mt: 1, opacity: 0.9, fontWeight: 500, display: { xs: 'none', sm: 'block' } }}>
                             Start your learning journey with us.
                         </Typography>
                     </Box>
@@ -170,8 +201,8 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                     width: { xs: '100%', md: 450 }, 
                     bgcolor: '#1f2937', 
                     color: '#fff',
-                    overflowY: 'auto',
-                    maxHeight: '95vh'
+                    overflowY: { xs: 'visible', md: 'auto' },
+                    maxHeight: { xs: 'none', md: '95vh' }
                 }}>
                     <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}>
                         <X />
@@ -245,7 +276,7 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                                 disabled={loading}
                                 sx={{
                                     mt: 2,
-                                    mb: 4,
+                                    mb: 2,
                                     py: 1.8,
                                     bgcolor: 'primary.main',
                                     color: 'primary.contrastText',
@@ -257,6 +288,16 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                             >
                                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
                             </Button>
+                            <Box sx={{ textAlign: 'center', mb: 2 }}>
+                                <Button 
+                                    variant="text" 
+                                    onClick={handleVerify} 
+                                    disabled={timer > 0 || loading} 
+                                    sx={{ color: 'primary.light', textTransform: 'none' }}
+                                >
+                                    {timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP'}
+                                </Button>
+                            </Box>
                         </Box>
                     )}
                 </Box>

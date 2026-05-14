@@ -40,6 +40,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ICourse {
   _id: string;
@@ -311,36 +312,51 @@ export default function CourseDetailPage() {
                     Add More Classes
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-slate-900 border-4 border-slate-800 rounded-[2.5rem] p-8 max-w-md sm:rounded-[3rem] animate-in zoom-in-95 duration-200">
-                  <DialogHeader className="space-y-4 text-center">
-                    <div className="w-16 h-16 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto border border-indigo-500/30">
-                      <Plus className="h-8 w-8 text-indigo-400" />
-                    </div>
-                    <DialogTitle className="text-3xl font-black text-slate-100 italic">Add Classes</DialogTitle>
-                    <DialogDescription className="text-slate-400 text-lg font-medium">
-                      Extend your learning period for {course.title}.
+                <DialogContent className="bg-slate-900 border-2 border-slate-800 rounded-[2rem] p-8 max-w-md shadow-2xl">
+                  <DialogHeader className="space-y-2 text-center">
+                    <DialogTitle className="text-2xl font-bold text-white">Add Classes</DialogTitle>
+                    <DialogDescription className="text-slate-400">
+                      Select how many additional classes you would like to add for <span className="text-indigo-400 font-semibold">{course.title}</span>.
                     </DialogDescription>
                   </DialogHeader>
 
-                  <div className="py-10 space-y-8">
-                    <div className="flex items-center justify-center gap-8">
-                      <Button onClick={handleDecrease} className="h-14 w-14 rounded-full bg-slate-950 border-2 border-slate-800 hover:border-red-500/50 hover:bg-red-500/10 text-slate-100 transition-all">
-                        <Minus className="h-6 w-6" />
+                  <div className="py-8 space-y-6">
+                    <div className="flex items-center justify-center gap-6">
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                        onClick={handleDecrease} 
+                        className="h-12 w-12 rounded-xl bg-slate-800 border-slate-700 hover:bg-slate-700 text-white"
+                      >
+                        <Minus className="h-5 w-5" />
                       </Button>
-                      <div className="text-center">
-                        <span className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-t from-indigo-400 to-cyan-400 leading-none">
+                      
+                      <div className="text-center min-w-[80px]">
+                        <span className="text-5xl font-bold text-white">
                           {classesToAdd}
                         </span>
-                        <p className="text-xs uppercase font-black tracking-[0.3em] text-slate-500 mt-2">Classes</p>
+                        <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">Classes</p>
                       </div>
-                      <Button onClick={handleIncrease} className="h-14 w-14 rounded-full bg-slate-950 border-2 border-slate-800 hover:border-green-500/50 hover:bg-green-100/10 text-slate-100 transition-all">
-                        <Plus className="h-6 w-6" />
+
+                      <Button 
+                        variant="outline" 
+                        size="icon"
+                        onClick={handleIncrease} 
+                        className="h-12 w-12 rounded-xl bg-slate-800 border-slate-700 hover:bg-slate-700 text-white"
+                      >
+                        <Plus className="h-5 w-5" />
                       </Button>
                     </div>
 
-                    <div className="bg-slate-950/50 p-6 rounded-3xl border-2 border-indigo-500/20 text-center">
-                      <p className="text-xs font-black text-indigo-300 uppercase tracking-widest mb-1">Total Payment</p>
-                      <p className="text-3xl font-black text-white">₹{totalPrice.toLocaleString()}</p>
+                    <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex justify-between items-center">
+                      <div className="text-left">
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Price per class</p>
+                        <p className="text-sm font-medium text-slate-300">₹{course.perClassPrice.toLocaleString()}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Total Payment</p>
+                        <p className="text-2xl font-bold text-white">₹{totalPrice.toLocaleString()}</p>
+                      </div>
                     </div>
                   </div>
 
@@ -348,9 +364,19 @@ export default function CourseDetailPage() {
                     <Button 
                       disabled={isProcessing}
                       onClick={handleProcessPayment}
-                      className="w-full text-xl py-8 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-[0_8px_0_rgba(67,56,202,1)] hover:translate-y-[4px] active:translate-y-[8px] active:shadow-none transition-all border-2 border-indigo-400"
+                      className="w-full h-14 text-lg rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all flex items-center justify-center gap-2"
                     >
-                      {isProcessing ? "Processing..." : "Confirm Payment"}
+                      {isProcessing ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span>Processing...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Rocket className="h-5 w-5" />
+                          <span>Confirm Payment</span>
+                        </>
+                      )}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

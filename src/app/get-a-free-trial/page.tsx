@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import PhoneInput from 'react-phone-number-input';
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './phone-input.css';
 import Link from "next/link";
@@ -10,18 +10,18 @@ import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { CountryDropdown } from 'react-country-region-selector';
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  User, 
-  BookOpen, 
-  Calendar, 
-  CheckCircle2, 
-  ChevronRight, 
-  ChevronLeft, 
-  Sparkles, 
-  Mail, 
-  Phone, 
-  GraduationCap, 
-  Globe, 
+import {
+  User,
+  BookOpen,
+  Calendar,
+  CheckCircle2,
+  ChevronRight,
+  ChevronLeft,
+  Sparkles,
+  Mail,
+  Phone,
+  GraduationCap,
+  Globe,
   MapPin,
   Rocket
 } from "lucide-react";
@@ -41,7 +41,7 @@ function useWindowSize() {
         height: window.innerHeight,
       });
     }
-    
+
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
@@ -73,12 +73,26 @@ export default function FreeTrialPage() {
   const { width, height } = useWindowSize();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Record<string, string>>({});
+  const phoneInputRef = React.useRef<any>(null);
+  const nameInputRef = React.useRef<HTMLInputElement>(null);
+  const emailInputRef = React.useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [timer, setTimer] = useState(0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
 
   const isUserAuthenticated = status === "authenticated" && session?.user?.role === 'student';
 
@@ -108,10 +122,23 @@ export default function FreeTrialPage() {
   }, [session]);
 
   const handleSendOtp = async () => {
-    if (!formData.email) {
-      toast.error("Please enter your email");
+    // Basic validations
+    if (!session) {
+      if (!formData.fullName || formData.fullName.trim().length < 3) {
+        toast.error("Please enter a valid full name (min 3 characters)");
+        return;
+      }
+      if (!formData.mobile || formData.mobile.length < 8 || formData.mobile.length > 14) {
+        toast.error("Please enter a valid mobile number (8-14 digits including country code)");
+        return;
+      }
+    }
+
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast.error("Please enter a valid email address");
       return;
     }
+
     if (!recaptchaToken) {
       toast.error("Please complete the reCAPTCHA verification.");
       return;
@@ -135,8 +162,8 @@ export default function FreeTrialPage() {
       }
 
       const apiEndpoint = session ? "/api/auth/login" : "/api/auth/signup";
-      const payload = session 
-        ? { email: formData.email, recaptchaToken } 
+      const payload = session
+        ? { email: formData.email, recaptchaToken }
         : { fullName: formData.fullName, email: formData.email, mobile: formData.mobile, recaptchaToken };
 
       const response = await fetch(apiEndpoint, {
@@ -147,6 +174,7 @@ export default function FreeTrialPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || "Failed to send OTP.");
       setOtpSent(true);
+      setTimer(30);
       toast.success("OTP sent to " + formData.email);
     } catch (err: any) {
       setError(err.message);
@@ -185,6 +213,41 @@ export default function FreeTrialPage() {
   };
 
   const handleNext = () => {
+    // Step-wise validation
+    if (activeStep === 1) {
+      if (!formData.grade || formData.grade.trim() === "") {
+        toast.error("Please enter your grade/class");
+        return;
+      }
+      if (!formData.subject) {
+        toast.error("Please select a subject");
+        return;
+      }
+      if (formData.subject === "other" && (!formData.otherSubject || formData.otherSubject.trim() === "")) {
+        toast.error("Please specify the subject");
+        return;
+      }
+    }
+
+    if (activeStep === 2) {
+      if (!formData.fatherName || formData.fatherName.trim() === "") {
+        toast.error("Please enter parent's name");
+        return;
+      }
+      if (!formData.city || formData.city.trim() === "") {
+        toast.error("Please enter your city");
+        return;
+      }
+      if (!formData.country || formData.country.trim() === "") {
+        toast.error("Please select your country");
+        return;
+      }
+      if (!formData.bookingDateAndTime) {
+        toast.error("Please select a booking date");
+        return;
+      }
+    }
+
     setError("");
     setActiveStep(prev => prev + 1);
   };
@@ -238,6 +301,13 @@ export default function FreeTrialPage() {
                     required
                     value={formData.fullName || ""}
                     onChange={handleChange}
+                    onBlur={() => {
+                      if (formData.fullName && formData.fullName.trim().length < 3) {
+                        toast.error("Please complete your full name");
+                        setTimeout(() => nameInputRef.current?.focus(), 0);
+                      }
+                    }}
+                    ref={nameInputRef}
                     className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:ring-0 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600"
                     disabled={otpSent}
                   />
@@ -248,11 +318,21 @@ export default function FreeTrialPage() {
                     placeholder="Mobile No."
                     required
                     value={formData.mobile}
-                    onChange={handlePhoneChange} 
+                    onChange={handlePhoneChange}
+                    onBlur={() => {
+                      const mobile = formData.mobile || "";
+                      if (mobile.length < 8 || mobile.length > 14) {
+                        toast.error("Please enter a valid mobile number");
+                        setTimeout(() => {
+                          const input = document.querySelector('.phone-input-container input') as HTMLInputElement;
+                          if (input) input.focus();
+                        }, 10);
+                      }
+                    }}
                     international
                     countryCallingCodeEditable={false}
                     disabled={otpSent}
-                    className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus-within:border-indigo-500 transition-all placeholder:text-slate-600"
+                    className="phone-input-container w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus-within:border-indigo-500 transition-all placeholder:text-slate-600"
                   />
                 </div>
               </div>
@@ -266,6 +346,13 @@ export default function FreeTrialPage() {
                 required
                 value={formData.email || ""}
                 onChange={handleChange}
+                onBlur={() => {
+                  if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+                    toast.error("Please enter a valid email address");
+                    setTimeout(() => emailInputRef.current?.focus(), 0);
+                  }
+                }}
+                ref={emailInputRef}
                 className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:ring-0 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600 disabled:opacity-60"
                 disabled={otpSent || !!session}
               />
@@ -282,6 +369,16 @@ export default function FreeTrialPage() {
                   onChange={handleChange}
                   className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 text-center text-2xl font-bold tracking-[0.5rem] focus:border-indigo-500 outline-none transition-all"
                 />
+                <div className="text-center mt-2">
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={timer > 0 || loading}
+                    className="text-xs font-bold text-indigo-400 hover:text-indigo-300 disabled:opacity-50 transition-colors"
+                  >
+                    {timer > 0 ? `Resend OTP in ${timer}s` : "Resend OTP"}
+                  </button>
+                </div>
               </motion.div>
             )}
             {!otpSent && (
@@ -323,11 +420,10 @@ export default function FreeTrialPage() {
                     key={sub.name}
                     type="button"
                     onClick={() => setFormData({ ...formData, subject: sub.id })}
-                    className={`py-2 px-1 text-[10px] font-bold rounded-xl border-2 transition-all ${
-                      formData.subject === sub.id 
-                        ? "bg-indigo-600 text-white border-indigo-400 shadow-[0_3px_0_rgba(67,56,202,1)]" 
+                    className={`py-2 px-1 text-[10px] font-bold rounded-xl border-2 transition-all ${formData.subject === sub.id
+                        ? "bg-indigo-600 text-white border-indigo-400 shadow-[0_3px_0_rgba(67,56,202,1)]"
                         : "bg-slate-950 text-slate-500 border-slate-800 hover:border-slate-700 hover:text-slate-300 shadow-[0_3px_0_rgba(30,41,59,1)]"
-                    }`}
+                      }`}
                   >
                     {sub.name}
                   </button>
@@ -379,7 +475,7 @@ export default function FreeTrialPage() {
                 className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all"
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <div className="relative group">
                 <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
@@ -467,7 +563,7 @@ export default function FreeTrialPage() {
 
         <AnimatePresence mode="wait">
           {activeStep === steps.length ? (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
               className="bg-slate-900/50 p-6 sm:p-10 rounded-[2.5rem] border-4 border-slate-800 shadow-[0_20px_50px_rgba(0,0,0,0.3)] text-center space-y-6"
             >
@@ -504,15 +600,14 @@ export default function FreeTrialPage() {
               {/* Compact Stepper */}
               <div className="relative max-w-xs mx-auto py-2">
                 <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-800 -translate-y-1/2" />
-                <motion.div 
+                <motion.div
                   className="absolute top-1/2 left-0 h-1 bg-indigo-500 -translate-y-1/2"
                   animate={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
                 />
                 <div className="relative flex justify-between">
                   {steps.map((step, idx) => (
-                    <div key={idx} className={`w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-all duration-300 ${
-                      idx <= activeStep ? "bg-indigo-600 border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.4)]" : "bg-slate-900 border-slate-800 text-slate-700"
-                    }`}>
+                    <div key={idx} className={`w-8 h-8 rounded-xl flex items-center justify-center border-2 transition-all duration-300 ${idx <= activeStep ? "bg-indigo-600 border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.4)]" : "bg-slate-900 border-slate-800 text-slate-700"
+                      }`}>
                       {idx < activeStep ? <CheckCircle2 className="w-4 h-4 text-white" /> : <step.icon className={`w-3.5 h-3.5 ${idx === activeStep ? "text-white" : ""}`} />}
                     </div>
                   ))}
@@ -522,7 +617,7 @@ export default function FreeTrialPage() {
               {/* Main Card - Compacted */}
               <motion.div layout className="bg-slate-900 border-4 border-slate-800 p-6 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl pointer-events-none" />
-                
+
                 {error && (
                   <div className="mb-4 p-2 bg-red-500/10 border-2 border-red-500/20 rounded-xl text-red-500 text-[11px] font-black tracking-wide text-center">
                     {error}

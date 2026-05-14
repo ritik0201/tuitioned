@@ -26,4 +26,6 @@ export interface CourseDetails {
   createdAt: string;
   joinLink?: string;
   classroomLink?: string;
+  teacherPerClassPrice?: number;
+  noOfclassTeacher?: number;
 }
