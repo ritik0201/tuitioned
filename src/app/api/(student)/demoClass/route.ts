@@ -139,7 +139,7 @@ export async function POST(request: Request) {
     // Send notification email to admin
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
-      to: "ritikkatsa2005@gmail.com, adityayadav114@gmail.com, tuitioned01@gmail.com",
+      to: "ritikkatsa2005@gmail.com, adityayadav114@gmail.com, tuitioned01@gmail.com, harshitverma503@gmail.com",
       subject: "New Demo Class Request!",
       html: `
         <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f4f4f5; padding: 20px; border-radius: 10px;">
