@@ -16,7 +16,9 @@ export async function sendEmail({ to, subject, html }: MailOptions) {
   }
 
   const transport = nodemailer.createTransport({
-    service: "gmail", // e.g., 'gmail'
+    host: "smtp.hostinger.com",
+    port: 465,
+    secure: true,
     auth: {
       user: EMAIL_USER,
       pass: EMAIL_PASS,
