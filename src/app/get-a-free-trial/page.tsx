@@ -2,9 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input';
-import 'react-phone-number-input/style.css';
-import './phone-input.css';
 import Link from "next/link";
 import { useSession, signIn } from "next-auth/react";
 import { toast } from "sonner";
@@ -56,6 +53,35 @@ const steps = [
   { title: "Schedule", icon: Calendar }
 ];
 
+const countryCodes = [
+  { code: "+91", name: "India", flag: "🇮🇳" },
+  { code: "+1", name: "United States / Canada", flag: "🇺🇸" },
+  { code: "+44", name: "United Kingdom", flag: "🇬🇧" },
+  { code: "+61", name: "Australia", flag: "🇦🇺" },
+  { code: "+971", name: "United Arab Emirates", flag: "🇦🇪" },
+  { code: "+65", name: "Singapore", flag: "🇸🇬" },
+  { code: "+64", name: "New Zealand", flag: "🇳🇿" },
+  { code: "+966", name: "Saudi Arabia", flag: "🇸🇦" },
+  { code: "+974", name: "Qatar", flag: "🇶🇦" },
+  { code: "+965", name: "Kuwait", flag: "🇰🇼" },
+  { code: "+968", name: "Oman", flag: "🇴🇲" },
+  { code: "+973", name: "Bahrain", flag: "🇧🇭" },
+  { code: "+60", name: "Malaysia", flag: "🇲🇾" },
+  { code: "+33", name: "France", flag: "🇫🇷" },
+  { code: "+49", name: "Germany", flag: "🇩🇪" },
+  { code: "+81", name: "Japan", flag: "🇯🇵" },
+  { code: "+86", name: "China", flag: "🇨🇳" },
+  { code: "+39", name: "Italy", flag: "🇮🇹" },
+  { code: "+34", name: "Spain", flag: "🇪🇸" },
+  { code: "+55", name: "Brazil", flag: "🇧🇷" },
+  { code: "+7", name: "Russia", flag: "🇷🇺" },
+  { code: "+82", name: "South Korea", flag: "🇰🇷" },
+  { code: "+92", name: "Pakistan", flag: "🇵🇰" },
+  { code: "+880", name: "Bangladesh", flag: "🇧🇩" },
+  { code: "+94", name: "Sri Lanka", flag: "🇱🇰" },
+  { code: "+977", name: "Nepal", flag: "🇳🇵" },
+];
+
 const subjects = [
   { id: "maths", name: "Maths" },
   { id: "science", name: "Science" },
@@ -73,8 +99,13 @@ export default function FreeTrialPage() {
   const { width, height } = useWindowSize();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState<Record<string, string>>({});
-  const phoneInputRef = React.useRef<any>(null);
+  const phoneInputRef = React.useRef<HTMLInputElement>(null);
   const nameInputRef = React.useRef<HTMLInputElement>(null);
+  const [countryCode, setCountryCode] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
   const emailInputRef = React.useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -106,8 +137,48 @@ export default function FreeTrialPage() {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handlePhoneChange = (value: string | undefined) => {
-    setFormData(prev => ({ ...prev, mobile: value || '' }));
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleCountryCodeSelect = (code: string) => {
+    setCountryCode(code);
+    setFormData(prev => ({ ...prev, mobile: code + mobileNumber }));
+    setIsDropdownOpen(false);
+    setSearchQuery("");
+  };
+
+  const handleMobileNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newNumber = e.target.value.replace(/\D/g, ""); // Keep only digits
+    setMobileNumber(newNumber);
+    setFormData(prev => ({ ...prev, mobile: countryCode + newNumber }));
+  };
+
+  const filteredCountryCodes = countryCodes.filter(c => 
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    c.code.includes(searchQuery)
+  );
+
+  const isSubjectSelected = (subjectId: string) => {
+    if (!formData.subject) return false;
+    return formData.subject.split(",").map(s => s.trim()).includes(subjectId);
+  };
+
+  const handleSubjectToggle = (subjectId: string) => {
+    const currentSubjects = formData.subject ? formData.subject.split(",").map(s => s.trim()).filter(Boolean) : [];
+    let newSubjects: string[];
+    if (currentSubjects.includes(subjectId)) {
+      newSubjects = currentSubjects.filter(s => s !== subjectId);
+    } else {
+      newSubjects = [...currentSubjects, subjectId];
+    }
+    setFormData(prev => ({ ...prev, subject: newSubjects.join(",") }));
   };
 
   useEffect(() => {
@@ -118,6 +189,24 @@ export default function FreeTrialPage() {
         email: session.user.email || "",
         mobile: session.user.mobile || "",
       }));
+
+      const userMobile = session.user.mobile;
+      if (userMobile) {
+        const sortedCodes = [...countryCodes].sort((a, b) => b.code.length - a.code.length);
+        const matched = sortedCodes.find(c => userMobile.startsWith(c.code));
+        if (matched) {
+          setCountryCode(matched.code);
+          setMobileNumber(userMobile.slice(matched.code.length));
+        } else {
+          const match = userMobile.match(/^(\+\d{1,4})/);
+          if (match) {
+            setCountryCode(match[1]);
+            setMobileNumber(userMobile.slice(match[1].length));
+          } else {
+            setMobileNumber(userMobile);
+          }
+        }
+      }
     }
   }, [session]);
 
@@ -126,6 +215,10 @@ export default function FreeTrialPage() {
     if (!session) {
       if (!formData.fullName || formData.fullName.trim().length < 3) {
         toast.error("Please enter a valid full name (min 3 characters)");
+        return;
+      }
+      if (!countryCode) {
+        toast.error("Please select a country code");
         return;
       }
       if (!formData.mobile || formData.mobile.length < 8 || formData.mobile.length > 14) {
@@ -219,11 +312,11 @@ export default function FreeTrialPage() {
         toast.error("Please enter your grade/class");
         return;
       }
-      if (!formData.subject) {
+      if (!formData.subject || formData.subject.trim() === "") {
         toast.error("Please select a subject");
         return;
       }
-      if (formData.subject === "other" && (!formData.otherSubject || formData.otherSubject.trim() === "")) {
+      if (isSubjectSelected("other") && (!formData.otherSubject || formData.otherSubject.trim() === "")) {
         toast.error("Please specify the subject");
         return;
       }
@@ -312,28 +405,91 @@ export default function FreeTrialPage() {
                     disabled={otpSent}
                   />
                 </div>
-                <div className="relative group">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors z-10" />
-                  <PhoneInput
-                    placeholder="Mobile No."
-                    required
-                    value={formData.mobile}
-                    onChange={handlePhoneChange}
-                    onBlur={() => {
-                      const mobile = formData.mobile || "";
-                      if (mobile.length < 8 || mobile.length > 14) {
-                        toast.error("Please enter a valid mobile number");
-                        setTimeout(() => {
-                          const input = document.querySelector('.phone-input-container input') as HTMLInputElement;
-                          if (input) input.focus();
-                        }, 10);
-                      }
-                    }}
-                    international
-                    countryCallingCodeEditable={false}
-                    disabled={otpSent}
-                    className="phone-input-container w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus-within:border-indigo-500 transition-all placeholder:text-slate-600"
-                  />
+                <div className="flex gap-2.5">
+                  <div ref={dropdownRef} className="relative w-1/3 group">
+                    <button
+                      type="button"
+                      disabled={otpSent}
+                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                      className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 px-3 focus:border-indigo-500 outline-none transition-all cursor-pointer text-sm font-semibold flex items-center justify-between h-[52px]"
+                    >
+                      <span>
+                        {countryCode ? (
+                          <>
+                            {countryCodes.find(c => c.code === countryCode)?.flag} {countryCode}
+                          </>
+                        ) : (
+                          <span className="text-slate-500 font-semibold text-[13px]">🌐 Code</span>
+                        )}
+                      </span>
+                      <div className="text-slate-500 group-hover:text-indigo-400 transition-colors">
+                        <svg className={`w-4 h-4 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </button>
+
+                    <AnimatePresence>
+                      {isDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="absolute left-0 right-0 mt-2 bg-slate-900 border-2 border-slate-800 rounded-xl shadow-2xl z-50 p-2 overflow-hidden w-[240px]"
+                        >
+                          <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-lg py-1.5 px-3 text-xs focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600 mb-2"
+                          />
+                          <div className="max-h-[160px] overflow-y-auto space-y-0.5 scrollbar-thin scrollbar-thumb-slate-800 pr-1">
+                            {filteredCountryCodes.length > 0 ? (
+                              filteredCountryCodes.map((c) => (
+                                <button
+                                  key={c.code}
+                                  type="button"
+                                  onClick={() => handleCountryCodeSelect(c.code)}
+                                  className={`flex items-center gap-2.5 w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold hover:bg-indigo-600 hover:text-white transition-colors cursor-pointer ${
+                                    countryCode === c.code ? 'bg-indigo-600/30 text-indigo-200' : 'text-slate-300'
+                                  }`}
+                                >
+                                  <span className="text-sm">{c.flag}</span>
+                                  <span>{c.code}</span>
+                                  <span className="text-[10px] text-slate-500 group-hover:text-indigo-200 truncate max-w-[120px]">{c.name}</span>
+                                </button>
+                              ))
+                            ) : (
+                              <div className="text-[11px] text-slate-600 text-center py-3 font-semibold">
+                                No countries found
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                  <div className="relative flex-1 group">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
+                    <input
+                      ref={phoneInputRef}
+                      type="tel"
+                      placeholder="Mobile No."
+                      required
+                      value={mobileNumber}
+                      onChange={handleMobileNumberChange}
+                      onBlur={() => {
+                        const mobile = formData.mobile || "";
+                        if (mobile.length < 8 || mobile.length > 14) {
+                          toast.error("Please enter a valid mobile number");
+                          setTimeout(() => phoneInputRef.current?.focus(), 10);
+                        }
+                      }}
+                      disabled={otpSent}
+                      className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-600 font-semibold h-[52px]"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -415,24 +571,27 @@ export default function FreeTrialPage() {
                 </label>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {subjects.map((sub) => (
-                  <button
-                    key={sub.name}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, subject: sub.id })}
-                    className={`py-2 px-1 text-[10px] font-bold rounded-xl border-2 transition-all ${formData.subject === sub.id
-                        ? "bg-indigo-600 text-white border-indigo-400 shadow-[0_3px_0_rgba(67,56,202,1)]"
-                        : "bg-slate-950 text-slate-500 border-slate-800 hover:border-slate-700 hover:text-slate-300 shadow-[0_3px_0_rgba(30,41,59,1)]"
-                      }`}
-                  >
-                    {sub.name}
-                  </button>
-                ))}
+                {subjects.map((sub) => {
+                  const selected = isSubjectSelected(sub.id);
+                  return (
+                    <button
+                      key={sub.name}
+                      type="button"
+                      onClick={() => handleSubjectToggle(sub.id)}
+                      className={`py-2 px-1 text-[10px] font-bold rounded-xl border-2 transition-all ${selected
+                          ? "bg-indigo-600 text-white border-indigo-400 shadow-[0_3px_0_rgba(67,56,202,1)]"
+                          : "bg-slate-950 text-slate-500 border-slate-800 hover:border-slate-700 hover:text-slate-300 shadow-[0_3px_0_rgba(30,41,59,1)]"
+                        }`}
+                    >
+                      {sub.name}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             <AnimatePresence>
-              {formData.subject === "other" && (
+              {isSubjectSelected("other") && (
                 <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}>
                   <input
                     name="otherSubject"

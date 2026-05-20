@@ -76,13 +76,18 @@ export async function POST(request: Request) {
       }
     }
 
-    // If 'other' is the subject, ensure otherSubject is provided
-    if (subject === 'other' && !body.otherSubject) {
+    // Validate subject and handle comma-separated subjects elegantly
+    const subjectList = subject ? String(subject).split(',').map((s: string) => s.trim()) : [];
+    if (subjectList.includes('other') && (!body.otherSubject || body.otherSubject.trim() === '')) {
         return NextResponse.json(
             { success: false, message: 'Please specify the subject.' },
             { status: 400 }
         );
     }
+
+    const resolvedSubject = subjectList.includes('other')
+      ? subjectList.map((s: string) => s === 'other' ? body.otherSubject : s).join(', ')
+      : subjectList.join(', ');
 
     const dateObj = new Date(bookingDateAndTime);
     dateObj.setUTCHours(0, 0, 0, 0);
@@ -95,7 +100,7 @@ export async function POST(request: Request) {
       city,
       country,
       topic,
-      subject: subject === 'other' ? body.otherSubject : subject,
+      subject: resolvedSubject,
       bookingDateAndTime,
       // teacherId can be assigned later by an admin
     });
@@ -124,7 +129,7 @@ export async function POST(request: Request) {
               Your demo class has been successfully booked! We are excited to help you on your learning journey.
             </p>
             <div style="background-color: #f0f9ff; border-left: 5px solid #0EA5E9; padding: 15px; margin: 20px 0;">
-              <p style="margin: 5px 0; font-size: 16px;"><strong>Subject:</strong> ${subject === 'other' ? body.otherSubject : subject}</p>
+              <p style="margin: 5px 0; font-size: 16px;"><strong>Subject:</strong> ${resolvedSubject}</p>
               <p style="margin: 5px 0; font-size: 16px;"><strong>Date:</strong> ${dateObj.toDateString()}</p>
             </div>
             <p style="font-size: 16px; color: #555;">We look forward to seeing you there! And Our team contact you withing 24 hours.</p>
@@ -174,7 +179,7 @@ export async function POST(request: Request) {
               </tr>
               <tr>
                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Subject</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${subject === 'other' ? body.otherSubject : subject}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${resolvedSubject}</td>
               </tr>
               <tr style="background-color: #f8fafc;">
                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Topic</td>
