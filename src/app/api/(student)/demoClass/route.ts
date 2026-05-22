@@ -131,7 +131,7 @@ export async function POST(request: Request) {
               <p style="margin: 5px 0; font-size: 16px;"><strong>Subject:</strong> ${resolvedSubject}</p>
               <p style="margin: 5px 0; font-size: 16px;"><strong>Date:</strong> ${dateObj.toDateString()}</p>
             </div>
-            <p style="font-size: 16px; color: #555;">We look forward to seeing you there! And Our team contact you withing 24 hours.</p>
+            <p style="font-size: 16px; color: #555;">We look forward to seeing you there! And Our team contact you within 24 hours.</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
             <p style="font-size: 14px; color: #888; text-align: center;">
               Best regards,<br/>
