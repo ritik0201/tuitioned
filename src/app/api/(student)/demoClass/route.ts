@@ -63,7 +63,6 @@ export async function POST(request: Request) {
       email: "Email is required.",
       grade: "Grade is required.",
       subject: "Subject is required.",
-      topic: "Topic is required.",
       city: "City is required.",
       country: "Country is required.",
       bookingDateAndTime: "Booking date and time are required."
@@ -183,7 +182,7 @@ export async function POST(request: Request) {
               </tr>
               <tr style="background-color: #f8fafc;">
                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Topic</td>
-                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${topic}</td>
+                <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${topic || 'Not provided'}</td>
               </tr>
               <tr>
                 <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Preferred Date</td>

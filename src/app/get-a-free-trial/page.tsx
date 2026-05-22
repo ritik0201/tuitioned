@@ -94,6 +94,16 @@ const subjects = [
   { id: "other", name: "Other" }
 ];
 
+const getNextDays = (count = 6) => {
+  const days = [];
+  for (let i = 0; i < count; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    days.push(d);
+  }
+  return days;
+};
+
 export default function FreeTrialPage() {
   const { data: session, status, update: updateSession } = useSession();
   const { width, height } = useWindowSize();
@@ -514,7 +524,13 @@ export default function FreeTrialPage() {
               />
             </div>
             {otpSent && (
-              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-1">
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} className="space-y-3">
+                <div className="text-center bg-indigo-500/10 border border-indigo-500/20 py-2.5 px-4 rounded-xl flex items-center justify-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+                  <p className="text-xs font-semibold text-indigo-300">
+                    OTP is received on your email
+                  </p>
+                </div>
                 <input
                   name="otp"
                   type="text"
@@ -661,16 +677,54 @@ export default function FreeTrialPage() {
               </div>
             </div>
 
-            <div className="relative group">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors" />
-              <input
-                name="bookingDateAndTime"
-                type="date"
-                required
-                value={formData.bookingDateAndTime || ""}
-                onChange={handleChange}
-                className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all"
-              />
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 flex items-center gap-2 tracking-wider uppercase px-1">
+                <Calendar className="w-3.5 h-3.5 text-indigo-400" /> Select preferred date
+              </label>
+              
+              {/* Premium Quick-Select Date Cards */}
+              <div className="grid grid-cols-3 gap-2">
+                {getNextDays(6).map((date) => {
+                  const dateStr = date.toISOString().split('T')[0];
+                  const isSelected = formData.bookingDateAndTime === dateStr;
+                  const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                  const dayNum = date.getDate();
+                  const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+
+                  return (
+                    <button
+                      key={dateStr}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, bookingDateAndTime: dateStr }))}
+                      className={`py-3 px-1 text-center rounded-xl border-2 transition-all cursor-pointer flex flex-col items-center justify-center ${isSelected
+                        ? "bg-indigo-600 text-white border-indigo-400 shadow-[0_3px_0_rgba(67,56,202,1)]"
+                        : "bg-slate-950 text-slate-500 border-slate-800 hover:border-slate-700 hover:text-slate-300 shadow-[0_3px_0_rgba(30,41,59,1)]"
+                      }`}
+                    >
+                      <span className="text-[9px] uppercase tracking-wider font-extrabold opacity-75">{dayName}</span>
+                      <span className="text-xl font-black my-0.5 tracking-tight">{dayNum}</span>
+                      <span className="text-[9px] uppercase tracking-wider font-extrabold opacity-75">{monthName}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Or Select Custom Date Input */}
+              <div className="relative group">
+                <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-400 transition-colors pointer-events-none" />
+                <input
+                  name="bookingDateAndTime"
+                  type="date"
+                  required
+                  value={formData.bookingDateAndTime || ""}
+                  onChange={handleChange}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full bg-slate-950 border-2 border-slate-800 text-slate-100 rounded-xl py-3 pl-10 pr-4 focus:border-indigo-500 outline-none transition-all text-xs font-semibold placeholder:text-slate-600 h-[52px]"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-500 tracking-widest uppercase pointer-events-none">
+                  OR CHOOSE OTHER
+                </span>
+              </div>
             </div>
           </motion.div>
         );
@@ -712,10 +766,12 @@ export default function FreeTrialPage() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 selection:bg-indigo-500/30 font-sans overflow-x-hidden relative">
-      {/* Subtle Background Accent */}
-      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full -mr-40 -mt-40 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-cyan-500/5 rounded-full -ml-30 -mb-30 blur-[80px] pointer-events-none" />
+    <main className="min-h-[calc(100vh-4rem)] bg-slate-950 text-slate-100 flex items-center justify-center p-4 selection:bg-indigo-500/30 font-sans relative">
+      {/* Subtle Background Accent Wrapper */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-indigo-500/5 rounded-full -mr-40 -mt-40 blur-[100px]" />
+        <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-cyan-500/5 rounded-full -ml-30 -mb-30 blur-[80px]" />
+      </div>
 
       <div className="w-full max-w-xl relative z-10">
         {showConfetti && <ReactConfetti width={width} height={height} numberOfPieces={150} recycle={false} />}
