@@ -6,16 +6,18 @@ interface MailOptions {
   html: string;
 }
 
-export async function sendEmail({ to, subject, html }: MailOptions) {
+let cachedTransporter: nodemailer.Transporter | null = null;
+
+function getTransporter() {
+  if (cachedTransporter) return cachedTransporter;
+
   const { EMAIL_USER, EMAIL_PASS } = process.env;
 
   if (!EMAIL_USER || !EMAIL_PASS) {
-    console.error("SMTP credentials are not set in environment variables.");
-    // In a real app, you might want to throw an error or handle this more gracefully
-    return { success: false, message: "SMTP credentials not configured." };
+    return null;
   }
 
-  const transport = nodemailer.createTransport({
+  cachedTransporter = nodemailer.createTransport({
     host: "smtp.hostinger.com",
     port: 465,
     secure: true,
@@ -23,14 +25,21 @@ export async function sendEmail({ to, subject, html }: MailOptions) {
       user: EMAIL_USER,
       pass: EMAIL_PASS,
     },
+    pool: true,             // Enable SMTP connection pooling
+    maxConnections: 5,     // Limit number of concurrent connections
+    maxMessages: 100,      // Max messages to send on a single connection before recycling
   });
 
-  try {
-    // Verify connection configuration
-    await transport.verify();
-  } catch (error) {
-    console.error("Error verifying email transport:", error);
-    return { success: false, message: "Failed to verify email transport." };
+  return cachedTransporter;
+}
+
+export async function sendEmail({ to, subject, html }: MailOptions) {
+  const { EMAIL_USER } = process.env;
+  const transport = getTransporter();
+
+  if (!transport || !EMAIL_USER) {
+    console.error("SMTP credentials are not set in environment variables.");
+    return { success: false, message: "SMTP credentials not configured." };
   }
 
   try {
@@ -47,4 +56,4 @@ export async function sendEmail({ to, subject, html }: MailOptions) {
     console.error("Error sending email:", error);
     return { success: false, message: "Failed to send email." };
   }
-}
+}
