@@ -12,7 +12,7 @@ export async function sendOtpEmail(email: string, otp: string) {
   });
 
   const mailOptions = {
-    from: `"TuitionEd Team" <${process.env.EMAIL_USER}>`,
+    from: `"Tuitioned Team" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "Your One-Time Password for TuitionEd",
     html: `

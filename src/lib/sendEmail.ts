@@ -44,7 +44,7 @@ export async function sendEmail({ to, subject, html }: MailOptions) {
 
   try {
     const mailOptions = {
-      from: EMAIL_USER,
+      from: `"Tuitioned" <${EMAIL_USER}>`,
       to,
       subject,
       html,

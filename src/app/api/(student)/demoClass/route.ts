@@ -116,7 +116,7 @@ export async function POST(request: Request) {
     });
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"Tuitioned" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Demo Class Confirmed!",
       html: `
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
 
     // Send notification email to admin
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: `"Tuitioned" <${process.env.EMAIL_USER}>`,
       to: "ritikkatsa2005@gmail.com, adityayadav114@gmail.com, tuitioned01@gmail.com, harshitverma503@gmail.com",
       subject: "New Demo Class Request!",
       html: `

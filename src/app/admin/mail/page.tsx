@@ -50,16 +50,58 @@ import { motion } from 'framer-motion';
 // Presets definition for email templates
 const templates = {
   custom: {
-    subject: '',
-    message: '',
-    accentColor: '#6366f1',
-    bgColor: '#f3f4f6',
-    textColor: '#1f2937',
+    subject: "Special Invitation: Tuitioned Refer & Save Program",
+    message: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13.5px; line-height: 1.6; color: #2d3748;">
+  <p style="margin-top: 0; margin-bottom: 14px;">Dear [Name],</p>
+
+  <p style="margin-bottom: 14px;">Thank you for being a valued member of the <strong>Tuitioned family</strong>. We truly appreciate your trust in us for your child's education.</p>
+
+  <p style="margin-bottom: 16px;">We're excited to introduce our <strong>Refer & Save Program</strong>—a simple way for you and your friends to save on tuition while helping more students access quality education.</p>
+
+  <div style="background-color: #f7fafc; border-left: 3px solid #3182ce; padding: 12px 16px; margin: 18px 0; border-radius: 0 4px 4px 0;">
+    <p style="margin: 0 0 6px 0; font-weight: 600; color: #2b6cb0; font-size: 13px;">Here's how it works:</p>
+    <ul style="margin: 0; padding-left: 18px; color: #2d3748; font-size: 13px;">
+      <li style="margin-bottom: 4px;">Refer a friend, relative, or colleague to Tuitioned.</li>
+      <li style="margin-bottom: 4px;">Your friend receives <strong>$15 OFF</strong> on their first month's tuition.</li>
+      <li style="margin-bottom: 0;">Once they successfully enroll and complete their first paid month, you'll also receive <strong>$15 OFF</strong> on your child's next month's tuition.</li>
+    </ul>
+  </div>
+
+  <p style="margin-bottom: 16px; font-size: 13px; color: #4a5568;"><em>There is no limit to the number of referrals! The more families you refer, the more you save.</em></p>
+
+  <p style="margin-bottom: 8px; font-weight: 600; color: #1a202c; font-size: 13.5px;">Why families choose Tuitioned:</p>
+  <ul style="margin: 0 0 18px 0; padding-left: 18px; color: #4a5568; font-size: 13px; line-height: 1.6;">
+    <li style="margin-bottom: 3px;">Personalized 1-on-1 live online classes</li>
+    <li style="margin-bottom: 3px;">Experienced and carefully selected tutors</li>
+    <li style="margin-bottom: 3px;">CBSE, ICSE, IB, IGCSE & other international curricula</li>
+    <li style="margin-bottom: 3px;">Flexible scheduling across different time zones</li>
+    <li style="margin-bottom: 0;">Individual learning plans tailored to every student's needs</li>
+  </ul>
+
+  <p style="margin-bottom: 8px; font-weight: 600; color: #1a202c; font-size: 13.5px;">How to Refer:</p>
+  <p style="margin-bottom: 18px; color: #4a5568; font-size: 13px;">Simply share our contact number with your friends or relatives and ask them to mention your name as the referral when they contact us. Once they enroll and complete their first paid month, both of you will receive your $15 tuition discount.</p>
+
+  <p style="margin-bottom: 18px; color: #2d3748;">Thank you for helping us grow the Tuitioned community. We look forward to welcoming more learners through your recommendation!</p>
+
+  <p style="margin-bottom: 0; color: #2d3748;">
+   <br />
+    <strong>Team Tuitioned</strong><br />
+  </p>
+
+  <hr style="border: 0; border-top: 1px solid #edf2f7; margin: 20px 0 12px 0;" />
+
+  <p style="margin: 0; font-size: 11px; color: #a0aec0; line-height: 1.4;">
+    Referral discounts are applicable after the referred student completes their first paid month. This offer is valid for a limited time.
+  </p>
+</div>`,
+    accentColor: '#3182ce',
+    bgColor: '#f7fafc',
+    textColor: '#2d3748',
     logoUrl: 'https://tuition-ed.com/wp-content/uploads/2025/05/cropped-Tuitioned-logo-1.png',
-    buttonLink: '',
-    buttonText: '',
-    buttonLink2: '',
-    buttonText2: ''
+    buttonLink: 'https://new.tuition-ed.com/get-a-free-trial',
+    buttonText: 'Book A Free Demo Now',
+    buttonLink2: 'https://tuition-ed.com/',
+    buttonText2: 'Visit Our Site'
   },
   summer: {
     subject: '☀️ Special Summer Class Offer: Boost Your Skills with TuitionEd!',
@@ -422,13 +464,12 @@ export default function BulkMailPage() {
     }
 
     if (templateType === 'custom') {
-      return `<div style="font-family: 'Inter', sans-serif; line-height: 1.6; color: ${textColor}; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff;">
-        <div style="text-align: center; margin-bottom: 24px;">
-           ${logoUrl ? `<img src="${logoUrl}" alt="Logo" style="max-height: 40px;" />` : `<h1 style="color: ${accentColor}; margin: 0; font-family: sans-serif;">TuitionEd</h1>`}
-        </div>
-        <div style="background: #f9fafb; padding: 20px; border-radius: 6px;">
+      return `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: ${textColor}; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px; background-color: #ffffff;">
+        ${logoUrl ? `<div style="text-align: center; margin-bottom: 24px;"><img src="${logoUrl}" alt="Logo" style="max-height: 40px;" /></div>` : ''}
+        <div>
           ${htmlContent.replace(/\[Name\]/g, name)}
         </div>
+        ${(buttonLink || buttonLink2) ? `
         <div style="margin-top: 24px; text-align: center;">
           ${buttonLink ? `
             <a href="${buttonLink}" target="_blank" style="background-color: ${accentColor}; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-block; margin: 6px;">
@@ -440,10 +481,7 @@ export default function BulkMailPage() {
               ${buttonText2 || 'Read More'}
             </a>
           ` : ''}
-        </div>
-        <div style="margin-top: 24px; font-size: 12px; color: #6b7280; text-align: center;">
-          This is an automated email from TuitionEd Admin. Please do not reply.
-        </div>
+        </div>` : ''}
       </div>`;
     }
 
