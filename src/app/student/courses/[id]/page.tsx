@@ -40,7 +40,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface ICourse {
   _id: string;
@@ -78,16 +77,16 @@ interface ApiResponse {
 function CourseDetailSkeleton() {
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-pulse">
-      <Skeleton className="h-10 w-32 bg-slate-800 rounded-xl" />
-      <Skeleton className="h-24 w-full bg-slate-800 rounded-[2rem]" />
+      <Skeleton className="h-10 w-32 bg-slate-800 rounded-none" />
+      <Skeleton className="h-24 w-full bg-slate-800 rounded-none" />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <Skeleton className="h-[400px] w-full bg-slate-800 rounded-[2.5rem]" />
-          <Skeleton className="h-[300px] w-full bg-slate-800 rounded-[2.5rem]" />
+          <Skeleton className="h-[400px] w-full bg-slate-800 rounded-none" />
+          <Skeleton className="h-[300px] w-full bg-slate-800 rounded-none" />
         </div>
         <div className="space-y-8">
-          <Skeleton className="h-[250px] w-full bg-slate-800 rounded-[2.5rem]" />
-          <Skeleton className="h-[250px] w-full bg-slate-800 rounded-[2.5rem]" />
+          <Skeleton className="h-[250px] w-full bg-slate-800 rounded-none" />
+          <Skeleton className="h-[250px] w-full bg-slate-800 rounded-none" />
         </div>
       </div>
     </div>
@@ -273,344 +272,226 @@ export default function CourseDetailPage() {
   const completionPercentage = totalCourseClasses > 0 ? (completedClassesCount / totalCourseClasses) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 py-8 md:py-12 px-4 selection:bg-indigo-500/30">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-slate-950 text-slate-100 py-6 px-4 font-sans">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Navigation */}
         <Button
           variant="ghost"
           onClick={() => router.back()}
-          className="group hover:bg-slate-900 text-slate-400 hover:text-indigo-400 rounded-xl transition-all"
+          className="group hover:bg-slate-900 text-slate-400 hover:text-indigo-400 rounded-none transition-all border border-slate-800"
         >
           <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
           Back to Courses
         </Button>
 
         {/* Management Bar */}
-        <div className="relative group overflow-hidden bg-slate-900/50 backdrop-blur-xl border-4 border-slate-800 p-6 md:p-8 rounded-[2rem] shadow-2xl">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-indigo-500/10 transition-colors"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-4">
-              <div className="p-4 bg-indigo-500/10 rounded-2xl border border-indigo-500/30">
-                <Layout className="h-8 w-8 text-indigo-400" />
-              </div>
-              <div>
-                <h3 className="text-xl md:text-2xl font-black tracking-tight">Course Management</h3>
-                <p className="text-slate-400 text-sm font-medium">Manage your enrollment and progress.</p>
-              </div>
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-none shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-slate-950 border border-slate-800 rounded-none">
+              <Layout className="h-6 w-6 text-indigo-400" />
+            </div>
+            <div>
+              <h3 className="text-xl font-black uppercase tracking-wider">Course Management</h3>
+              <p className="text-slate-400 text-xs font-medium">Manage your enrollment and progress.</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            <div className="text-center px-5 py-2 bg-slate-950 border border-slate-800 rounded-none">
+              <p className="text-[10px] uppercase font-black text-slate-500">Remaining</p>
+              <p className="text-xl font-black text-indigo-400">{remainingClassesCount}</p>
             </div>
             
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <div className="text-center px-6 py-2 bg-slate-950/50 rounded-2xl border border-slate-800">
-                <p className="text-[10px] uppercase font-black tracking-widest text-slate-500">Remaining</p>
-                <p className="text-2xl font-black text-indigo-400">{remainingClassesCount}</p>
-              </div>
-              
-              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-                <DialogTrigger asChild>
-                  <Button className="h-14 sm:h-16 px-6 sm:px-10 text-base sm:text-lg rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-[0_6px_0_rgba(67,56,202,1)] hover:shadow-[0_3px_0_rgba(67,56,202,1)] hover:translate-y-[3px] transition-all border-2 border-indigo-400">
-                    <PlusCircle className="mr-3 h-5 w-5 sm:h-6 sm:w-6" />
-                    Add More Classes
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-slate-900 border-2 border-slate-800 rounded-[2rem] p-8 max-w-md shadow-2xl">
-                  <DialogHeader className="space-y-2 text-center">
-                    <DialogTitle className="text-2xl font-bold text-white">Add Classes</DialogTitle>
-                    <DialogDescription className="text-slate-400">
-                      Select how many additional classes you would like to add for <span className="text-indigo-400 font-semibold">{course.title}</span>.
-                    </DialogDescription>
-                  </DialogHeader>
+            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+              <DialogTrigger asChild>
+                <Button className="h-12 px-6 text-xs font-black uppercase tracking-wider rounded-none bg-indigo-600 hover:bg-indigo-500 text-white border border-indigo-400">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add More Classes
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-900 border border-slate-700 rounded-none p-6 max-w-md shadow-2xl">
+                <DialogHeader className="space-y-2 text-center">
+                  <DialogTitle className="text-xl font-black uppercase text-white">Add Classes</DialogTitle>
+                  <DialogDescription className="text-slate-400 text-xs">
+                    Select how many additional classes you would like to add for <span className="text-indigo-400 font-bold">{course.title}</span>.
+                  </DialogDescription>
+                </DialogHeader>
 
-                  <div className="py-8 space-y-6">
-                    <div className="flex items-center justify-center gap-6">
-                      <Button 
-                        variant="outline" 
-                        size="icon"
-                        onClick={handleDecrease} 
-                        className="h-12 w-12 rounded-xl bg-slate-800 border-slate-700 hover:bg-slate-700 text-white"
-                      >
-                        <Minus className="h-5 w-5" />
-                      </Button>
-                      
-                      <div className="text-center min-w-[80px]">
-                        <span className="text-5xl font-bold text-white">
-                          {classesToAdd}
-                        </span>
-                        <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">Classes</p>
-                      </div>
-
-                      <Button 
-                        variant="outline" 
-                        size="icon"
-                        onClick={handleIncrease} 
-                        className="h-12 w-12 rounded-xl bg-slate-800 border-slate-700 hover:bg-slate-700 text-white"
-                      >
-                        <Plus className="h-5 w-5" />
-                      </Button>
+                <div className="py-6 space-y-4">
+                  <div className="flex items-center justify-center gap-4">
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={handleDecrease} 
+                      className="h-10 w-10 rounded-none bg-slate-950 border-slate-700 hover:bg-slate-800 text-white"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    
+                    <div className="text-center min-w-[70px]">
+                      <span className="text-4xl font-black text-white">{classesToAdd}</span>
+                      <p className="text-[10px] uppercase font-black text-slate-500 mt-0.5">Classes</p>
                     </div>
 
-                    <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex justify-between items-center">
-                      <div className="text-left">
-                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Price per class</p>
-                        <p className="text-sm font-medium text-slate-300">₹{course.perClassPrice.toLocaleString()}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs font-semibold text-indigo-400 uppercase tracking-wider">Total Payment</p>
-                        <p className="text-2xl font-bold text-white">₹{totalPrice.toLocaleString()}</p>
-                      </div>
-                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="icon"
+                      onClick={handleIncrease} 
+                      className="h-10 w-10 rounded-none bg-slate-950 border-slate-700 hover:bg-slate-800 text-white"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
                   </div>
 
-                  <DialogFooter>
-                    <Button 
-                      disabled={isProcessing}
-                      onClick={handleProcessPayment}
-                      className="w-full h-14 text-lg rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all flex items-center justify-center gap-2"
-                    >
-                      {isProcessing ? (
-                        <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          <span>Processing...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Rocket className="h-5 w-5" />
-                          <span>Confirm Payment</span>
-                        </>
-                      )}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
+                  <div className="bg-slate-950 p-4 rounded-none border border-slate-800 flex justify-between items-center">
+                    <div>
+                      <p className="text-[10px] font-black text-slate-500 uppercase">Price per class</p>
+                      <p className="text-xs font-bold text-slate-300">₹{course.perClassPrice.toLocaleString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-black text-indigo-400 uppercase">Total</p>
+                      <p className="text-xl font-black text-white">₹{totalPrice.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter>
+                  <Button 
+                    disabled={isProcessing}
+                    onClick={handleProcessPayment}
+                    className="w-full h-12 text-xs font-black uppercase tracking-wider rounded-none bg-indigo-600 hover:bg-indigo-500 text-white transition-all flex items-center justify-center gap-2"
+                  >
+                    {isProcessing ? "Processing..." : "Confirm Payment"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
-        {/* Main Information Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Details */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="bg-slate-900 border-4 border-slate-800 p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-              <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/5 rounded-full -mb-48 -mr-48 blur-3xl"></div>
-              
-              <div className="relative z-10 space-y-8">
-                <div className="space-y-4">
-                  <Badge className={`px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest border-2 ${
-                    remainingClassesCount > 0 ? "bg-green-500/10 text-green-400 border-green-500/30" : "bg-yellow-500/10 text-yellow-400 border-yellow-500/30"
-                  }`}>
-                    {remainingClassesCount > 0 ? "Status: Active" : "Status: Inactive"}
-                  </Badge>
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400">
-                    {course.title}
-                  </h1>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-950/50 border border-slate-800 rounded-lg">
-                    <ShieldCheck className="h-4 w-4 text-cyan-400" />
-                    <span className="text-sm font-black text-slate-300">Grade {course.grade}</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-6 bg-slate-950/50 rounded-3xl border border-slate-800 transition-colors hover:border-indigo-500/30 group">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-indigo-500/10 rounded-2xl border border-indigo-500/30 group-hover:scale-110 transition-transform">
-                        <IndianRupee className="h-5 w-5 text-indigo-400" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest">Pricing</p>
-                        <p className="text-lg font-black tracking-tight text-white">₹{course.perClassPrice} <span className="text-xs text-slate-500">/ Class</span></p>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6 bg-slate-950/50 rounded-3xl border border-slate-800 transition-colors hover:border-purple-500/30 group">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-purple-500/10 rounded-2xl border border-purple-500/30 group-hover:scale-110 transition-transform">
-                        <CalendarIcon className="h-5 w-5 text-purple-400" />
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {course.classDays?.map(day => (
-                          <span key={day} className="text-[10px] font-black uppercase italic text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20">{day}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h4 className="flex items-center gap-2 text-xl font-black italic text-slate-200">
-                    <Info className="h-5 w-5 text-indigo-400" />
-                    Course Description
-                  </h4>
-                  <p className="text-slate-400 font-medium leading-relaxed text-lg">
-                    {course.description}
-                  </p>
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-none shadow-xl space-y-6">
+              <div className="space-y-2">
+                <Badge className="px-3 py-1 rounded-none font-black text-[10px] uppercase border bg-slate-950 text-emerald-400 border-emerald-500/40">
+                  {remainingClassesCount > 0 ? "Active" : "Inactive"}
+                </Badge>
+                <h1 className="text-2xl sm:text-4xl font-black uppercase text-white tracking-tight">
+                  {course.title}
+                </h1>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-950 border border-slate-800 rounded-none text-xs font-black text-slate-300">
+                  <ShieldCheck className="h-4 w-4 text-cyan-400" /> Grade {course.grade}
                 </div>
               </div>
-            </div>
 
-            {/* Progress Circle - Moved from sidebar to fill gaps and show prominence */}
-            <div className="bg-slate-900 border-4 border-slate-800 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mt-16 -mr-16 blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-black italic text-slate-100 tracking-tight flex items-center justify-center md:justify-start gap-3">
-                    <Sparkles className="h-6 w-6 text-yellow-400" />
-                    Overall Progression
-                  </h3>
-                  <p className="text-slate-400 font-medium max-w-xs">Track your journey through this course. Each lesson brings you closer to mastery.</p>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 text-center">
-                      <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Completed</p>
-                      <p className="text-2xl font-black text-green-400">{completedClassesCount}</p>
-                    </div>
-                    <div className="bg-slate-950/50 p-4 rounded-2xl border border-slate-800 text-center">
-                      <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Total</p>
-                      <p className="text-2xl font-black text-indigo-400">{totalCourseClasses}</p>
-                    </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 bg-slate-950 rounded-none border border-slate-800">
+                  <p className="text-[10px] font-black uppercase text-slate-500">Pricing</p>
+                  <p className="text-base font-black text-white">₹{course.perClassPrice} / Class</p>
+                </div>
+                <div className="p-4 bg-slate-950 rounded-none border border-slate-800">
+                  <p className="text-[10px] font-black uppercase text-slate-500 mb-1">Days</p>
+                  <div className="flex flex-wrap gap-1">
+                    {course.classDays?.map(day => (
+                      <span key={day} className="text-[10px] font-black uppercase text-purple-300 bg-purple-950 px-2 py-0.5 border border-purple-800">{day}</span>
+                    ))}
                   </div>
                 </div>
+              </div>
 
-                <div className="relative inline-flex items-center justify-center w-40 h-40 rounded-full border-[10px] border-slate-800 border-t-indigo-500 border-l-indigo-500 -rotate-45 shadow-[0_0_30px_rgba(99,102,241,0.2)]">
-                  <div className="rotate-45 flex flex-col items-center">
-                    <span className="text-4xl font-black text-white">{Math.round(completionPercentage)}%</span>
-                    <span className="text-xs font-black uppercase text-slate-500 tracking-tighter">Completed</span>
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <h4 className="text-sm font-black uppercase text-slate-300 flex items-center gap-2">
+                  <Info className="h-4 w-4 text-indigo-400" /> Course Overview
+                </h4>
+                <p className="text-slate-400 font-medium text-xs leading-relaxed">
+                  {course.description}
+                </p>
               </div>
             </div>
 
             {/* Lesson History */}
-            <div className="space-y-6">
-              <h3 className="text-2xl font-black italic tracking-tight text-slate-100 flex items-center gap-3">
-                <TrendingUp className="h-6 w-6 text-green-400" />
-                Lesson History
+            <div className="space-y-4">
+              <h3 className="text-lg font-black uppercase text-slate-200 flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-green-400" /> Lesson History
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {completedClasses.length > 0 ? (
                   completedClasses.map((c) => (
-                    <div key={c._id} className="p-6 bg-slate-900 border-4 border-slate-800 rounded-[2.5rem] hover:border-indigo-500/50 transition-all group overflow-hidden relative shadow-xl">
-                      <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-all group-hover:scale-110">
-                        <Layout className="h-20 w-20 text-indigo-400" />
-                      </div>
-                      <div className="relative z-10 space-y-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                             <div className="h-1 w-4 bg-indigo-500 rounded-full"></div>
-                             <p className="text-[10px] font-black uppercase tracking-widest text-indigo-400">
-                               {new Date(c.completedAt).toLocaleDateString()}
-                             </p>
-                          </div>
-                          <h4 className="text-lg font-bold text-slate-100">{c.topic}</h4>
-                        </div>
-                        {c.homeworkFile && (
-                          <Button 
-                            variant="ghost" 
-                            className="w-full h-10 bg-indigo-500/10 border border-indigo-500/30 hover:bg-indigo-500/20 text-indigo-400 font-bold italic rounded-xl flex items-center justify-center gap-2"
-                            asChild
-                          >
-                            <a href={c.homeworkFile} target="_blank" rel="noopener noreferrer">
-                              <Download className="h-3 w-3" />
-                              Homework
-                            </a>
-                          </Button>
-                        )}
-                      </div>
+                    <div key={c._id} className="p-4 bg-slate-900 border border-slate-800 rounded-none space-y-2">
+                      <p className="text-[10px] font-black uppercase text-indigo-400">
+                        {new Date(c.completedAt).toLocaleDateString()}
+                      </p>
+                      <h4 className="text-sm font-bold text-slate-100">{c.topic}</h4>
+                      {c.homeworkFile && (
+                        <Button 
+                          variant="ghost" 
+                          className="w-full h-8 bg-slate-950 border border-slate-800 hover:bg-slate-800 text-indigo-400 font-bold text-xs rounded-none flex items-center justify-center gap-1"
+                          asChild
+                        >
+                          <a href={c.homeworkFile} target="_blank" rel="noopener noreferrer">
+                            <Download className="h-3 w-3" /> Homework
+                          </a>
+                        </Button>
+                      )}
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-full p-12 text-center bg-slate-900/50 border-4 border-dashed border-slate-800 rounded-[2.5rem]">
-                    <Clock className="h-12 w-12 text-slate-700 mx-auto mb-4 opacity-50" />
-                    <p className="text-slate-500 font-bold italic">No lessons recorded yet.</p>
+                  <div className="col-span-full p-8 text-center bg-slate-900 border border-slate-800 rounded-none">
+                    <p className="text-slate-500 text-xs font-bold uppercase">No lessons recorded yet.</p>
                   </div>
                 )}
               </div>
             </div>
           </div>
 
-          {/* Right Column: Instructor & Actions */}
-          <div className="space-y-8">
-            <div className="bg-slate-900 border-4 border-slate-800 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group h-fit">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full -mt-16 -mr-16 blur-2xl"></div>
+          {/* Right Column */}
+          <div className="space-y-6">
+            <div className="bg-slate-900 border border-slate-800 p-6 rounded-none space-y-6">
+              <h3 className="text-lg font-black uppercase text-slate-100 flex items-center gap-2">
+                <Target className="h-5 w-5 text-purple-400" /> Instructor
+              </h3>
               
-              <div className="relative z-10 space-y-8">
-                <div className="space-y-6">
-                  <h3 className="text-xl font-black italic text-slate-100 tracking-tight flex items-center gap-3">
-                    <Target className="h-6 w-6 text-purple-400" />
-                    Course Instructor
-                  </h3>
-                  
-                  <div className="p-6 bg-slate-950/50 rounded-3xl border border-slate-800 text-center space-y-3">
-                    <div className="w-20 h-20 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-3xl mx-auto flex items-center justify-center p-2">
-                       <div className="w-full h-full bg-slate-950 rounded-2xl flex items-center justify-center">
-                          <span className="text-3xl font-black text-white italic">{course.teacherName?.charAt(0) || "S"}</span>
-                       </div>
-                    </div>
-                    <div>
-                      <p className="text-lg font-black text-white">{course.teacherName || "Name Pending"}</p>
-                      <p className="text-xs font-black uppercase text-slate-500 tracking-widest mt-1">Lead Teacher</p>
-                    </div>
-                  </div>
+              <div className="p-4 bg-slate-950 border border-slate-800 rounded-none text-center space-y-2">
+                <p className="text-base font-black text-white">{course.teacherName || "Name Pending"}</p>
+                <p className="text-[10px] font-black uppercase text-slate-500">Lead Teacher</p>
+              </div>
 
-                  <div className="p-4 bg-slate-950/50 rounded-2xl border border-slate-800 flex items-center justify-center gap-3">
-                    <Clock className="h-5 w-5 text-cyan-400" />
-                    <span className="text-sm font-black text-slate-300">{course.classTime || "Time Pending"}</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
+              <div className="space-y-2">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setIsMessageModalOpen(true)}
+                  className="w-full h-11 bg-slate-950 border border-slate-800 hover:bg-slate-800 text-slate-300 rounded-none font-black text-xs uppercase"
+                >
+                  <MessageSquare className="h-4 w-4 text-indigo-400 mr-2" /> Send Message
+                </Button>
+                
+                <Link href={course.joinLink || "#"} className={!course.joinLink || remainingClassesCount <= 0 ? 'pointer-events-none' : ''}>
                   <Button 
-                    variant="ghost" 
-                    onClick={() => setIsMessageModalOpen(true)}
-                    className="w-full h-14 bg-slate-950/50 border-2 border-slate-800 hover:border-indigo-500/50 text-slate-300 hover:text-white rounded-2xl transition-all font-black flex items-center justify-center gap-2"
+                    disabled={!course.joinLink || remainingClassesCount <= 0}
+                    className="w-full h-12 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-xs rounded-none border border-emerald-400 flex items-center justify-center gap-2"
                   >
-                    <MessageSquare className="h-5 w-5 text-indigo-400" />
-                    Send Message
+                    <Video className="h-4 w-4" /> Join Class
                   </Button>
-                  
-                  <Link href={course.joinLink || "#"} className={!course.joinLink || remainingClassesCount <= 0 ? 'pointer-events-none' : ''}>
-                    <Button 
-                      disabled={!course.joinLink || remainingClassesCount <= 0}
-                      className="w-full h-16 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-black shadow-[0_6px_0_rgba(16,185,129,0.5)] active:translate-y-[4px] active:shadow-none transition-all border-2 border-emerald-400/50 rounded-2xl flex items-center justify-center gap-3 text-lg"
-                    >
-                      <Video className="h-6 w-6" />
-                      Join Class
-                    </Button>
-                  </Link>
-
-                  <Link href={course.classroomLink || "#"} className={!course.classroomLink || remainingClassesCount <= 0 ? 'pointer-events-none' : ''}>
-                    <Button 
-                      variant="ghost"
-                      disabled={!course.classroomLink || remainingClassesCount <= 0}
-                      className="w-full h-14 bg-slate-800/20 border-2 border-slate-800/50 hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 rounded-2xl transition-all font-black flex items-center justify-center gap-2"
-                    >
-                      Course Materials
-                      <Layout className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
+                </Link>
               </div>
             </div>
 
-            {/* Calendar - Moved from below progress to below instructor */}
-            <div className="bg-slate-900 border-4 border-slate-800 p-6 sm:p-8 rounded-[2.5rem] shadow-2xl space-y-6">
-              <h3 className="text-xl font-black italic text-slate-100 tracking-tight flex items-center gap-3">
-                <CalendarIcon className="h-6 w-6 text-cyan-400" />
-                Upcoming Classes
+            <div className="bg-slate-900 border border-slate-800 p-6 rounded-none space-y-4">
+              <h3 className="text-base font-black uppercase text-slate-100 flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5 text-cyan-400" /> Calendar
               </h3>
-              
-              <div className="flex items-center justify-center overflow-hidden">
-                <div className="max-w-[280px] sm:max-w-md w-full">
-                  <Calendar
-                    mode="multiple"
-                    month={calendarMonth}
-                    onMonthChange={setCalendarMonth}
-                    modifiers={{ completed: completedDays }}
-                    className="p-0 border-none mx-auto w-full"
-                    modifiersStyles={{
-                      completed: { color: "#fff", backgroundColor: '#6366f1', borderRadius: '50%', fontWeight: 'bold' },
-                    }}
-                  />
-                </div>
+              <div className="flex items-center justify-center">
+                <Calendar
+                  mode="multiple"
+                  month={calendarMonth}
+                  onMonthChange={setCalendarMonth}
+                  modifiers={{ completed: completedDays }}
+                  className="p-0 border-none mx-auto w-full"
+                  modifiersStyles={{
+                    completed: { color: "#fff", backgroundColor: '#6366f1', borderRadius: '0px', fontWeight: 'bold' },
+                  }}
+                />
               </div>
             </div>
           </div>

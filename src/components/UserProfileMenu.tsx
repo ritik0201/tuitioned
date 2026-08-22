@@ -15,13 +15,9 @@ import {
 import {
   LayoutDashboard,
   User,
-  Settings,
   LogOut,
   Mail,
-  Phone,
   Calendar,
-  Award,
-  BookOpen,
 } from 'lucide-react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
@@ -105,7 +101,7 @@ export default function UserProfileMenu({
           gap: 1,
           cursor: 'pointer',
           p: 0.5,
-          borderRadius: '50%',
+          borderRadius: 0,
           '&:hover': {
             bgcolor: 'rgba(255, 255, 255, 0.1)',
           },
@@ -117,7 +113,8 @@ export default function UserProfileMenu({
             height: 32,
             bgcolor: 'primary.main',
             fontSize: '0.875rem',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            borderRadius: 0
           }}
         >
           {userInitial}
@@ -135,7 +132,7 @@ export default function UserProfileMenu({
             mt: 1.5,
             bgcolor: '#1f2937',
             color: 'white',
-            borderRadius: 2,
+            borderRadius: 0,
             minWidth: 280,
             boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)',
           }
@@ -143,13 +140,14 @@ export default function UserProfileMenu({
       >
         {/* User Info Header */}
         <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ display: 'flex', items: 'center', gap: 2 }}>
             <Avatar
               sx={{
                 width: 48,
                 height: 48,
                 bgcolor: 'primary.main',
-                fontSize: '1.25rem'
+                fontSize: '1.25rem',
+                borderRadius: 0
               }}
             >
               {userInitial}
@@ -165,7 +163,8 @@ export default function UserProfileMenu({
                   bgcolor: 'primary.main',
                   color: 'white',
                   fontSize: '0.7rem',
-                  height: 20
+                  height: 20,
+                  borderRadius: 0
                 }}
               />
             </Box>
