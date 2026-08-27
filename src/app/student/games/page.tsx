@@ -14,12 +14,9 @@ import { Sparkles, Gamepad2, Brain, Rocket, Music, Search, Zap } from 'lucide-re
 // Dynamic game imports for Next.js SSR safety
 const MathBalloonPop = dynamic(() => import('@/components/games/MathBalloonPop'), { ssr: false });
 const SpaceMemoryMatch = dynamic(() => import('@/components/games/SpaceMemoryMatch'), { ssr: false });
-const WordNinja = dynamic(() => import('@/components/games/WordNinja'), { ssr: false });
 const ColorShapeMixer = dynamic(() => import('@/components/games/ColorShapeMixer'), { ssr: false });
-const DinoRunner = dynamic(() => import('@/components/games/DinoRunner'), { ssr: false });
 const ConstellationConnect = dynamic(() => import('@/components/games/ConstellationConnect'), { ssr: false });
 const CodeGalaxy = dynamic(() => import('@/components/games/CodeGalaxy'), { ssr: false });
-const SpellingBee = dynamic(() => import('@/components/games/SpellingBee'), { ssr: false });
 const LaserDefender = dynamic(() => import('@/components/games/LaserDefender'), { ssr: false });
 
 const GAMES_DATA: GameConfig[] = [
@@ -44,6 +41,26 @@ const GAMES_DATA: GameConfig[] = [
     skillsLearned: ['Mental Arithmetic', 'Speed Math', 'Focus']
   },
   {
+    id: 'space_memory',
+    title: 'Space Memory',
+    subtitle: 'Cosmic Cards',
+    description: 'Flip celestial cards and match planet pairs!',
+    category: 'space',
+    icon: '🪐',
+    gradient: 'bg-gradient-to-br from-indigo-600 to-blue-600',
+    borderColor: 'border-indigo-500/30',
+    bgGlow: 'bg-indigo-500',
+    difficulty: 'Medium',
+    ageRange: '4-10',
+    instructions: [
+      '1. Tap cosmic cards to flip them over.',
+      '2. Memorize celestial planet icons and find matching pairs.',
+      '3. Clear all 6 pairs in minimum total moves!',
+      '4. Finish under 12 moves to unlock the Space Cadet badge!'
+    ],
+    skillsLearned: ['Visual Memory', 'Concentration', 'Pattern Matching']
+  },
+   {
     id: 'laser_defender',
     title: 'Laser Planet Defense',
     subtitle: 'Space Math Laser Cannon',
@@ -63,126 +80,48 @@ const GAMES_DATA: GameConfig[] = [
     ],
     skillsLearned: ['Mental Math', 'Reaction Speed', 'Problem Solving']
   },
-  // {
-  //   id: 'space_memory',
-  //   title: 'Space Memory',
-  //   subtitle: 'Cosmic Cards',
-  //   description: 'Flip celestial cards and match planet pairs!',
-  //   category: 'space',
-  //   icon: '🪐',
-  //   gradient: 'bg-gradient-to-br from-indigo-600 to-blue-600',
-  //   borderColor: 'border-indigo-500/30',
-  //   bgGlow: 'bg-indigo-500',
-  //   difficulty: 'Medium',
-  //   ageRange: '4-10',
-  //   instructions: [
-  //     '1. Tap cosmic cards to flip them over.',
-  //     '2. Memorize celestial planet icons and find matching pairs.',
-  //     '3. Clear all 6 pairs in minimum total moves!',
-  //     '4. Finish under 12 moves to unlock the Space Cadet badge!'
-  //   ],
-  //   skillsLearned: ['Visual Memory', 'Concentration', 'Pattern Matching']
-  // },
-  // {
-  //   id: 'word_ninja',
-  //   title: 'Word Ninja',
-  //   subtitle: 'Spelling Slice',
-  //   description: 'Slice falling letters to spell target words!',
-  //   category: 'words',
-  //   icon: '🥷',
-  //   gradient: 'bg-gradient-to-br from-amber-600 to-orange-600',
-  //   borderColor: 'border-amber-500/30',
-  //   bgGlow: 'bg-amber-500',
-  //   difficulty: 'Easy',
-  //   ageRange: '6-12',
-  //   instructions: [
-  //     '1. Read the target vocabulary word displayed at top.',
-  //     '2. Slice or tap falling letter bubbles in correct spelling sequence.',
-  //     '3. Avoid wrong letters to protect your streak multiplier!',
-  //     '4. Spell 5 words correctly for the Word Ninja badge!'
-  //   ],
-  //   skillsLearned: ['Spelling', 'Vocabulary', 'Hand-Eye Coordination']
-  // },
-  // {
-  //   id: 'code_galaxy',
-  //   title: 'Code Galaxy Quest',
-  //   subtitle: 'Rover Programming Logic',
-  //   description: 'Guide the cosmic rover with code commands!',
-  //   category: 'logic',
-  //   icon: '🤖',
-  //   gradient: 'bg-gradient-to-br from-indigo-600 to-cyan-600',
-  //   borderColor: 'border-indigo-500/30',
-  //   bgGlow: 'bg-indigo-500',
-  //   difficulty: 'Fun Challenge',
-  //   ageRange: '6-14',
-  //   instructions: [
-  //     '1. Inspect the grid map with rover 🤖, star ⭐, and finish 🏁.',
-  //     '2. Add directional code commands (Up ⬆️, Right ➡️, Down ⬇️).',
-  //     '3. Tap "RUN CODE" to execute your program sequence!',
-  //     '4. Complete 3 logic levels for the Galactic Coder badge!'
-  //   ],
-  //   skillsLearned: ['Programming Logic', 'Sequencing', 'Spatial Reasoning']
-  // },
-  // {
-  //   id: 'spelling_bee',
-  //   title: 'Cyber Spelling Bee',
-  //   subtitle: 'Audio Vocabulary Builder',
-  //   description: 'Unscramble flying letters to build target words!',
-  //   category: 'words',
-  //   icon: '🐝',
-  //   gradient: 'bg-gradient-to-br from-amber-500 to-yellow-500',
-  //   borderColor: 'border-amber-500/30',
-  //   bgGlow: 'bg-amber-500',
-  //   difficulty: 'Easy',
-  //   ageRange: '5-12',
-  //   instructions: [
-  //     '1. Read category hint & blank letter slots.',
-  //     '2. Tap scrambled letter tiles in correct sequence to build words.',
-  //     '3. Use "RESET WORD" if you need to retry.',
-  //     '4. Score 100+ points for the Spelling Champion badge!'
-  //   ],
-  //   skillsLearned: ['Vocabulary Builder', 'Anagram Solving', 'Phonetics']
-  // },
-  // {
-  //   id: 'shape_mixer',
-  //   title: 'Shape Synth Lab',
-  //   subtitle: 'Audio Music Synth',
-  //   description: 'Tap colorful shapes to compose musical tunes!',
-  //   category: 'logic',
-  //   icon: '🎨',
-  //   gradient: 'bg-gradient-to-br from-pink-600 to-rose-600',
-  //   borderColor: 'border-pink-500/30',
-  //   bgGlow: 'bg-pink-500',
-  //   difficulty: 'Easy',
-  //   ageRange: '3-10',
-  //   instructions: [
-  //     '1. Tap colorful synth shapes to play musical notes.',
-  //     '2. Sequence different notes to create your custom melody.',
-  //     '3. Tap "PLAY MELODY" to listen to your song composition!',
-  //     '4. Create 10 sound combos for the Color Maestro badge!'
-  //   ],
-  //   skillsLearned: ['Audio Synthesis', 'Creative Composition', 'Auditory Memory']
-  // },
-  // {
-  //   id: 'dino_runner',
-  //   title: 'Dino Quiz Runner!',
-  //   subtitle: 'Endless Quiz Runner',
-  //   description: 'Run & jump over hurdles by answering trivia!',
-  //   category: 'arcade',
-  //   icon: '🦖',
-  //   gradient: 'bg-gradient-to-br from-emerald-600 to-teal-600',
-  //   borderColor: 'border-emerald-500/30',
-  //   bgGlow: 'bg-emerald-500',
-  //   difficulty: 'Easy',
-  //   ageRange: '5-12',
-  //   instructions: [
-  //     '1. Your dinosaur runner moves automatically across the track.',
-  //     '2. Answer trivia questions correctly when hurdles appear.',
-  //     '3. Correct answers trigger high jumps over cactus hurdles!',
-  //     '4. Score 100+ points for the Dino Champion badge!'
-  //   ],
-  //   skillsLearned: ['General Knowledge', 'Quick Quiz', 'Timing']
-  // },
+  {
+    id: 'code_galaxy',
+    title: 'Code Galaxy Quest',
+    subtitle: 'Rover Programming Logic',
+    description: 'Guide the cosmic rover with code commands!',
+    category: 'logic',
+    icon: '🤖',
+    gradient: 'bg-gradient-to-br from-indigo-600 to-cyan-600',
+    borderColor: 'border-indigo-500/30',
+    bgGlow: 'bg-indigo-500',
+    difficulty: 'Fun Challenge',
+    ageRange: '6-14',
+    instructions: [
+      '1. Inspect the grid map with rover 🤖, star ⭐, and finish 🏁.',
+      '2. Add directional code commands (Up ⬆️, Right ➡️, Down ⬇️).',
+      '3. Tap "RUN CODE" to execute your program sequence!',
+      '4. Complete 3 logic levels for the Galactic Coder badge!'
+    ],
+    skillsLearned: ['Programming Logic', 'Sequencing', 'Spatial Reasoning']
+  },
+
+  {
+    id: 'shape_mixer',
+    title: 'Shape Synth Lab',
+    subtitle: 'Audio Music Synth',
+    description: 'Tap colorful shapes to compose musical tunes!',
+    category: 'logic',
+    icon: '🎨',
+    gradient: 'bg-gradient-to-br from-pink-600 to-rose-600',
+    borderColor: 'border-pink-500/30',
+    bgGlow: 'bg-pink-500',
+    difficulty: 'Easy',
+    ageRange: '3-10',
+    instructions: [
+      '1. Tap colorful synth shapes to play musical notes.',
+      '2. Sequence different notes to create your custom melody.',
+      '3. Tap "PLAY MELODY" to listen to your song composition!',
+      '4. Create 10 sound combos for the Color Maestro badge!'
+    ],
+    skillsLearned: ['Audio Synthesis', 'Creative Composition', 'Auditory Memory']
+  },
+
   {
     id: 'constellation',
     title: 'Constellation Connect',
@@ -278,11 +217,8 @@ export default function StudentGamesPage() {
             {activeGameId === 'math_balloon' && <MathBalloonPop onBack={handleBackToHub} />}
             {activeGameId === 'laser_defender' && <LaserDefender onBack={handleBackToHub} />}
             {activeGameId === 'space_memory' && <SpaceMemoryMatch onBack={handleBackToHub} />}
-            {activeGameId === 'word_ninja' && <WordNinja onBack={handleBackToHub} />}
             {activeGameId === 'code_galaxy' && <CodeGalaxy onBack={handleBackToHub} />}
-            {activeGameId === 'spelling_bee' && <SpellingBee onBack={handleBackToHub} />}
             {activeGameId === 'shape_mixer' && <ColorShapeMixer onBack={handleBackToHub} />}
-            {activeGameId === 'dino_runner' && <DinoRunner onBack={handleBackToHub} />}
             {activeGameId === 'constellation' && <ConstellationConnect onBack={handleBackToHub} />}
           </div>
         ) : (

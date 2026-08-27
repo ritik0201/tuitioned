@@ -17,14 +17,7 @@ export const INITIAL_BADGES: Badge[] = [
     unlocked: false,
     gameId: 'space_memory'
   },
-  {
-    id: 'word_ninja',
-    title: 'Word Ninja',
-    description: 'Spell 5 words correctly in Word Ninja',
-    icon: '🥷',
-    unlocked: false,
-    gameId: 'word_ninja'
-  },
+
   {
     id: 'color_maestro',
     title: 'Color Maestro',
@@ -33,14 +26,7 @@ export const INITIAL_BADGES: Badge[] = [
     unlocked: false,
     gameId: 'shape_mixer'
   },
-  {
-    id: 'dino_runner',
-    title: 'Dino Champion',
-    description: 'Score 100+ points in Dino Quiz Runner!',
-    icon: '🦖',
-    unlocked: false,
-    gameId: 'dino_runner'
-  },
+
   {
     id: 'star_tracer',
     title: 'Star Stargazer',
@@ -57,14 +43,7 @@ export const INITIAL_BADGES: Badge[] = [
     unlocked: false,
     gameId: 'code_galaxy'
   },
-  {
-    id: 'spelling_bee',
-    title: 'Spelling Champion',
-    description: 'Score 100+ points in Cyber Spelling Bee!',
-    icon: '🐝',
-    unlocked: false,
-    gameId: 'spelling_bee'
-  },
+
   {
     id: 'laser_defender',
     title: 'Laser Defender',
