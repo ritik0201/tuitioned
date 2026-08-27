@@ -10,7 +10,7 @@ export interface GameConfig {
   gradient: string;
   borderColor: string;
   bgGlow: string;
-  difficulty: 'Easy' | 'Medium' | 'Fun Challenge';
+  difficulty: 'Easy' | 'Medium' | 'Hard';
   ageRange: string;
   instructions: string[];
   skillsLearned: string[];

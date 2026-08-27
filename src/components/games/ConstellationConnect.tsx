@@ -48,7 +48,10 @@ function generateProceduralNodes(count: number): StarNode[] {
   return nodes;
 }
 
+type DifficultyMode = 'easy' | 'medium' | 'hard';
+
 export default function ConstellationConnect({ onBack }: ConstellationConnectProps) {
+  const [diffMode, setDiffMode] = useState<DifficultyMode>('easy');
   const [constellation, setConstellation] = useState<Constellation | null>(null);
   const [nextExpectedId, setNextExpectedId] = useState(1);
   const [connectedNodes, setConnectedNodes] = useState<StarNode[]>([]);
@@ -58,9 +61,10 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
   const [isMuted, setIsMuted] = useState(false);
 
   // Generate procedurally random constellation
-  const initProceduralConstellation = () => {
+  const initProceduralConstellation = (overrideDiff?: DifficultyMode) => {
+    const activeDiff = overrideDiff || diffMode;
+    const nodeCount = activeDiff === 'easy' ? 4 : activeDiff === 'medium' ? 6 : 9;
     const baseInfo = CONSTELLATIONS_LIBRARY[Math.floor(Math.random() * CONSTELLATIONS_LIBRARY.length)];
-    const nodeCount = Math.floor(Math.random() * 3) + 5; // 5 to 7 nodes
     const generatedNodes = generateProceduralNodes(nodeCount);
 
     setConstellation({
@@ -71,6 +75,12 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
     setNextExpectedId(1);
     setConnectedNodes([]);
     setIsConstellationDone(false);
+  };
+
+  const changeDifficulty = (mode: DifficultyMode) => {
+    soundManager.playPop();
+    setDiffMode(mode);
+    initProceduralConstellation(mode);
   };
 
   useEffect(() => {
@@ -93,7 +103,8 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
         soundManager.playVictory();
 
         setIsConstellationDone(true);
-        const newScore = score + 50;
+        const points = diffMode === 'easy' ? 30 : diffMode === 'medium' ? 50 : 80;
+        const newScore = score + points;
         const newCompleted = completedCount + 1;
 
         setScore(newScore);
@@ -117,23 +128,43 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
   return (
     <div className="relative w-full max-w-4xl mx-auto bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-800 text-white font-sans select-none">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-slate-800/80 backdrop-blur-md border-b border-slate-700">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between px-6 py-4 bg-slate-800/80 backdrop-blur-md border-b border-slate-700 gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 transition text-sm font-semibold cursor-pointer"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-600 transition text-sm font-semibold cursor-pointer border border-slate-600"
           >
             <ArrowLeft className="w-4 h-4" /> Hub
           </button>
-          <div className="flex items-center gap-2 bg-blue-900/40 border border-blue-500/30 px-3 py-1 rounded-xl">
+          <div className="flex items-center gap-2 bg-cyan-900/40 border border-cyan-500/30 px-3 py-1 rounded-xl">
             <Sparkles className="w-4 h-4 text-cyan-400" />
             <span className="text-sm font-bold text-cyan-200">Constellation Connect 🌌</span>
+          </div>
+
+          <div className="flex items-center bg-slate-900 border border-slate-700 p-0.5 rounded-xl">
+            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => changeDifficulty(mode)}
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
+                  diffMode === mode
+                    ? mode === 'easy'
+                      ? 'bg-emerald-600 text-white'
+                      : mode === 'medium'
+                      ? 'bg-cyan-600 text-white'
+                      : 'bg-purple-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           <button
-            onClick={initProceduralConstellation}
+            onClick={() => initProceduralConstellation()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-600/60 hover:bg-cyan-500 text-xs font-bold text-cyan-200 border border-cyan-400/30 transition cursor-pointer"
             title="Generate Random Constellation"
           >
@@ -219,7 +250,7 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
               <Star className="w-5 h-5 fill-emerald-400" /> Star Map Unlocked!
             </div>
             <button
-              onClick={initProceduralConstellation}
+              onClick={() => initProceduralConstellation()}
               className="px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 font-bold text-white shadow-xl transition transform hover:scale-105 cursor-pointer"
             >
               Generate Next Procedural Star Map 🌌

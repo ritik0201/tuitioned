@@ -36,7 +36,10 @@ const ALL_SPACE_SYMBOLS = [
   { symbol: '🔮', name: 'Crystal' }
 ];
 
+type DifficultyMode = 'easy' | 'medium' | 'hard';
+
 export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
+  const [diffMode, setDiffMode] = useState<DifficultyMode>('medium');
   const [cards, setCards] = useState<CardItem[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
@@ -48,13 +51,18 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
   const [starsEarned, setStarsEarned] = useState(3);
   const [themeName, setThemeName] = useState('Cosmic Fleet');
 
-  // Procedurally pick 6 random pairs out of 16 symbols every time!
-  const initDeck = () => {
+  const pairCount = diffMode === 'easy' ? 4 : diffMode === 'medium' ? 6 : 8;
+
+  // Procedurally pick random pairs out of 16 symbols every time!
+  const initDeck = (overrideDiff?: DifficultyMode) => {
+    const activeDiff = overrideDiff || diffMode;
+    const count = activeDiff === 'easy' ? 4 : activeDiff === 'medium' ? 6 : 8;
+
     const shuffledPool = [...ALL_SPACE_SYMBOLS].sort(() => Math.random() - 0.5);
-    const selectedSix = shuffledPool.slice(0, 6);
+    const selectedPairs = shuffledPool.slice(0, count);
     
     const deck: CardItem[] = [];
-    const pairs = [...selectedSix, ...selectedSix];
+    const pairs = [...selectedPairs, ...selectedPairs];
     const shuffledPairs = pairs.sort(() => Math.random() - 0.5);
 
     shuffledPairs.forEach((item, index) => {
@@ -76,6 +84,12 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
     setTime(0);
     setStarsEarned(3);
     setThemeName(`Galactic Sector #${Math.floor(Math.random() * 900) + 100}`);
+  };
+
+  const changeDifficulty = (mode: DifficultyMode) => {
+    soundManager.playPop();
+    setDiffMode(mode);
+    initDeck(mode);
   };
 
   useEffect(() => {
@@ -162,7 +176,7 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
     <div className="relative w-full max-w-4xl mx-auto bg-slate-900 rounded-none overflow-hidden shadow-2xl border border-slate-800 text-white font-sans select-none">
       {/* Top Header */}
       <div className="flex items-center justify-between px-6 py-4 bg-slate-800/80 backdrop-blur-md border-b border-slate-700">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={onBack}
             className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-slate-700 hover:bg-slate-600 transition text-sm font-semibold cursor-pointer border border-slate-600"
@@ -173,11 +187,31 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
             <Sparkles className="w-4 h-4 text-indigo-400" />
             <span className="text-sm font-bold text-indigo-200">Space Memory ({themeName})</span>
           </div>
+
+          <div className="flex items-center bg-slate-900 border border-slate-700 p-0.5 rounded-none">
+            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => changeDifficulty(mode)}
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
+                  diffMode === mode
+                    ? mode === 'easy'
+                      ? 'bg-emerald-600 text-white'
+                      : mode === 'medium'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-purple-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
           <button
-            onClick={initDeck}
+            onClick={() => initDeck()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-none bg-indigo-600/60 hover:bg-indigo-500 text-xs font-bold text-indigo-200 border border-indigo-400/30 transition cursor-pointer"
             title="Generate Random Deck"
           >
@@ -252,7 +286,7 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
 
             <div className="flex gap-4">
               <button
-                onClick={initDeck}
+                onClick={() => initDeck()}
                 className="flex-1 py-3 px-4 rounded-none bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 font-bold text-white shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 <RotateCcw className="w-5 h-5" /> Play New Random Deck

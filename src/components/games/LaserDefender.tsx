@@ -18,24 +18,28 @@ interface Meteor {
   options: number[];
 }
 
-function generateMeteor(id: number): Meteor {
-  const ops: ('+' | '-' | '×')[] = ['+', '-', '×'];
+type DifficultyMode = 'easy' | 'medium' | 'hard';
+
+function generateMeteor(id: number, diffMode: DifficultyMode = 'medium'): Meteor {
+  const ops: ('+' | '-' | '×')[] = diffMode === 'easy' ? ['+', '-'] : ['+', '-', '×'];
   const op = ops[Math.floor(Math.random() * ops.length)];
   let num1 = 1;
   let num2 = 1;
   let answer = 2;
 
+  const maxNum = diffMode === 'easy' ? 10 : diffMode === 'medium' ? 15 : 30;
+
   if (op === '+') {
-    num1 = Math.floor(Math.random() * 12) + 1;
-    num2 = Math.floor(Math.random() * 12) + 1;
+    num1 = Math.floor(Math.random() * maxNum) + 1;
+    num2 = Math.floor(Math.random() * maxNum) + 1;
     answer = num1 + num2;
   } else if (op === '-') {
-    num1 = Math.floor(Math.random() * 15) + 5;
+    num1 = Math.floor(Math.random() * maxNum) + 5;
     num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
     answer = num1 - num2;
   } else {
-    num1 = Math.floor(Math.random() * 6) + 2;
-    num2 = Math.floor(Math.random() * 5) + 2;
+    num1 = Math.floor(Math.random() * (diffMode === 'medium' ? 6 : 9)) + 2;
+    num2 = Math.floor(Math.random() * (diffMode === 'medium' ? 5 : 8)) + 2;
     answer = num1 * num2;
   }
 
@@ -50,10 +54,11 @@ function generateMeteor(id: number): Meteor {
 }
 
 export default function LaserDefender({ onBack }: LaserDefenderProps) {
+  const [diffMode, setDiffMode] = useState<DifficultyMode>('medium');
   const [score, setScore] = useState(0);
   const [health, setHealth] = useState(100);
   const [meteorCount, setMeteorCount] = useState(0);
-  const [currentMeteor, setCurrentMeteor] = useState<Meteor>(() => generateMeteor(1));
+  const [currentMeteor, setCurrentMeteor] = useState<Meteor>(() => generateMeteor(1, 'medium'));
   const [gameOver, setGameOver] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -62,15 +67,26 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
     if (gameOver) return;
     const interval = setInterval(() => {
       setHealth(prev => {
-        if (prev <= 10) {
+        const drain = diffMode === 'easy' ? 1 : diffMode === 'medium' ? 2 : 4;
+        if (prev <= drain) {
           endGame();
           return 0;
         }
-        return prev - 2;
+        return prev - drain;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [gameOver]);
+  }, [gameOver, diffMode]);
+
+  const changeDifficulty = (mode: DifficultyMode) => {
+    soundManager.playPop();
+    setDiffMode(mode);
+    setScore(0);
+    setHealth(100);
+    setMeteorCount(0);
+    setGameOver(false);
+    setCurrentMeteor(generateMeteor(1, mode));
+  };
 
   const handleShoot = (selectedVal: number) => {
     if (gameOver) return;
@@ -79,9 +95,9 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
       soundManager.playPop();
       soundManager.playCorrect();
 
-      const newScore = score + 20;
+      const newScore = score + (diffMode === 'easy' ? 15 : diffMode === 'medium' ? 20 : 30);
       setScore(newScore);
-      setHealth(prev => Math.min(100, prev + 5));
+      setHealth(prev => Math.min(100, prev + 8));
 
       saveHighScore('laser_defender', newScore);
       if (newScore >= 100) {
@@ -89,11 +105,12 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
       }
 
       setMeteorCount(prev => prev + 1);
-      setCurrentMeteor(generateMeteor(meteorCount + 2));
+      setCurrentMeteor(generateMeteor(meteorCount + 2, diffMode));
     } else {
       soundManager.playWrong();
-      setHealth(prev => Math.max(0, prev - 20));
-      if (health <= 20) {
+      const penalty = diffMode === 'easy' ? 10 : diffMode === 'medium' ? 20 : 30;
+      setHealth(prev => Math.max(0, prev - penalty));
+      if (health <= penalty) {
         endGame();
       }
     }
@@ -109,7 +126,7 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
     setHealth(100);
     setMeteorCount(0);
     setGameOver(false);
-    setCurrentMeteor(generateMeteor(1));
+    setCurrentMeteor(generateMeteor(1, diffMode));
   };
 
   const toggleSound = () => {
@@ -120,8 +137,8 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
   return (
     <div className="relative w-full max-w-4xl mx-auto bg-slate-900 rounded-none overflow-hidden border border-slate-800 text-white font-sans select-none shadow-xl">
       {/* Top Bar */}
-      <div className="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800 gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={onBack}
             className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-slate-800 hover:bg-slate-700 transition text-xs font-black cursor-pointer border border-slate-700"
@@ -131,6 +148,26 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
           <div className="flex items-center gap-2 bg-red-950 border border-red-600 px-3 py-1 rounded-none">
             <Zap className="w-4 h-4 text-red-400" />
             <span className="text-xs font-black uppercase text-red-300">Laser Planet Defense</span>
+          </div>
+
+          <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-none">
+            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => changeDifficulty(mode)}
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
+                  diffMode === mode
+                    ? mode === 'easy'
+                      ? 'bg-emerald-600 text-white'
+                      : mode === 'medium'
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-red-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
         </div>
 

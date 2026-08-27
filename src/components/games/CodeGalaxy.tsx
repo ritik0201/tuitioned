@@ -9,37 +9,131 @@ interface CodeGalaxyProps {
   onBack: () => void;
 }
 
-type Command = 'RIGHT' | 'UP' | 'DOWN';
+type Command = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+
+interface Collectible {
+  id: string;
+  icon: string;
+  name: string;
+  points: number;
+  x: number;
+  y: number;
+}
 
 interface Level {
   id: number;
   gridSize: number;
   start: { x: number; y: number };
   target: { x: number; y: number };
-  starPos: { x: number; y: number };
+  collectibles: Collectible[];
 }
 
-const PROCEDURAL_LEVELS: Level[] = [
-  { id: 1, gridSize: 4, start: { x: 0, y: 0 }, target: { x: 3, y: 0 }, starPos: { x: 1, y: 0 } },
-  { id: 2, gridSize: 4, start: { x: 0, y: 0 }, target: { x: 2, y: 2 }, starPos: { x: 2, y: 0 } },
-  { id: 3, gridSize: 5, start: { x: 0, y: 0 }, target: { x: 4, y: 3 }, starPos: { x: 2, y: 1 } },
-  { id: 4, gridSize: 5, start: { x: 0, y: 1 }, target: { x: 4, y: 4 }, starPos: { x: 3, y: 2 } }
+type DifficultyMode = 'easy' | 'medium' | 'hard';
+
+const EASY_LEVELS: Level[] = [
+  {
+    id: 1,
+    gridSize: 4,
+    start: { x: 0, y: 0 },
+    target: { x: 3, y: 0 },
+    collectibles: [
+      { id: 'star_1', icon: '⭐', name: 'Cosmic Star', points: 20, x: 1, y: 0 },
+      { id: 'gem_1', icon: '💎', name: 'Space Crystal', points: 25, x: 2, y: 0 }
+    ]
+  },
+  {
+    id: 2,
+    gridSize: 4,
+    start: { x: 0, y: 0 },
+    target: { x: 2, y: 2 },
+    collectibles: [
+      { id: 'star_2', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 0 },
+      { id: 'energy_1', icon: '⚡', name: 'Energy Core', points: 30, x: 1, y: 1 }
+    ]
+  }
+];
+
+const MEDIUM_LEVELS: Level[] = [
+  {
+    id: 1,
+    gridSize: 5,
+    start: { x: 0, y: 0 },
+    target: { x: 4, y: 3 },
+    collectibles: [
+      { id: 'star_m1', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 0 },
+      { id: 'gem_m1', icon: '💎', name: 'Space Crystal', points: 25, x: 2, y: 2 },
+      { id: 'orb_m1', icon: '🔮', name: 'Quantum Orb', points: 30, x: 4, y: 1 }
+    ]
+  },
+  {
+    id: 2,
+    gridSize: 5,
+    start: { x: 0, y: 1 },
+    target: { x: 4, y: 4 },
+    collectibles: [
+      { id: 'star_m2', icon: '⭐', name: 'Cosmic Star', points: 20, x: 1, y: 2 },
+      { id: 'energy_m2', icon: '⚡', name: 'Energy Core', points: 25, x: 3, y: 2 },
+      { id: 'orb_m2', icon: '🔮', name: 'Quantum Orb', points: 30, x: 4, y: 3 }
+    ]
+  }
+];
+
+const HARD_LEVELS: Level[] = [
+  {
+    id: 1,
+    gridSize: 6,
+    start: { x: 0, y: 0 },
+    target: { x: 5, y: 5 },
+    collectibles: [
+      { id: 'star_h1', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 0 },
+      { id: 'gem_h1', icon: '💎', name: 'Space Crystal', points: 25, x: 3, y: 2 },
+      { id: 'orb_h1', icon: '🔮', name: 'Quantum Orb', points: 30, x: 4, y: 4 },
+      { id: 'alien_h1', icon: '🛸', name: 'Alien Relic', points: 40, x: 1, y: 4 }
+    ]
+  },
+  {
+    id: 2,
+    gridSize: 6,
+    start: { x: 0, y: 2 },
+    target: { x: 5, y: 1 },
+    collectibles: [
+      { id: 'star_h2', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 2 },
+      { id: 'energy_h2', icon: '⚡', name: 'Energy Core', points: 25, x: 4, y: 1 },
+      { id: 'orb_h2', icon: '🔮', name: 'Quantum Orb', points: 30, x: 1, y: 3 },
+      { id: 'crown_h2', icon: '👑', name: 'Stellar Crown', points: 50, x: 5, y: 3 }
+    ]
+  }
 ];
 
 export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
+  const [diffMode, setDiffMode] = useState<DifficultyMode>('medium');
   const [levelIdx, setLevelIdx] = useState(0);
   const [commands, setCommands] = useState<Command[]>([]);
   const [roverPos, setRoverPos] = useState({ x: 0, y: 0 });
+  const [collectedIds, setCollectedIds] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [score, setScore] = useState(0);
-  const [starCollected, setStarCollected] = useState(false);
   const [levelSuccess, setLevelSuccess] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  const currentLevel = PROCEDURAL_LEVELS[levelIdx % PROCEDURAL_LEVELS.length];
+  const levelsList = diffMode === 'easy' ? EASY_LEVELS : diffMode === 'medium' ? MEDIUM_LEVELS : HARD_LEVELS;
+  const currentLevel = levelsList[levelIdx % levelsList.length];
+  const maxCmds = diffMode === 'easy' ? 10 : diffMode === 'medium' ? 12 : 15;
+
+  const changeDifficulty = (mode: DifficultyMode) => {
+    soundManager.playPop();
+    setDiffMode(mode);
+    setLevelIdx(0);
+    setCommands([]);
+    setScore(0);
+    setCollectedIds([]);
+    setLevelSuccess(false);
+    const targetLevels = mode === 'easy' ? EASY_LEVELS : mode === 'medium' ? MEDIUM_LEVELS : HARD_LEVELS;
+    setRoverPos(targetLevels[0].start);
+  };
 
   const addCommand = (cmd: Command) => {
-    if (isRunning || commands.length >= 8) return;
+    if (isRunning || commands.length >= maxCmds) return;
     soundManager.playPop();
     setCommands([...commands, cmd]);
   };
@@ -56,30 +150,43 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
 
     let curX = currentLevel.start.x;
     let curY = currentLevel.start.y;
-    let collected = false;
+    const collectedSet = new Set<string>();
 
     for (let i = 0; i < commands.length; i++) {
       const cmd = commands[i];
       if (cmd === 'RIGHT') curX = Math.min(currentLevel.gridSize - 1, curX + 1);
+      if (cmd === 'LEFT') curX = Math.max(0, curX - 1);
       if (cmd === 'UP') curY = Math.max(0, curY - 1);
       if (cmd === 'DOWN') curY = Math.min(currentLevel.gridSize - 1, curY + 1);
 
-      soundManager.playTone(400 + i * 50);
+      soundManager.playTone(400 + i * 40);
       setRoverPos({ x: curX, y: curY });
 
-      if (curX === currentLevel.starPos.x && curY === currentLevel.starPos.y) {
-        collected = true;
-        setStarCollected(true);
-      }
+      // Check item collection at current rover position
+      currentLevel.collectibles.forEach(item => {
+        if (item.x === curX && item.y === curY && !collectedSet.has(item.id)) {
+          collectedSet.add(item.id);
+          soundManager.playTone(650 + collectedSet.size * 80);
+          setCollectedIds(Array.from(collectedSet));
+        }
+      });
 
-      await new Promise(res => setTimeout(res, 450));
+      await new Promise(res => setTimeout(res, 400));
     }
 
     if (curX === currentLevel.target.x && curY === currentLevel.target.y) {
       soundManager.playCorrect();
       soundManager.playVictory();
-      const points = 30 + (collected ? 20 : 0);
-      const newScore = score + points;
+
+      // Compute total collected points
+      const collectedPoints = currentLevel.collectibles
+        .filter(c => collectedSet.has(c.id))
+        .reduce((sum, c) => sum + c.points, 0);
+
+      const levelCompletionBonus = 30;
+      const totalEarned = levelCompletionBonus + collectedPoints;
+      const newScore = score + totalEarned;
+      
       setScore(newScore);
       setLevelSuccess(true);
 
@@ -98,16 +205,16 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
     const nextIdx = levelIdx + 1;
     setLevelIdx(nextIdx);
     setCommands([]);
-    const nextLvl = PROCEDURAL_LEVELS[nextIdx % PROCEDURAL_LEVELS.length];
+    const nextLvl = levelsList[nextIdx % levelsList.length];
     setRoverPos(nextLvl.start);
-    setStarCollected(false);
+    setCollectedIds([]);
     setLevelSuccess(false);
   };
 
   const resetRover = () => {
     setCommands([]);
     setRoverPos(currentLevel.start);
-    setStarCollected(false);
+    setCollectedIds([]);
     setLevelSuccess(false);
   };
 
@@ -118,9 +225,9 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
 
   return (
     <div className="relative w-full max-w-4xl mx-auto bg-slate-900 rounded-none overflow-hidden border border-slate-800 text-white font-sans select-none shadow-xl">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800">
-        <div className="flex items-center gap-4">
+      {/* Header Bar */}
+      <div className="flex flex-wrap items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800 gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={onBack}
             className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-slate-800 hover:bg-slate-700 transition text-xs font-black cursor-pointer border border-slate-700"
@@ -130,6 +237,26 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
           <div className="flex items-center gap-2 bg-indigo-950 border border-indigo-600 px-3 py-1 rounded-none">
             <Cpu className="w-4 h-4 text-indigo-400" />
             <span className="text-xs font-black uppercase text-indigo-300">Code Galaxy Quest</span>
+          </div>
+
+          <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-none">
+            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => changeDifficulty(mode)}
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
+                  diffMode === mode
+                    ? mode === 'easy'
+                      ? 'bg-emerald-600 text-white'
+                      : mode === 'medium'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-purple-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
         </div>
 
@@ -153,7 +280,7 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
         </div>
       </div>
 
-      {/* Stage */}
+      {/* Stage Area */}
       <div className="relative min-h-[380px] sm:min-h-[420px] p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-950">
         {/* Grid World */}
         <div className="flex-1 flex flex-col items-center justify-center space-y-4">
@@ -168,16 +295,21 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
               const y = Math.floor(idx / currentLevel.gridSize);
               const isRover = roverPos.x === x && roverPos.y === y;
               const isTarget = currentLevel.target.x === x && currentLevel.target.y === y;
-              const isStar = currentLevel.starPos.x === x && currentLevel.starPos.y === y && !starCollected;
+
+              // Find collectible at this grid cell
+              const collectible = currentLevel.collectibles.find(c => c.x === x && c.y === y);
+              const isItemUncollected = collectible && !collectedIds.includes(collectible.id);
 
               return (
                 <div
                   key={idx}
-                  className="w-14 h-14 bg-slate-950 border border-slate-800 flex items-center justify-center text-2xl relative"
+                  className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-950 border border-slate-800 flex items-center justify-center text-2xl relative"
                 >
                   {isRover && '🤖'}
                   {isTarget && !isRover && '🏁'}
-                  {isStar && !isRover && '⭐'}
+                  {isItemUncollected && !isRover && (
+                    <span className="animate-pulse duration-700">{collectible.icon}</span>
+                  )}
                 </div>
               );
             })}
@@ -187,6 +319,9 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
             <div className="bg-emerald-950 border border-emerald-500 p-4 text-center space-y-2 w-full max-w-xs">
               <Sparkles className="w-6 h-6 text-emerald-400 mx-auto" />
               <h4 className="text-sm font-black text-emerald-300 uppercase">Mission Accomplished!</h4>
+              <p className="text-xs text-emerald-200">
+                Captured {collectedIds.length}/{currentLevel.collectibles.length} collectibles!
+              </p>
               <button
                 onClick={nextLevel}
                 className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs uppercase rounded-none border border-emerald-400 cursor-pointer"
@@ -197,11 +332,37 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
           )}
         </div>
 
-        {/* Command Panel */}
+        {/* Command & Collectibles Panel */}
         <div className="w-full md:w-72 bg-slate-900 border border-slate-800 p-5 space-y-4 shadow-lg">
-          <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">Command Sequence</h4>
+          {/* Collectibles HUD */}
+          <div className="bg-slate-950 border border-slate-800 p-2.5 rounded-none space-y-1">
+            <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <span>Collectibles</span>
+              <span className="text-indigo-400">({collectedIds.length}/{currentLevel.collectibles.length})</span>
+            </div>
+            <div className="flex gap-2 text-xl flex-wrap">
+              {currentLevel.collectibles.map(item => {
+                const isCollected = collectedIds.includes(item.id);
+                return (
+                  <span
+                    key={item.id}
+                    title={`${item.name} (+${item.points} pts)`}
+                    className={`transition-all ${isCollected ? 'opacity-100 scale-110' : 'opacity-30 grayscale'}`}
+                  >
+                    {item.icon}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
 
-          <div className="min-h-[120px] bg-slate-950 border border-slate-800 p-3 flex flex-wrap gap-2 content-start">
+          <div className="flex items-center justify-between">
+            <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">Command Sequence</h4>
+            <span className="text-[10px] font-black text-indigo-400">({commands.length}/{maxCmds})</span>
+          </div>
+
+          {/* Command Sequence Display */}
+          <div className="min-h-[100px] bg-slate-950 border border-slate-800 p-3 flex flex-wrap gap-2 content-start">
             {commands.length === 0 ? (
               <span className="text-[10px] text-slate-600 font-bold uppercase">Click buttons below to add code!</span>
             ) : (
@@ -211,38 +372,52 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
                   onClick={() => removeCommand(i)}
                   className="px-2.5 py-1 bg-indigo-950 border border-indigo-600 text-indigo-300 text-xs font-black rounded-none cursor-pointer"
                 >
-                  {cmd === 'RIGHT' && '➡️ Right'}
                   {cmd === 'UP' && '⬆️ Up'}
                   {cmd === 'DOWN' && '⬇️ Down'}
+                  {cmd === 'LEFT' && '⬅️ Left'}
+                  {cmd === 'RIGHT' && '➡️ Right'}
                 </button>
               ))
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          {/* 4-Way Directional Pad */}
+          <div className="grid grid-cols-4 gap-1.5">
             <button
               onClick={() => addCommand('UP')}
               disabled={isRunning}
-              className="py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 cursor-pointer uppercase"
+              title="Add Up Command"
+              className="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 cursor-pointer uppercase flex items-center justify-center"
             >
-              <ArrowUp className="w-4 h-4 mx-auto" />
-            </button>
-            <button
-              onClick={() => addCommand('RIGHT')}
-              disabled={isRunning}
-              className="py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 cursor-pointer uppercase"
-            >
-              <ArrowRight className="w-4 h-4 mx-auto" />
+              <ArrowUp className="w-4 h-4" />
             </button>
             <button
               onClick={() => addCommand('DOWN')}
               disabled={isRunning}
-              className="py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 cursor-pointer uppercase"
+              title="Add Down Command"
+              className="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 cursor-pointer uppercase flex items-center justify-center"
             >
-              <ArrowDown className="w-4 h-4 mx-auto" />
+              <ArrowDown className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => addCommand('LEFT')}
+              disabled={isRunning}
+              title="Add Left Command"
+              className="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 cursor-pointer uppercase flex items-center justify-center"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => addCommand('RIGHT')}
+              disabled={isRunning}
+              title="Add Right Command"
+              className="py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-black text-slate-200 cursor-pointer uppercase flex items-center justify-center"
+            >
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
+          {/* Actions */}
           <div className="flex gap-2">
             <button
               onClick={runCode}
@@ -254,6 +429,7 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
             <button
               onClick={resetRover}
               className="px-3 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-black text-xs uppercase rounded-none border border-slate-700 cursor-pointer"
+              title="Reset Sequence"
             >
               <RotateCcw className="w-3.5 h-3.5" />
             </button>

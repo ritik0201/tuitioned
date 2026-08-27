@@ -15,25 +15,34 @@ interface Question {
   options: number[];
 }
 
-function generateQuestion(level: number): Question {
+type DifficultyMode = 'easy' | 'medium' | 'hard';
+
+function generateQuestion(level: number, diffMode: DifficultyMode = 'easy'): Question {
   let num1 = 0;
   let num2 = 0;
   let answer = 0;
   let text = '';
 
-  if (level === 1) {
-    num1 = Math.floor(Math.random() * 9) + 1;
-    num2 = Math.floor(Math.random() * 9) + 1;
+  const maxVal = diffMode === 'easy' ? 9 : diffMode === 'medium' ? 20 : 50;
+
+  if (diffMode === 'hard' && Math.random() > 0.5) {
+    const mult = Math.floor(Math.random() * 8) + 2;
+    answer = Math.floor(Math.random() * 9) + 1;
+    num1 = mult * answer;
+    text = `${num1} ÷ ${mult} = ?`;
+  } else if (level === 1) {
+    num1 = Math.floor(Math.random() * maxVal) + 1;
+    num2 = Math.floor(Math.random() * maxVal) + 1;
     answer = num1 + num2;
     text = `${num1} + ${num2} = ?`;
   } else if (level === 2) {
-    num1 = Math.floor(Math.random() * 10) + 10;
-    num2 = Math.floor(Math.random() * 9) + 1;
+    num1 = Math.floor(Math.random() * maxVal) + 10;
+    num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
     answer = num1 - num2;
     text = `${num1} - ${num2} = ?`;
   } else {
-    num1 = Math.floor(Math.random() * 5) + 2;
-    num2 = Math.floor(Math.random() * 5) + 2;
+    num1 = Math.floor(Math.random() * (diffMode === 'easy' ? 5 : 9)) + 2;
+    num2 = Math.floor(Math.random() * (diffMode === 'easy' ? 5 : 9)) + 2;
     answer = num1 * num2;
     text = `${num1} × ${num2} = ?`;
   }
@@ -144,13 +153,26 @@ export default function MathBalloonPop({ onBack }: MathBalloonPopProps) {
     };
   }, []);
 
+  const [diffMode, setDiffMode] = useState<DifficultyMode>('easy');
+
+  const changeDifficulty = (mode: DifficultyMode) => {
+    soundManager.playPop();
+    setDiffMode(mode);
+    setScore(0);
+    setStreak(0);
+    setLevel(1);
+    setTimeLeft(mode === 'easy' ? 45 : mode === 'medium' ? 35 : 25);
+    setGameOver(false);
+    setQuestion(generateQuestion(1, mode));
+  };
+
   const handlePop = (selectedAnswer: number) => {
     if (gameOver) return;
 
     if (selectedAnswer === question.answer) {
       soundManager.playPop();
       soundManager.playCorrect();
-      const points = 10 + streak * 2;
+      const points = (diffMode === 'easy' ? 10 : diffMode === 'medium' ? 15 : 25) + streak * 2;
       const nextScore = score + points;
       const nextStreak = streak + 1;
 
@@ -164,7 +186,7 @@ export default function MathBalloonPop({ onBack }: MathBalloonPopProps) {
         unlockBadge('math_wizard');
       }
 
-      setQuestion(generateQuestion(nextStreak >= 5 ? 3 : nextStreak >= 2 ? 2 : 1));
+      setQuestion(generateQuestion(nextStreak >= 5 ? 3 : nextStreak >= 2 ? 2 : 1, diffMode));
     } else {
       soundManager.playWrong();
       setStreak(0);
@@ -185,10 +207,10 @@ export default function MathBalloonPop({ onBack }: MathBalloonPopProps) {
     setScore(0);
     setStreak(0);
     setLevel(1);
-    setTimeLeft(45);
+    setTimeLeft(diffMode === 'easy' ? 45 : diffMode === 'medium' ? 35 : 25);
     setGameOver(false);
     setNewRecord(false);
-    setQuestion(generateQuestion(1));
+    setQuestion(generateQuestion(1, diffMode));
   };
 
   const toggleSound = () => {
@@ -200,7 +222,7 @@ export default function MathBalloonPop({ onBack }: MathBalloonPopProps) {
     <div className="relative w-full max-w-4xl mx-auto bg-slate-900 rounded-none overflow-hidden border border-slate-800 text-white font-sans select-none shadow-xl">
       {/* Top Bar */}
       <div className="flex flex-wrap items-center justify-between px-6 py-4 bg-slate-950 border-b border-slate-800 gap-3">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={onBack}
             className="flex items-center gap-2 px-3 py-1.5 rounded-none bg-slate-800 hover:bg-slate-700 transition text-xs font-black cursor-pointer border border-slate-700"
@@ -210,6 +232,27 @@ export default function MathBalloonPop({ onBack }: MathBalloonPopProps) {
           <div className="flex items-center gap-2 bg-purple-950 border border-purple-600 px-3 py-1 rounded-none">
             <Sparkles className="w-4 h-4 text-purple-400" />
             <span className="text-xs font-black uppercase text-purple-300">Math Balloon Pop</span>
+          </div>
+
+          {/* Difficulty Selector */}
+          <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-none">
+            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+              <button
+                key={mode}
+                onClick={() => changeDifficulty(mode)}
+                className={`px-2.5 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
+                  diffMode === mode
+                    ? mode === 'easy'
+                      ? 'bg-emerald-600 text-white'
+                      : mode === 'medium'
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-red-600 text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
           </div>
         </div>
 
