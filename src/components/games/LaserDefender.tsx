@@ -18,7 +18,7 @@ interface Meteor {
   options: number[];
 }
 
-type DifficultyMode = 'easy' | 'medium' | 'hard';
+type DifficultyMode = 'easy' | 'medium' | 'high';
 
 function generateMeteor(id: number, diffMode: DifficultyMode = 'medium'): Meteor {
   const ops: ('+' | '-' | '×')[] = diffMode === 'easy' ? ['+', '-'] : ['+', '-', '×'];
@@ -27,7 +27,7 @@ function generateMeteor(id: number, diffMode: DifficultyMode = 'medium'): Meteor
   let num2 = 1;
   let answer = 2;
 
-  const maxNum = diffMode === 'easy' ? 10 : diffMode === 'medium' ? 15 : 30;
+  const maxNum = diffMode === 'easy' ? 12 : diffMode === 'medium' ? 25 : 50;
 
   if (op === '+') {
     num1 = Math.floor(Math.random() * maxNum) + 1;
@@ -38,14 +38,14 @@ function generateMeteor(id: number, diffMode: DifficultyMode = 'medium'): Meteor
     num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
     answer = num1 - num2;
   } else {
-    num1 = Math.floor(Math.random() * (diffMode === 'medium' ? 6 : 9)) + 2;
-    num2 = Math.floor(Math.random() * (diffMode === 'medium' ? 5 : 8)) + 2;
+    num1 = Math.floor(Math.random() * (diffMode === 'easy' ? 6 : diffMode === 'medium' ? 10 : 12)) + 2;
+    num2 = Math.floor(Math.random() * (diffMode === 'easy' ? 5 : diffMode === 'medium' ? 8 : 10)) + 2;
     answer = num1 * num2;
   }
 
   const optionsSet = new Set<number>([answer]);
   while (optionsSet.size < 4) {
-    const delta = (Math.floor(Math.random() * 4) + 1) * (Math.random() > 0.5 ? 1 : -1);
+    const delta = (Math.floor(Math.random() * 5) + 1) * (Math.random() > 0.5 ? 1 : -1);
     optionsSet.add(Math.max(1, answer + delta));
   }
 
@@ -151,7 +151,7 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
           </div>
 
           <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-none">
-            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+            {(['easy', 'medium', 'high'] as DifficultyMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}

@@ -48,7 +48,7 @@ function generateProceduralNodes(count: number): StarNode[] {
   return nodes;
 }
 
-type DifficultyMode = 'easy' | 'medium' | 'hard';
+type DifficultyMode = 'easy' | 'medium' | 'high';
 
 export default function ConstellationConnect({ onBack }: ConstellationConnectProps) {
   const [diffMode, setDiffMode] = useState<DifficultyMode>('easy');
@@ -63,7 +63,7 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
   // Generate procedurally random constellation
   const initProceduralConstellation = (overrideDiff?: DifficultyMode) => {
     const activeDiff = overrideDiff || diffMode;
-    const nodeCount = activeDiff === 'easy' ? 4 : activeDiff === 'medium' ? 6 : 9;
+    const nodeCount = activeDiff === 'easy' ? 4 : activeDiff === 'medium' ? 7 : 10;
     const baseInfo = CONSTELLATIONS_LIBRARY[Math.floor(Math.random() * CONSTELLATIONS_LIBRARY.length)];
     const generatedNodes = generateProceduralNodes(nodeCount);
 
@@ -142,7 +142,7 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
           </div>
 
           <div className="flex items-center bg-slate-900 border border-slate-700 p-0.5 rounded-xl">
-            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+            {(['easy', 'medium', 'high'] as DifficultyMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}

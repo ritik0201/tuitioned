@@ -36,7 +36,7 @@ const ALL_SPACE_SYMBOLS = [
   { symbol: '🔮', name: 'Crystal' }
 ];
 
-type DifficultyMode = 'easy' | 'medium' | 'hard';
+type DifficultyMode = 'easy' | 'medium' | 'high';
 
 export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
   const [diffMode, setDiffMode] = useState<DifficultyMode>('medium');
@@ -135,7 +135,7 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
           const newMatches = matches + 1;
           setMatches(newMatches);
 
-          if (newMatches === 6) {
+          if (newMatches === pairCount) {
             handleVictory(moves + 1);
           }
         }, 400);
@@ -189,7 +189,7 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
           </div>
 
           <div className="flex items-center bg-slate-900 border border-slate-700 p-0.5 rounded-none">
-            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+            {(['easy', 'medium', 'high'] as DifficultyMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}

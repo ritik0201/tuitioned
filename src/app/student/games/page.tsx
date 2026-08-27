@@ -70,7 +70,7 @@ const GAMES_DATA: GameConfig[] = [
     gradient: 'bg-gradient-to-br from-red-600 to-amber-600',
     borderColor: 'border-red-500/30',
     bgGlow: 'bg-red-500',
-    difficulty: 'Hard',
+    difficulty: 'High',
     ageRange: '6-14',
     instructions: [
       '1. Inspect the math problem on the incoming meteor hazard.',
@@ -90,7 +90,7 @@ const GAMES_DATA: GameConfig[] = [
     gradient: 'bg-gradient-to-br from-indigo-600 to-cyan-600',
     borderColor: 'border-indigo-500/30',
     bgGlow: 'bg-indigo-500',
-    difficulty: 'Hard',
+    difficulty: 'High',
     ageRange: '6-14',
     instructions: [
       '1. Inspect the grid map with rover 🤖, star ⭐, and finish 🏁.',

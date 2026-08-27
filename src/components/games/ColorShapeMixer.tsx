@@ -17,7 +17,7 @@ interface ShapeItem {
   frequency: number;
 }
 
-type DifficultyMode = 'easy' | 'medium' | 'hard';
+type DifficultyMode = 'easy' | 'medium' | 'high';
 
 const SHAPES: ShapeItem[] = [
   { id: '1', type: 'circle', color: '#FF597B', name: 'Ruby Circle (C5)', frequency: 523.25 },
@@ -95,7 +95,7 @@ export default function ColorShapeMixer({ onBack }: ColorShapeMixerProps) {
           </div>
 
           <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-none">
-            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+            {(['easy', 'medium', 'high'] as DifficultyMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}

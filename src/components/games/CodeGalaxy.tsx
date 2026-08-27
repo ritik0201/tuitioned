@@ -28,108 +28,92 @@ interface Level {
   collectibles: Collectible[];
 }
 
-type DifficultyMode = 'easy' | 'medium' | 'hard';
+type DifficultyMode = 'easy' | 'medium' | 'high';
 
-const EASY_LEVELS: Level[] = [
-  {
-    id: 1,
-    gridSize: 4,
-    start: { x: 0, y: 0 },
-    target: { x: 3, y: 0 },
-    collectibles: [
-      { id: 'star_1', icon: '⭐', name: 'Cosmic Star', points: 20, x: 1, y: 0 },
-      { id: 'gem_1', icon: '💎', name: 'Space Crystal', points: 25, x: 2, y: 0 }
-    ]
-  },
-  {
-    id: 2,
-    gridSize: 4,
-    start: { x: 0, y: 0 },
-    target: { x: 2, y: 2 },
-    collectibles: [
-      { id: 'star_2', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 0 },
-      { id: 'energy_1', icon: '⚡', name: 'Energy Core', points: 30, x: 1, y: 1 }
-    ]
-  }
+const COLLECTIBLE_TYPES = [
+  { icon: '⭐', name: 'Cosmic Star', points: 20 },
+  { icon: '💎', name: 'Space Crystal', points: 25 },
+  { icon: '⚡', name: 'Energy Core', points: 30 },
+  { icon: '🔮', name: 'Quantum Orb', points: 35 },
+  { icon: '🛸', name: 'Alien Relic', points: 40 },
+  { icon: '👑', name: 'Stellar Crown', points: 50 }
 ];
 
-const MEDIUM_LEVELS: Level[] = [
-  {
-    id: 1,
-    gridSize: 5,
-    start: { x: 0, y: 0 },
-    target: { x: 4, y: 3 },
-    collectibles: [
-      { id: 'star_m1', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 0 },
-      { id: 'gem_m1', icon: '💎', name: 'Space Crystal', points: 25, x: 2, y: 2 },
-      { id: 'orb_m1', icon: '🔮', name: 'Quantum Orb', points: 30, x: 4, y: 1 }
-    ]
-  },
-  {
-    id: 2,
-    gridSize: 5,
-    start: { x: 0, y: 1 },
-    target: { x: 4, y: 4 },
-    collectibles: [
-      { id: 'star_m2', icon: '⭐', name: 'Cosmic Star', points: 20, x: 1, y: 2 },
-      { id: 'energy_m2', icon: '⚡', name: 'Energy Core', points: 25, x: 3, y: 2 },
-      { id: 'orb_m2', icon: '🔮', name: 'Quantum Orb', points: 30, x: 4, y: 3 }
-    ]
+function generateProceduralLevel(levelIdx: number, diffMode: DifficultyMode): Level {
+  const gridSize = diffMode === 'easy' ? 4 : diffMode === 'medium' ? 5 : 6;
+  const start = { x: 0, y: Math.floor(Math.random() * gridSize) };
+  
+  let targetY = Math.floor(Math.random() * gridSize);
+  while (targetY === start.y && gridSize > 3) {
+    targetY = Math.floor(Math.random() * gridSize);
   }
-];
+  const target = { x: gridSize - 1, y: targetY };
 
-const HARD_LEVELS: Level[] = [
-  {
-    id: 1,
-    gridSize: 6,
-    start: { x: 0, y: 0 },
-    target: { x: 5, y: 5 },
-    collectibles: [
-      { id: 'star_h1', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 0 },
-      { id: 'gem_h1', icon: '💎', name: 'Space Crystal', points: 25, x: 3, y: 2 },
-      { id: 'orb_h1', icon: '🔮', name: 'Quantum Orb', points: 30, x: 4, y: 4 },
-      { id: 'alien_h1', icon: '🛸', name: 'Alien Relic', points: 40, x: 1, y: 4 }
-    ]
-  },
-  {
-    id: 2,
-    gridSize: 6,
-    start: { x: 0, y: 2 },
-    target: { x: 5, y: 1 },
-    collectibles: [
-      { id: 'star_h2', icon: '⭐', name: 'Cosmic Star', points: 20, x: 2, y: 2 },
-      { id: 'energy_h2', icon: '⚡', name: 'Energy Core', points: 25, x: 4, y: 1 },
-      { id: 'orb_h2', icon: '🔮', name: 'Quantum Orb', points: 30, x: 1, y: 3 },
-      { id: 'crown_h2', icon: '👑', name: 'Stellar Crown', points: 50, x: 5, y: 3 }
-    ]
+  const count = diffMode === 'easy' ? 2 : diffMode === 'medium' ? 3 : 4;
+  const collectibles: Collectible[] = [];
+  const usedCoords = new Set<string>([`${start.x},${start.y}`, `${target.x},${target.y}`]);
+
+  for (let i = 0; i < count; i++) {
+    let cx = Math.floor(Math.random() * gridSize);
+    let cy = Math.floor(Math.random() * gridSize);
+    let key = `${cx},${cy}`;
+    
+    let attempts = 0;
+    while (usedCoords.has(key) && attempts < 20) {
+      cx = Math.floor(Math.random() * gridSize);
+      cy = Math.floor(Math.random() * gridSize);
+      key = `${cx},${cy}`;
+      attempts++;
+    }
+
+    if (!usedCoords.has(key)) {
+      usedCoords.add(key);
+      const itemInfo = COLLECTIBLE_TYPES[i % COLLECTIBLE_TYPES.length];
+      collectibles.push({
+        id: `c_${levelIdx}_${i}_${Date.now()}`,
+        icon: itemInfo.icon,
+        name: itemInfo.name,
+        points: itemInfo.points,
+        x: cx,
+        y: cy
+      });
+    }
   }
-];
+
+  return {
+    id: levelIdx + 1,
+    gridSize,
+    start,
+    target,
+    collectibles
+  };
+}
 
 export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
   const [diffMode, setDiffMode] = useState<DifficultyMode>('medium');
   const [levelIdx, setLevelIdx] = useState(0);
+  const [currentLevel, setCurrentLevel] = useState<Level>(() => generateProceduralLevel(0, 'medium'));
   const [commands, setCommands] = useState<Command[]>([]);
-  const [roverPos, setRoverPos] = useState({ x: 0, y: 0 });
+  const [roverPos, setRoverPos] = useState(currentLevel.start);
   const [collectedIds, setCollectedIds] = useState<string[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const [score, setScore] = useState(0);
   const [levelSuccess, setLevelSuccess] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
-  const levelsList = diffMode === 'easy' ? EASY_LEVELS : diffMode === 'medium' ? MEDIUM_LEVELS : HARD_LEVELS;
-  const currentLevel = levelsList[levelIdx % levelsList.length];
   const maxCmds = diffMode === 'easy' ? 10 : diffMode === 'medium' ? 12 : 15;
 
   const changeDifficulty = (mode: DifficultyMode) => {
     soundManager.playPop();
     setDiffMode(mode);
     setLevelIdx(0);
+    const newLvl = generateProceduralLevel(0, mode);
+    setCurrentLevel(newLvl);
+    setRoverPos(newLvl.start);
     setCommands([]);
     setScore(0);
     setCollectedIds([]);
     setLevelSuccess(false);
-    const targetLevels = mode === 'easy' ? EASY_LEVELS : mode === 'medium' ? MEDIUM_LEVELS : HARD_LEVELS;
-    setRoverPos(targetLevels[0].start);
   };
 
   const addCommand = (cmd: Command) => {
@@ -205,7 +189,8 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
     const nextIdx = levelIdx + 1;
     setLevelIdx(nextIdx);
     setCommands([]);
-    const nextLvl = levelsList[nextIdx % levelsList.length];
+    const nextLvl = generateProceduralLevel(nextIdx, diffMode);
+    setCurrentLevel(nextLvl);
     setRoverPos(nextLvl.start);
     setCollectedIds([]);
     setLevelSuccess(false);
@@ -240,7 +225,7 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
           </div>
 
           <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-none">
-            {(['easy', 'medium', 'hard'] as DifficultyMode[]).map((mode) => (
+            {(['easy', 'medium', 'high'] as DifficultyMode[]).map((mode) => (
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}
