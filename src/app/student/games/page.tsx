@@ -18,8 +18,50 @@ const ColorShapeMixer = dynamic(() => import('@/components/games/ColorShapeMixer
 const ConstellationConnect = dynamic(() => import('@/components/games/ConstellationConnect'), { ssr: false });
 const CodeGalaxy = dynamic(() => import('@/components/games/CodeGalaxy'), { ssr: false });
 const LaserDefender = dynamic(() => import('@/components/games/LaserDefender'), { ssr: false });
+const FractionCarnival = dynamic(() => import('@/components/games/FractionCarnival'), { ssr: false });
+const FractionRescue = dynamic(() => import('@/components/games/FractionRescue'), { ssr: false });
 
 const GAMES_DATA: GameConfig[] = [
+  {
+    id: 'fraction_rescue',
+    title: 'Helicopter Fraction Rescue',
+    subtitle: 'Number Line Navigator',
+    description: 'Help the helicopter rescue panda by dividing the number line into equal parts and locating target fractions!',
+    category: 'math',
+    icon: '🚁',
+    gradient: 'bg-gradient-to-br from-teal-600 to-emerald-600',
+    borderColor: 'border-emerald-500/30',
+    bgGlow: 'bg-emerald-500',
+    difficulty: 'Medium',
+    ageRange: '5-12',
+    instructions: [
+      '1. Inspect the target fraction (e.g. 5/8) in Panda’s thought bubble.',
+      '2. Use the Parts stepper slider (<< >>) to divide the number line into equal denominator parts.',
+      '3. Select the target fraction tick mark on the number line.',
+      '4. Tap "Check" to launch the helicopter rescue flight and earn points!'
+    ],
+    skillsLearned: ['Number Line Fractions', 'Denominator Divisions', 'Fraction Equivalence']
+  },
+  {
+    id: 'fraction_carnival',
+    title: 'Fraction Carnival',
+    subtitle: 'Carnival Fraction Matcher',
+    description: 'Identify hanging shapes with shaded parts that match target fractions in the carnival booth!',
+    category: 'math',
+    icon: '🎪',
+    gradient: 'bg-gradient-to-br from-amber-600 to-orange-600',
+    borderColor: 'border-amber-500/30',
+    bgGlow: 'bg-amber-500',
+    difficulty: 'Medium',
+    ageRange: '5-12',
+    instructions: [
+      '1. Inspect the target fraction displayed on the riveted card at the bottom stall.',
+      '2. Look at the hanging shapes (circles, squares, bars, triangles) suspended from strings.',
+      '3. Click the shape whose orange shaded region represents the target fraction.',
+      '4. Complete 5 rounds and score 100+ points to unlock the Fraction Master badge!'
+    ],
+    skillsLearned: ['Visual Fractions', 'Parts of a Whole', 'Geometric Shapes']
+  },
   {
     id: 'math_balloon',
     title: 'Math Balloon Pop!',
@@ -215,7 +257,9 @@ export default function StudentGamesPage() {
           /* Active Game Player Overlay */
           <div className="w-full flex justify-center py-1">
             {activeGameId === 'math_balloon' && <MathBalloonPop onBack={handleBackToHub} />}
+            {activeGameId === 'fraction_rescue' && <FractionRescue onBack={handleBackToHub} />}
             {activeGameId === 'laser_defender' && <LaserDefender onBack={handleBackToHub} />}
+            {activeGameId === 'fraction_carnival' && <FractionCarnival onBack={handleBackToHub} />}
             {activeGameId === 'space_memory' && <SpaceMemoryMatch onBack={handleBackToHub} />}
             {activeGameId === 'code_galaxy' && <CodeGalaxy onBack={handleBackToHub} />}
             {activeGameId === 'shape_mixer' && <ColorShapeMixer onBack={handleBackToHub} />}

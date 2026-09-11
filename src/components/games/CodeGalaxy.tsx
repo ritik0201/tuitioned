@@ -42,7 +42,7 @@ const COLLECTIBLE_TYPES = [
 function generateProceduralLevel(levelIdx: number, diffMode: DifficultyMode): Level {
   const gridSize = diffMode === 'easy' ? 4 : diffMode === 'medium' ? 5 : 6;
   const start = { x: 0, y: Math.floor(Math.random() * gridSize) };
-  
+
   let targetY = Math.floor(Math.random() * gridSize);
   while (targetY === start.y && gridSize > 3) {
     targetY = Math.floor(Math.random() * gridSize);
@@ -57,7 +57,7 @@ function generateProceduralLevel(levelIdx: number, diffMode: DifficultyMode): Le
     let cx = Math.floor(Math.random() * gridSize);
     let cy = Math.floor(Math.random() * gridSize);
     let key = `${cx},${cy}`;
-    
+
     let attempts = 0;
     while (usedCoords.has(key) && attempts < 20) {
       cx = Math.floor(Math.random() * gridSize);
@@ -170,7 +170,7 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
       const levelCompletionBonus = 30;
       const totalEarned = levelCompletionBonus + collectedPoints;
       const newScore = score + totalEarned;
-      
+
       setScore(newScore);
       setLevelSuccess(true);
 
@@ -229,15 +229,14 @@ export default function CodeGalaxy({ onBack }: CodeGalaxyProps) {
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}
-                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
-                  diffMode === mode
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${diffMode === mode
                     ? mode === 'easy'
                       ? 'bg-emerald-600 text-white'
                       : mode === 'medium'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-purple-600 text-white'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-purple-600 text-white'
                     : 'text-slate-400 hover:text-white'
-                }`}
+                  }`}
               >
                 {mode}
               </button>

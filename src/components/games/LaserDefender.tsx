@@ -155,15 +155,14 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}
-                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
-                  diffMode === mode
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${diffMode === mode
                     ? mode === 'easy'
                       ? 'bg-emerald-600 text-white'
                       : mode === 'medium'
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-red-600 text-white'
+                        ? 'bg-amber-600 text-white'
+                        : 'bg-red-600 text-white'
                     : 'text-slate-400 hover:text-white'
-                }`}
+                  }`}
               >
                 {mode}
               </button>
@@ -177,9 +176,8 @@ export default function LaserDefender({ onBack }: LaserDefenderProps) {
             <div className="w-full bg-slate-950 border border-slate-800 h-3 rounded-none overflow-hidden">
               <div
                 style={{ width: `${health}%` }}
-                className={`h-full transition-all duration-300 ${
-                  health > 50 ? 'bg-emerald-500' : health > 20 ? 'bg-amber-500' : 'bg-red-500'
-                }`}
+                className={`h-full transition-all duration-300 ${health > 50 ? 'bg-emerald-500' : health > 20 ? 'bg-amber-500' : 'bg-red-500'
+                  }`}
               />
             </div>
           </div>

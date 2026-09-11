@@ -37,7 +37,7 @@ const NOTE_FREQS = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046
 function generateProceduralNodes(count: number): StarNode[] {
   const nodes: StarNode[] = [];
   const padding = 15;
-  
+
   for (let i = 1; i <= count; i++) {
     const x = Math.floor(Math.random() * (100 - padding * 2)) + padding;
     const y = Math.floor(Math.random() * (100 - padding * 2)) + padding;
@@ -146,15 +146,14 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}
-                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
-                  diffMode === mode
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${diffMode === mode
                     ? mode === 'easy'
                       ? 'bg-emerald-600 text-white'
                       : mode === 'medium'
-                      ? 'bg-cyan-600 text-white'
-                      : 'bg-purple-600 text-white'
+                        ? 'bg-cyan-600 text-white'
+                        : 'bg-purple-600 text-white'
                     : 'text-slate-400 hover:text-white'
-                }`}
+                  }`}
               >
                 {mode}
               </button>
@@ -230,13 +229,12 @@ export default function ConstellationConnect({ onBack }: ConstellationConnectPro
                 key={node.id}
                 onClick={() => handleStarClick(node)}
                 style={{ left: `${node.x}%`, top: `${node.y}%` }}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center font-black text-sm transition-all transform z-10 cursor-pointer shadow-lg border-2 ${
-                  isConnected
+                className={`absolute -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center font-black text-sm transition-all transform z-10 cursor-pointer shadow-lg border-2 ${isConnected
                     ? 'bg-cyan-500 border-cyan-300 text-white scale-110 shadow-cyan-500/50'
                     : isNext
-                    ? 'bg-amber-500 border-white text-white animate-bounce scale-125 shadow-amber-500/80'
-                    : 'bg-slate-800 border-slate-600 text-slate-400 hover:scale-105'
-                }`}
+                      ? 'bg-amber-500 border-white text-white animate-bounce scale-125 shadow-amber-500/80'
+                      : 'bg-slate-800 border-slate-600 text-slate-400 hover:scale-105'
+                  }`}
               >
                 {isConnected ? '⭐' : node.id}
               </button>

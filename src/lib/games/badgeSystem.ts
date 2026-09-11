@@ -53,6 +53,22 @@ export const INITIAL_BADGES: Badge[] = [
     gameId: 'laser_defender'
   },
   {
+    id: 'fraction_master',
+    title: 'Fraction Master',
+    description: 'Score 100+ points in Fraction Carnival!',
+    icon: '🎪',
+    unlocked: false,
+    gameId: 'fraction_carnival'
+  },
+  {
+    id: 'fraction_pilot',
+    title: 'Fraction Rescue Pilot',
+    description: 'Score 100+ points in Helicopter Fraction Rescue!',
+    icon: '🚁',
+    unlocked: false,
+    gameId: 'fraction_rescue'
+  },
+  {
     id: 'star_collector',
     title: 'Star Collector',
     description: 'Earn 50 stars across all mini-games',

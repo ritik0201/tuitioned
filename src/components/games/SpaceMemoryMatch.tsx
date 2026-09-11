@@ -60,7 +60,7 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
 
     const shuffledPool = [...ALL_SPACE_SYMBOLS].sort(() => Math.random() - 0.5);
     const selectedPairs = shuffledPool.slice(0, count);
-    
+
     const deck: CardItem[] = [];
     const pairs = [...selectedPairs, ...selectedPairs];
     const shuffledPairs = pairs.sort(() => Math.random() - 0.5);
@@ -193,15 +193,14 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}
-                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
-                  diffMode === mode
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${diffMode === mode
                     ? mode === 'easy'
                       ? 'bg-emerald-600 text-white'
                       : mode === 'medium'
-                      ? 'bg-indigo-600 text-white'
-                      : 'bg-purple-600 text-white'
+                        ? 'bg-indigo-600 text-white'
+                        : 'bg-purple-600 text-white'
                     : 'text-slate-400 hover:text-white'
-                }`}
+                  }`}
               >
                 {mode}
               </button>
@@ -249,13 +248,12 @@ export default function SpaceMemoryMatch({ onBack }: SpaceMemoryMatchProps) {
                   key={card.id}
                   onClick={() => handleCardClick(card.id)}
                   disabled={card.isMatched}
-                  className={`h-28 rounded-none flex items-center justify-center text-4xl transition-all transform duration-300 shadow-xl cursor-pointer border-2 ${
-                    card.isMatched
+                  className={`h-28 rounded-none flex items-center justify-center text-4xl transition-all transform duration-300 shadow-xl cursor-pointer border-2 ${card.isMatched
                       ? 'bg-emerald-900/30 border-emerald-500/50 scale-95 opacity-60'
                       : showFace
-                      ? 'bg-indigo-600 border-indigo-300 scale-105'
-                      : 'bg-slate-800 hover:bg-slate-700 border-indigo-500/30 hover:scale-105'
-                  }`}
+                        ? 'bg-indigo-600 border-indigo-300 scale-105'
+                        : 'bg-slate-800 hover:bg-slate-700 border-indigo-500/30 hover:scale-105'
+                    }`}
                 >
                   {showFace ? (
                     <span className="animate-in zoom-in duration-200">{card.symbol}</span>

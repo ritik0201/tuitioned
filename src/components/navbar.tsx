@@ -23,6 +23,7 @@ const Logo = () => (
 
 const navLinks = [
     { href: 'https://tuition-ed.com/k-12-school-time-courses/', label: 'Courses' },
+    { href: '/pricing', label: 'Pricing' },
     { href: 'https://tuition-ed.com/about-us/', label: 'About' },
     { href: 'https://tuition-ed.com/blog/', label: 'Blog' },
     { href: 'https://tuition-ed.com/contact-us/', label: 'Contact' },

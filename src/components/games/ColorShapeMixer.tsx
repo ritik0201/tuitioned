@@ -99,15 +99,14 @@ export default function ColorShapeMixer({ onBack }: ColorShapeMixerProps) {
               <button
                 key={mode}
                 onClick={() => changeDifficulty(mode)}
-                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
-                  diffMode === mode
+                className={`px-2 py-1 text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${diffMode === mode
                     ? mode === 'easy'
                       ? 'bg-emerald-600 text-white'
                       : mode === 'medium'
-                      ? 'bg-pink-600 text-white'
-                      : 'bg-purple-600 text-white'
+                        ? 'bg-pink-600 text-white'
+                        : 'bg-purple-600 text-white'
                     : 'text-slate-400 hover:text-white'
-                }`}
+                  }`}
               >
                 {mode}
               </button>
