@@ -154,11 +154,22 @@ interface ShortTermItem {
 
 const SHORT_TERM_DATA: ShortTermItem[] = [
   {
-    id: 'k8',
-    category: 'K-8 (All Subjects)',
-    badge: 'Elementary & Middle',
-    description: 'Math, Science, English, & Social Studies for Grades K through 8.',
+    id: 'k2',
+    category: 'K – Grade 2 (All Subjects)',
+    badge: 'Early Elementary',
+    description: 'Math, Science, Reading, & English for Kindergarten through Grade 2.',
     icon: <BookOpen className="w-5 h-5 text-blue-400" />,
+    rates: [
+      { frequency: '0 – 3 Classes / week', usd: '$9 / hr', inr: '₹828 / hr' },
+      { frequency: '3+ Classes / week', usd: '$8 / hr', inr: '₹736 / hr', discountNote: 'SAVE 11%' }
+    ]
+  },
+  {
+    id: 'g38',
+    category: 'Grade 3 – 8 (All Subjects)',
+    badge: 'Elementary & Middle',
+    description: 'Math, Science, English, & Social Studies for Grades 3 through 8.',
+    icon: <BookMarked className="w-5 h-5 text-teal-400" />,
     rates: [
       { frequency: '0 – 3 Classes / week', usd: '$9 / hr', inr: '₹828 / hr' },
       { frequency: '3+ Classes / week', usd: '$8 / hr', inr: '₹736 / hr', discountNote: 'SAVE 11%' }
@@ -171,8 +182,8 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
     description: 'Algebra, Calculus, Physics, Chemistry, Biology, SAT/ACT test prep.',
     icon: <GraduationCap className="w-5 h-5 text-indigo-400" />,
     rates: [
-      { frequency: '0 – 3 Classes / week', usd: '$10 / hr', inr: '₹920 / hr' },
-      { frequency: '3+ Classes / week', usd: '$9 / hr', inr: '₹828 / hr', discountNote: 'SAVE 10%' }
+      { frequency: '0 – 3 Classes / week', usd: '$11 / hr', inr: '₹1,012 / hr' },
+      { frequency: '3+ Classes / week', usd: '$10 / hr', inr: '₹920 / hr', discountNote: 'SAVE 9%' }
     ]
   },
   {
@@ -182,8 +193,8 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
     description: 'Python, Scratch, Music/Instruments, Spanish, French, German & more.',
     icon: <Code2 className="w-5 h-5 text-purple-400" />,
     rates: [
-      { frequency: '0 – 3 Classes / week', usd: '$12 / hr', inr: '₹1,104 / hr' },
-      { frequency: '3+ Classes / week', usd: '$11 / hr', inr: '₹1,012 / hr', discountNote: 'SAVE 8%' }
+      { frequency: '0 – 3 Classes / week', usd: '$13 / hr', inr: '₹1,196 / hr' },
+      { frequency: '3+ Classes / week', usd: '$12 / hr', inr: '₹1,104 / hr', discountNote: 'SAVE 8%' }
     ]
   },
   {
@@ -201,7 +212,7 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
 const FAQS = [
   {
     q: 'How do the short-term hourly plans work vs long-term packages?',
-    a: 'Short-term plans offer pay-as-you-go hourly flexibility without committing to a 6 or 12-month semester. You pay per class based on weekly frequency, with discounted rates when taking 3+ classes per week.'
+    a: 'Short-term plans offer pay-as-you-go hourly flexibility without committing to a 6 or 12-month semester. Each class session is held for 40 minutes. You pay per class based on weekly frequency, with discounted rates when taking 3+ classes per week.'
   },
   {
     q: 'How do the 1-on-1 live classes work?',
@@ -281,7 +292,7 @@ export default function PricingPage() {
             <Clock className="w-4 h-4" />
             <span>Short-Term Hourly Plans</span>
             <span className="text-[10px] bg-emerald-950/80 border border-emerald-400/40 text-emerald-300 px-2 py-0.5 rounded-full">
-              Pay-As-You-Go
+              Pay-As-You-Go • 40 Min/Class
             </span>
           </button>
         </div>
@@ -487,14 +498,18 @@ export default function PricingPage() {
           <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
               <div>
-                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                <h3 className="text-2xl font-bold text-white flex items-center gap-2 flex-wrap">
                   Short-Term Hourly Rates
                   <span className="text-xs bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 font-semibold px-2.5 py-0.5 rounded-full">
                     Pay-As-You-Go
                   </span>
+                  <span className="text-xs bg-blue-950/80 text-blue-300 border border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-blue-400" />
+                    40 Minutes per Class
+                  </span>
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
-                  Flexible per-hour pricing tailored to your weekly schedule. Zero long-term commitment required.
+                  Flexible per-hour pricing tailored to your weekly schedule. Each class session is held for 40 minutes with zero long-term commitment.
                 </p>
               </div>
 
@@ -586,7 +601,7 @@ export default function PricingPage() {
                   Looking for Short-Term or Hourly Classes?
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
-                  Pay per hour with zero long-term commitment. Discounted rates available for 3+ classes per week.
+                  Pay per hour with zero long-term commitment. Each class will be held for 40 minutes. Discounted rates available for 3+ classes per week.
                 </p>
               </div>
 
@@ -612,13 +627,25 @@ export default function PricingPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-800/80 font-medium">
                   <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">K-8 (All Subjects)</td>
+                    <td className="py-3 px-4 text-white font-semibold">K – Grade 2 (All Subjects)</td>
                     <td className="py-3 px-4">0–3 Classes</td>
                     <td className="py-3 px-4 font-bold text-slate-200">$9 / hr</td>
                     <td className="py-3 px-4 font-bold text-slate-200">₹828 / hr</td>
                   </tr>
                   <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">K-8 (All Subjects)</td>
+                    <td className="py-3 px-4 text-white font-semibold">K – Grade 2 (All Subjects)</td>
+                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 11%)</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">$8 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">₹736 / hr</td>
+                  </tr>
+                  <tr className="hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
+                    <td className="py-3 px-4">0–3 Classes</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">$9 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">₹828 / hr</td>
+                  </tr>
+                  <tr className="hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
                     <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 11%)</td>
                     <td className="py-3 px-4 font-bold text-emerald-400">$8 / hr</td>
                     <td className="py-3 px-4 font-bold text-emerald-400">₹736 / hr</td>
@@ -626,26 +653,26 @@ export default function PricingPage() {
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">9-12 (All Subjects)</td>
                     <td className="py-3 px-4">0–3 Classes</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">$10 / hr</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">₹920 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">$11 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">₹1,012 / hr</td>
                   </tr>
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">9-12 (All Subjects)</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 10%)</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">$9 / hr</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">₹828 / hr</td>
+                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 9%)</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">$10 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">₹920 / hr</td>
                   </tr>
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">Coding, Instruments & Languages</td>
                     <td className="py-3 px-4">0–3 Classes</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">$12 / hr</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">₹1,104 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">$13 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">₹1,196 / hr</td>
                   </tr>
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">Coding, Instruments & Languages</td>
                     <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 8%)</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">$11 / hr</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">₹1,012 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">$12 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">₹1,104 / hr</td>
                   </tr>
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">Advanced Tech (AI, ML, Web Dev)</td>
