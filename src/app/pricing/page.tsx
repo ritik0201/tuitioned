@@ -156,8 +156,8 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
   {
     id: 'k2',
     category: 'K – Grade 2 (All Subjects)',
-    badge: 'Early Elementary',
-    description: 'Math, Science, Reading, & English for Kindergarten through Grade 2.',
+    badge: 'Early Elementary • 40 Mins',
+    description: 'Math, Science, Reading, & English for Kindergarten through Grade 2 (40 min sessions).',
     icon: <BookOpen className="w-5 h-5 text-blue-400" />,
     rates: [
       { frequency: '0 – 3 Classes / week', usd: '$9 / hr', inr: '₹828 / hr' },
@@ -167,12 +167,12 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
   {
     id: 'g38',
     category: 'Grade 3 – 8 (All Subjects)',
-    badge: 'Elementary & Middle',
-    description: 'Math, Science, English, & Social Studies for Grades 3 through 8.',
+    badge: 'Elementary & Middle • 1 Hour',
+    description: 'Math, Science, English, & Social Studies for Grades 3 through 8 (1 hour sessions).',
     icon: <BookMarked className="w-5 h-5 text-teal-400" />,
     rates: [
-      { frequency: '0 – 3 Classes / week', usd: '$9 / hr', inr: '₹828 / hr' },
-      { frequency: '3+ Classes / week', usd: '$8 / hr', inr: '₹736 / hr', discountNote: 'SAVE 11%' }
+      { frequency: '0 – 3 Classes / week', usd: '$10 / hr', inr: '₹920 / hr' },
+      { frequency: '3+ Classes / week', usd: '$9 / hr', inr: '₹828 / hr', discountNote: 'SAVE 10%' }
     ]
   },
   {
@@ -212,7 +212,7 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
 const FAQS = [
   {
     q: 'How do the short-term hourly plans work vs long-term packages?',
-    a: 'Short-term plans offer pay-as-you-go hourly flexibility without committing to a 6 or 12-month semester. Each class session is held for 40 minutes. You pay per class based on weekly frequency, with discounted rates when taking 3+ classes per week.'
+    a: 'Short-term plans offer pay-as-you-go hourly flexibility without committing to a 6 or 12-month semester. K–2 sessions are scheduled for 40 minutes, while Grade 3–8 and upper grades feature 1-hour sessions. You pay per class based on weekly frequency, with discounted rates when taking 3+ classes per week.'
   },
   {
     q: 'How do the 1-on-1 live classes work?',
@@ -503,14 +503,14 @@ export default function PricingPage() {
                   <span className="text-xs bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 font-semibold px-2.5 py-0.5 rounded-full">
                     Pay-As-You-Go
                   </span>
-                  <span className="text-xs bg-blue-950/80 text-blue-300 border border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  {/* <span className="text-xs bg-blue-950/80 text-blue-300 border border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-blue-400" />
                     40 Minutes per Class
-                  </span>
+                  </span> */}
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                {/* <p className="text-xs text-slate-400 mt-1">
                   Flexible per-hour pricing tailored to your weekly schedule. Each class session is held for 40 minutes with zero long-term commitment.
-                </p>
+                </p> */}
               </div>
 
               <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-xs font-semibold text-slate-300 shrink-0">
@@ -641,14 +641,14 @@ export default function PricingPage() {
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
                     <td className="py-3 px-4">0–3 Classes</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">$9 / hr</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">₹828 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">$10 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-200">₹920 / hr</td>
                   </tr>
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 11%)</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">$8 / hr</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">₹736 / hr</td>
+                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 10%)</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">$9 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-400">₹828 / hr</td>
                   </tr>
                   <tr className="hover:bg-slate-950/50 transition">
                     <td className="py-3 px-4 text-white font-semibold">9-12 (All Subjects)</td>
