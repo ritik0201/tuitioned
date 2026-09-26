@@ -156,8 +156,8 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
   {
     id: 'k2',
     category: 'K – Grade 2 (All Subjects)',
-    badge: 'Early Elementary • 40 Mins',
-    description: 'Math, Science, Reading, & English for Kindergarten through Grade 2 (40 min sessions).',
+    badge: 'Early Elementary',
+    description: 'Math, Science, Reading, & English for Kindergarten through Grade 2.',
     icon: <BookOpen className="w-5 h-5 text-blue-400" />,
     rates: [
       { frequency: '0 – 3 Classes / week', usd: '$9 / hr', inr: '₹828 / hr' },
@@ -212,7 +212,7 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
 const FAQS = [
   {
     q: 'How do the short-term hourly plans work vs long-term packages?',
-    a: 'Short-term plans offer pay-as-you-go hourly flexibility without committing to a 6 or 12-month semester. K–2 sessions are scheduled for 40 minutes, while Grade 3–8 and upper grades feature 1-hour sessions. You pay per class based on weekly frequency, with discounted rates when taking 3+ classes per week.'
+    a: 'Short-term plans offer pay-as-you-go hourly flexibility without committing to a 6 or 12-month semester. You pay per class based on weekly frequency, with discounted rates when taking 3+ classes per week.'
   },
   {
     q: 'How do the 1-on-1 live classes work?',
@@ -292,7 +292,7 @@ export default function PricingPage() {
             <Clock className="w-4 h-4" />
             <span>Short-Term Hourly Plans</span>
             <span className="text-[10px] bg-emerald-950/80 border border-emerald-400/40 text-emerald-300 px-2 py-0.5 rounded-full">
-              Pay-As-You-Go • 40 Min/Class
+              Pay-As-You-Go
             </span>
           </button>
         </div>
@@ -503,14 +503,14 @@ export default function PricingPage() {
                   <span className="text-xs bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 font-semibold px-2.5 py-0.5 rounded-full">
                     Pay-As-You-Go
                   </span>
-                  {/* <span className="text-xs bg-blue-950/80 text-blue-300 border border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="text-xs bg-blue-950/80 text-blue-300 border border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-blue-400" />
-                    40 Minutes per Class
-                  </span> */}
+                    Flexible class sessions
+                  </span>
                 </h3>
-                {/* <p className="text-xs text-slate-400 mt-1">
-                  Flexible per-hour pricing tailored to your weekly schedule. Each class session is held for 40 minutes with zero long-term commitment.
-                </p> */}
+                <p className="text-xs text-slate-400 mt-1">
+                  Flexible per-hour pricing tailored to your weekly schedule with zero long-term commitment.
+                </p>
               </div>
 
               <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-xs font-semibold text-slate-300 shrink-0">
@@ -601,7 +601,7 @@ export default function PricingPage() {
                   Looking for Short-Term or Hourly Classes?
                 </h3>
                 <p className="text-xs text-slate-400 mt-1">
-                  Pay per hour with zero long-term commitment. Each class will be held for 40 minutes. Discounted rates available for 3+ classes per week.
+                  Pay per hour with zero long-term commitment. Discounted rates available for 3+ classes per week.
                 </p>
               </div>
 
