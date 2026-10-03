@@ -239,15 +239,19 @@ export async function PUT(request: Request) {
 
     const updateData: any = {};
     if (status) updateData.status = status;
-    if (teacherId) {
-      const teacher = await User.findById(teacherId);
-      if (!teacher || teacher.role !== 'teacher') {
-        return NextResponse.json(
-          { success: false, message: 'Invalid teacher ID or User is not a teacher.' },
-          { status: 400 }
-        );
+    if (teacherId !== undefined) {
+      if (!teacherId) {
+        updateData.teacherId = null;
+      } else {
+        const teacher = await User.findById(teacherId);
+        if (!teacher || teacher.role !== 'teacher') {
+          return NextResponse.json(
+            { success: false, message: 'Invalid teacher ID or User is not a teacher.' },
+            { status: 400 }
+          );
+        }
+        updateData.teacherId = teacherId;
       }
-      updateData.teacherId = teacherId;
     }
     if (joinLink) updateData.joinLink = joinLink;
     if (bookingDateAndTime) updateData.bookingDateAndTime = bookingDateAndTime;

@@ -156,8 +156,8 @@ const SHORT_TERM_DATA: ShortTermItem[] = [
   {
     id: 'k2',
     category: 'K – Grade 2 (All Subjects)',
-    badge: 'Early Elementary',
-    description: 'Math, Science, Reading, & English for Kindergarten through Grade 2.',
+    badge: 'Early Elementary • 40 Mins',
+    description: 'Math, Science, Reading, & English for Kindergarten through Grade 2 (40 min sessions).',
     icon: <BookOpen className="w-5 h-5 text-blue-400" />,
     rates: [
       { frequency: '0 – 3 Classes / week', usd: '$9 / hr', inr: '₹828 / hr' },
