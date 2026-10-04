@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import { useTheme } from 'next-themes';
-import { Sun, Moon } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sun, Moon, Sparkles } from 'lucide-react';
 
 interface ThemeToggleProps {
   className?: string;
@@ -19,7 +20,7 @@ export function ThemeToggle({ className = '', showText = false }: ThemeTogglePro
 
   if (!mounted) {
     return (
-      <div className={`w-9 h-9 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/40 dark:border-slate-700/40 animate-pulse ${className}`} />
+      <div className={`w-14 h-8 rounded-full bg-slate-200/50 dark:bg-slate-800/50 border border-slate-300/40 dark:border-slate-700/40 animate-pulse ${className}`} />
     );
   }
 
@@ -30,35 +31,102 @@ export function ThemeToggle({ className = '', showText = false }: ThemeTogglePro
   };
 
   return (
-    <button
-      onClick={toggleTheme}
-      className={`relative inline-flex items-center justify-center gap-2 p-2 rounded-xl transition-all duration-300
-        bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300/80
-        dark:bg-slate-800/80 dark:hover:bg-slate-700/90 dark:text-amber-400 dark:border-slate-700/60
-        shadow-sm hover:shadow active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 cursor-pointer
-        ${className}`}
-      title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      aria-label="Toggle light and dark mode"
-    >
-      <div className="relative w-5 h-5 flex items-center justify-center overflow-hidden">
-        <Sun
-          className={`w-5 h-5 text-amber-500 transition-all duration-500 transform ${
-            isDark ? 'rotate-90 scale-0 opacity-0 absolute' : 'rotate-0 scale-100 opacity-100'
+    <div className={`inline-flex items-center gap-2.5 ${className}`}>
+      <button
+        onClick={toggleTheme}
+        type="button"
+        className={`relative w-14 h-8 rounded-full p-1 transition-colors duration-500 shadow-inner outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 cursor-pointer overflow-hidden group select-none border ${
+          isDark
+            ? 'bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border-indigo-500/30 shadow-indigo-950/50'
+            : 'bg-gradient-to-r from-amber-200 via-sky-300 to-sky-400 border-amber-300/60 shadow-sky-200/50'
+        }`}
+        title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        aria-label="Toggle theme mode"
+      >
+        {/* Background Decorative Elements */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <AnimatePresence mode="wait">
+            {isDark ? (
+              <motion.div
+                key="dark-stars"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full relative"
+              >
+                {/* Tiny star dots for dark mode */}
+                <span className="absolute top-1.5 left-2.5 w-1 h-1 rounded-full bg-white/90 shadow-[0_0_3px_#fff] animate-pulse" />
+                <span className="absolute bottom-2 left-4 w-0.5 h-0.5 rounded-full bg-white/70" />
+                <span className="absolute top-2 left-6 w-1 h-1 rounded-full bg-indigo-200/80 shadow-[0_0_3px_#a5b4fc]" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="light-clouds"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+                className="w-full h-full relative"
+              >
+                {/* Soft sun rays / cloud hints for light mode */}
+                <span className="absolute bottom-0 right-1.5 w-4 h-2 rounded-t-full bg-white/60 backdrop-blur-xs" />
+                <span className="absolute top-1 right-5 w-2 h-2 rounded-full bg-amber-100/50" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Sliding Knob */}
+        <motion.div
+          className={`relative z-10 w-6 h-6 rounded-full flex items-center justify-center shadow-md border backdrop-blur-xs ${
+            isDark
+              ? 'bg-gradient-to-tr from-indigo-900 to-slate-800 border-indigo-400/40 text-amber-300 shadow-indigo-500/30'
+              : 'bg-gradient-to-tr from-amber-400 to-yellow-300 border-amber-200 text-amber-900 shadow-amber-500/40'
           }`}
-        />
-        <Moon
-          className={`w-5 h-5 text-blue-400 transition-all duration-500 transform ${
-            isDark ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0 absolute'
-          }`}
-        />
-      </div>
+          animate={{
+            x: isDark ? 24 : 0,
+            rotate: isDark ? 360 : 0,
+          }}
+          transition={{
+            type: 'spring',
+            stiffness: 500,
+            damping: 30,
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {isDark ? (
+              <motion.div
+                key="moon-icon"
+                initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Moon className="w-3.5 h-3.5 text-amber-300 fill-amber-300/20" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="sun-icon"
+                initial={{ opacity: 0, rotate: 90, scale: 0.5 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Sun className="w-3.5 h-3.5 text-amber-950 fill-amber-900/20" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </button>
+
       {showText && (
-        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+        <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+          <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-indigo-400 shadow-[0_0_6px_#818cf8]' : 'bg-amber-500 shadow-[0_0_6px_#f59e0b]'}`} />
           {isDark ? 'Dark Mode' : 'Light Mode'}
         </span>
       )}
-      <span className="sr-only">Toggle mode</span>
-    </button>
+    </div>
   );
 }
 
