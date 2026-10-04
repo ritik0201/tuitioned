@@ -62,14 +62,14 @@ export default function Home() {
     {/* Hero Section */}
     <section className="relative w-full min-h-screen flex flex-col items-center justify-center overflow-hidden px-4 sm:px-6 lg:px-8">
       {/* Background Grid */}
-      <div className="absolute inset-0 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
+      <div className="absolute inset-0 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)]"></div>
 
-      {/* Spotlight Effect  hy*/}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      {/* Spotlight Effect */}
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.08)_0%,transparent_70%)]"></div>
 
       {/* Content */}
       <div className="relative z-10 text-center">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           Expert Online Tutoring
         </h1>
         <p className="mt-6 text-lg md:text-xl max-w-3xl mx-auto text-muted-foreground">
@@ -77,10 +77,10 @@ export default function Home() {
         </p>
         <div className="mt-8 flex justify-center gap-4">
           <a href="/get-a-free-trial">
-            <RippleButton className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white rounded-lg shadow-md border-white border-solid border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 transform hover:scale-105">
+            <RippleButton className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md border-blue-500 border-solid border-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-300 transform hover:scale-105">
               <span className="flex items-center">
                 Get a Free Trial
-                <GoArrowRight className="ml-2" />  /
+                <GoArrowRight className="ml-2" />
               </span>
             </RippleButton>
           </a>
@@ -98,7 +98,7 @@ export default function Home() {
       <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
         <div className="max-w-2xl mx-auto lg:text-center">
           <h2 className="text-base font-semibold leading-7 text-blue-500">Why Choose Tuitioned?</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
             A Better Learning Experience
           </p>
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
@@ -112,10 +112,10 @@ export default function Home() {
             {/* SpotlightCard 1 */}
             <SpotlightCard
               spotlightColor="rgba(59, 130, 246, 0.2)"
-              className="relative h-full bg-gray-800 border border-blue-500 rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.2)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.35)] hover:scale-[1.03] before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-blue-500/10 before:to-transparent before:animate-pulse"
+              className="relative h-full bg-card border border-blue-500/30 rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)] hover:scale-[1.03]"
             >
               <div className="flex flex-col h-full p-6 relative z-10">
-                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-foreground">
                   <GoZap className="h-5 w-5 flex-none text-blue-500" aria-hidden="true" />
                   Tailored Learning
                 </dt>
@@ -132,10 +132,10 @@ export default function Home() {
             {/* SpotlightCard 2 */}
             <SpotlightCard
               spotlightColor="rgba(59, 130, 246, 0.2)"
-              className="relative h-full bg-gray-800 border border-blue-500 rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.2)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.35)] hover:scale-[1.03] before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-blue-500/10 before:to-transparent before:animate-pulse"
+              className="relative h-full bg-card border border-blue-500/30 rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)] hover:scale-[1.03]"
             >
               <div className="flex flex-col h-full p-6 relative z-10">
-                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-foreground">
                   <GoShieldCheck className="h-5 w-5 flex-none text-blue-500" aria-hidden="true" />
                   Expert Guidance
                 </dt>
@@ -151,10 +151,10 @@ export default function Home() {
             {/* SpotlightCard 3 */}
             <SpotlightCard
               spotlightColor="rgba(59, 130, 246, 0.2)"
-              className="relative h-full bg-gray-800 border border-blue-500 rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.2)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.35)] hover:scale-[1.03] before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-blue-500/10 before:to-transparent before:animate-pulse"
+              className="relative h-full bg-card border border-blue-500/30 rounded-2xl shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.3)] hover:scale-[1.03]"
             >
               <div className="flex flex-col h-full p-6 relative z-10">
-                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7">
+                <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-foreground">
                   <GoPeople className="h-5 w-5 flex-none text-blue-500" aria-hidden="true" />
                   Community Engagement
                 </dt>
@@ -183,7 +183,7 @@ export default function Home() {
       <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
         <div className="max-w-2xl mx-auto lg:text-center mb-16">
           <h2 className="text-base font-semibold leading-7 text-blue-500">How It Works</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl text-slate-900 dark:text-white">
             A Glimpse Into Our Process
           </p>
         </div>
@@ -215,10 +215,10 @@ export default function Home() {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: '12px', px: 2 }}>
-                  <Typography variant="h6" component="span">
+                  <Typography variant="h6" component="span" sx={{ color: 'text.primary' }}>
                     Sign Up
                   </Typography>
-                  <Typography>Create your account to get started.</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>Create your account to get started.</Typography>
                 </TimelineContent>
               </TimelineItem>
 
@@ -235,10 +235,10 @@ export default function Home() {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: '12px', px: 2 }}>
-                  <Typography variant="h6" component="span">
+                  <Typography variant="h6" component="span" sx={{ color: 'text.primary' }}>
                     Explore Tutors
                   </Typography>
-                  <Typography>Find the perfect mentor for your needs.</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>Find the perfect mentor for your needs.</Typography>
                 </TimelineContent>
               </TimelineItem>
 
@@ -255,10 +255,10 @@ export default function Home() {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: '12px', px: 2 }}>
-                  <Typography variant="h6" component="span">
+                  <Typography variant="h6" component="span" sx={{ color: 'text.primary' }}>
                     Book a Free Trial
                   </Typography>
-                  <Typography>Schedule a demo session at your convenience.</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>Schedule a demo session at your convenience.</Typography>
                 </TimelineContent>
               </TimelineItem>
 
@@ -275,10 +275,10 @@ export default function Home() {
                   <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: '12px', px: 2 }}>
-                  <Typography variant="h6" component="span">
+                  <Typography variant="h6" component="span" sx={{ color: 'text.primary' }}>
                     Start Learning
                   </Typography>
-                  <Typography>Attend your trial and begin your journey!</Typography>
+                  <Typography sx={{ color: 'text.secondary' }}>Attend your trial and begin your journey!</Typography>
                 </TimelineContent>
               </TimelineItem>
             </Timeline>
@@ -292,26 +292,26 @@ export default function Home() {
       <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="text-lg font-semibold leading-8 tracking-tight text-blue-500">Testimonials</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl text-slate-900 dark:text-white">
             Loved by learners worldwide
           </p>
         </div>
         <div className="mx-auto mt-16 flow-root max-w-2xl sm:mt-20 lg:mx-0 lg:max-w-none">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <SpotlightCard className="bg-gray-800 border border-blue-500">
+            <SpotlightCard className="bg-card border border-blue-500/30 text-card-foreground shadow-lg">
               <blockquote className="p-8 h-full">
                 <p className="text-lg text-muted-foreground">"This platform transformed the way I learn. The interactive lessons and expert feedback are invaluable. I've progressed more in the last 3 months than I did in 3 years of self-study."</p>
                 <footer className="mt-6">
-                  <p className="font-semibold">Alex Johnson</p>
+                  <p className="font-semibold text-foreground">Alex Johnson</p>
                   <p className="text-sm text-muted-foreground">Web Development Student</p>
                 </footer>
               </blockquote>
             </SpotlightCard>
-            <SpotlightCard className="bg-gray-800 border border-blue-500">
+            <SpotlightCard className="bg-card border border-blue-500/30 text-card-foreground shadow-lg">
               <blockquote className="p-8 h-full">
                 <p className="text-lg text-muted-foreground">"As an educator, I'm always looking for tools that make teaching more effective. The community features and progress tracking have made my job so much easier and more rewarding."</p>
                 <footer className="mt-6">
-                  <p className="font-semibold">Maria Garcia</p>
+                  <p className="font-semibold text-foreground">Maria Garcia</p>
                   <p className="text-sm text-muted-foreground">University Professor</p>
                 </footer>
               </blockquote>
@@ -326,7 +326,7 @@ export default function Home() {
       <div className="container mx-auto px-6 lg:px-8 max-w-7xl">
         <div className="max-w-2xl mx-auto lg:text-center">
           <h2 className="text-base font-semibold leading-7 text-blue-500">Our Tutors</h2>
-          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">The Experts Behind Your Success</p>
+          <p className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl text-slate-900 dark:text-white">The Experts Behind Your Success</p>
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
             Our dedicated team of educators and professionals are here to guide you on your learning journey.
           </p>

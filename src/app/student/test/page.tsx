@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, CheckCircle, XCircle, Rocket, Sparkles, BookOpen, GraduationCap, Hash, Trophy, RotateCcw, Star, Target, Lightbulb, ArrowRight, Zap, Check } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Rocket, Sparkles, BookOpen, GraduationCap, Hash, Trophy, RotateCcw, Star, Target, Lightbulb, ArrowRight, Zap, Check, Calculator, Globe, Code2, FlaskConical } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface Question {
@@ -17,12 +17,12 @@ interface Question {
 }
 
 const TOPIC_SUGGESTIONS = [
-  { label: '📐 Mathematics', value: 'Mathematics & Algebra' },
-  { label: '🪐 Solar System', value: 'Astronomy & Solar System' },
-  { label: '🐍 Python Coding', value: 'Python Programming Basics' },
-  { label: '📚 English Grammar', value: 'English Grammar & Vocabulary' },
-  { label: '🧪 Chemistry Lab', value: 'Chemistry Elements & Reactions' },
-  { label: '⚡ Physics Motion', value: 'Laws of Physics & Motion' }
+  { label: 'Mathematics', value: 'Mathematics & Algebra', icon: Calculator },
+  { label: 'Solar System', value: 'Astronomy & Solar System', icon: Globe },
+  { label: 'Python Coding', value: 'Python Programming Basics', icon: Code2 },
+  { label: 'English Grammar', value: 'English Grammar & Vocabulary', icon: BookOpen },
+  { label: 'Chemistry Lab', value: 'Chemistry Elements & Reactions', icon: FlaskConical },
+  { label: 'Physics Motion', value: 'Laws of Physics & Motion', icon: Zap }
 ];
 
 export default function TestPage() {
@@ -121,36 +121,36 @@ Do not include any other text, just the JSON array.`;
   const filledAnswersCount = answers.filter(a => a !== -1).length;
 
   return (
-    <div className="w-full bg-slate-950 text-slate-100 py-4 px-2 font-sans select-none">
+    <div className="w-full bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-4 px-2 font-sans select-none transition-colors duration-200">
       <div className="container mx-auto max-w-4xl space-y-6">
         {/* Header */}
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-none shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-none shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
           <div className="space-y-1 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-950 border border-indigo-500/40 text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-none">
-              <Zap className="h-3 w-3 text-yellow-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-500/40 text-indigo-700 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-none">
+              <Zap className="h-3 w-3 text-amber-500 dark:text-yellow-400" />
               AI Quiz Studio
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black uppercase text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-black uppercase text-slate-900 dark:text-white tracking-tight">
               Academic Assessment
             </h1>
-            <p className="text-xs text-slate-400 font-medium">Generate instant quizzes for any grade or topic!</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Generate instant quizzes for any grade or topic!</p>
           </div>
 
           <div className="flex items-center gap-3 relative z-10">
-            <Badge className="px-3 py-1.5 rounded-none font-black text-xs uppercase bg-slate-950 text-slate-300 border border-slate-800">
+            <Badge className="px-3 py-1.5 rounded-none font-black text-xs uppercase bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800">
               Grade {classLevel}
             </Badge>
-            <Badge className="px-3 py-1.5 rounded-none font-black text-xs uppercase bg-indigo-950 text-indigo-300 border border-indigo-500/40">
+            <Badge className="px-3 py-1.5 rounded-none font-black text-xs uppercase bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-500/40">
               {numQuestions} Questions
             </Badge>
           </div>
         </div>
 
         {!questions.length && !isGenerating && (
-          <Card className="border border-slate-800 rounded-none bg-slate-900 shadow-xl overflow-hidden">
-            <CardHeader className="bg-slate-950 border-b border-slate-800 py-4 px-6">
-              <CardTitle className="text-lg font-black uppercase text-indigo-400 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-indigo-400" />
+          <Card className="border border-slate-200 dark:border-slate-800 rounded-none bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+            <CardHeader className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 py-4 px-6">
+              <CardTitle className="text-lg font-black uppercase text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                 Configure Quiz
               </CardTitle>
             </CardHeader>
@@ -158,35 +158,39 @@ Do not include any other text, just the JSON array.`;
             <CardContent className="p-6 space-y-6">
               {/* Topic Input */}
               <div className="space-y-3">
-                <Label htmlFor="topic" className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-purple-400" /> Enter Topic or Subject
+                <Label htmlFor="topic" className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-purple-600 dark:text-purple-400" /> Enter Topic or Subject
                 </Label>
                 <Input
                   id="topic"
                   placeholder="e.g. Linear Equations, Solar System, Python Loops..."
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  className="text-sm font-bold py-3 px-4 rounded-none border border-slate-800 bg-slate-950 text-white placeholder:text-slate-600 focus-visible:ring-indigo-500"
+                  className="text-sm font-bold py-3 px-4 rounded-none border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 focus-visible:ring-indigo-500"
                 />
 
                 {/* Quick Topic Chips */}
                 <div className="space-y-2 pt-1">
                   <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest block">Quick Suggestions:</span>
                   <div className="flex flex-wrap gap-2">
-                    {TOPIC_SUGGESTIONS.map((chip, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setTopic(chip.value)}
-                        className={`text-xs font-bold px-3 py-1.5 rounded-none border transition-all cursor-pointer ${
-                          topic === chip.value
-                            ? 'bg-indigo-600 text-white border-indigo-400 shadow-md'
-                            : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700 hover:text-slate-200'
-                        }`}
-                      >
-                        {chip.label}
-                      </button>
-                    ))}
+                    {TOPIC_SUGGESTIONS.map((chip, idx) => {
+                      const ChipIcon = chip.icon;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => setTopic(chip.value)}
+                          className={`text-xs font-bold px-3 py-1.5 rounded-none border transition-all cursor-pointer flex items-center gap-1.5 ${
+                            topic === chip.value
+                              ? 'bg-indigo-600 text-white border-indigo-400 shadow-md'
+                              : 'bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-400 border-slate-300 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-700 hover:text-slate-900 dark:hover:text-slate-200'
+                          }`}
+                        >
+                          <ChipIcon className="w-3.5 h-3.5 shrink-0" />
+                          <span>{chip.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -194,14 +198,14 @@ Do not include any other text, just the JSON array.`;
               {/* Grid Options */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="classLevel" className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-green-400" /> Target Grade
+                  <Label htmlFor="classLevel" className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <GraduationCap className="h-4 w-4 text-emerald-600 dark:text-green-400" /> Target Grade
                   </Label>
                   <Select value={classLevel} onValueChange={setClassLevel}>
-                    <SelectTrigger className="text-xs font-bold py-3 rounded-none border border-slate-800 bg-slate-950 text-slate-100">
+                    <SelectTrigger className="text-xs font-bold py-3 rounded-none border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
                       <SelectValue placeholder="Select Grade" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-none border border-slate-800 bg-slate-900 text-slate-100">
+                    <SelectContent className="rounded-none border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
                       {Array.from({ length: 12 }).map((_, i) => (
                         <SelectItem key={i} value={`${i + 1}`} className="text-xs font-bold cursor-pointer rounded-none">
                           Grade {i + 1}
@@ -212,14 +216,14 @@ Do not include any other text, just the JSON array.`;
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="numQuestions" className="text-xs font-black uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                    <Hash className="h-4 w-4 text-amber-400" /> Number of Questions
+                  <Label htmlFor="numQuestions" className="text-xs font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                    <Hash className="h-4 w-4 text-amber-600 dark:text-amber-400" /> Number of Questions
                   </Label>
                   <Select value={numQuestions} onValueChange={setNumQuestions}>
-                    <SelectTrigger className="text-xs font-bold py-3 rounded-none border border-slate-800 bg-slate-950 text-slate-100">
+                    <SelectTrigger className="text-xs font-bold py-3 rounded-none border border-slate-300 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-none border border-slate-800 bg-slate-900 text-slate-100">
+                    <SelectContent className="rounded-none border border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
                       <SelectItem value="5" className="text-xs font-bold cursor-pointer rounded-none">5 Questions (Quick)</SelectItem>
                       <SelectItem value="10" className="text-xs font-bold cursor-pointer rounded-none">10 Questions (Standard)</SelectItem>
                       <SelectItem value="15" className="text-xs font-bold cursor-pointer rounded-none">15 Questions (Challenge)</SelectItem>
@@ -229,8 +233,8 @@ Do not include any other text, just the JSON array.`;
               </div>
 
               {error && (
-                <Alert variant="destructive" className="rounded-none border border-red-500/50 bg-red-950/50">
-                  <AlertDescription className="text-red-400 font-bold text-xs">{error}</AlertDescription>
+                <Alert variant="destructive" className="rounded-none border border-red-500/50 bg-red-500/10">
+                  <AlertDescription className="text-red-600 dark:text-red-400 font-bold text-xs">{error}</AlertDescription>
                 </Alert>
               )}
 
@@ -246,7 +250,7 @@ Do not include any other text, just the JSON array.`;
                   </div>
                 ) : (
                   <span className="flex items-center justify-center gap-2">
-                    ⚡ Generate Custom Quiz <ArrowRight className="h-4 w-4 ml-1" />
+                    <Zap className="h-4 w-4 text-amber-400 fill-amber-400" /> Generate Custom Quiz <ArrowRight className="h-4 w-4 ml-1" />
                   </span>
                 )}
               </Button>
@@ -255,12 +259,12 @@ Do not include any other text, just the JSON array.`;
         )}
 
         {isGenerating && (
-          <Card className="border border-indigo-500/50 rounded-none bg-slate-900 shadow-xl">
+          <Card className="border border-indigo-500/50 rounded-none bg-white dark:bg-slate-900 shadow-xl">
             <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
-              <Sparkles className="h-12 w-12 animate-pulse text-indigo-400" />
+              <Sparkles className="h-12 w-12 animate-pulse text-indigo-600 dark:text-indigo-400" />
               <div className="space-y-1 text-center">
-                <h3 className="text-lg font-black uppercase text-white tracking-wider">Crafting Questions with AI...</h3>
-                <p className="text-xs text-slate-400 font-medium">Analyzing {topic} for Grade {classLevel} assessment.</p>
+                <h3 className="text-lg font-black uppercase text-slate-900 dark:text-white tracking-wider">Crafting Questions with AI...</h3>
+                <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Analyzing {topic} for Grade {classLevel} assessment.</p>
               </div>
             </CardContent>
           </Card>
@@ -269,18 +273,18 @@ Do not include any other text, just the JSON array.`;
         {questions.length > 0 && !isSubmitted && (
           <div className="space-y-6">
             {/* Status Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 p-5 rounded-none border border-slate-800 shadow-md">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-800 shadow-sm">
               <div className="space-y-1">
-                <span className="text-[10px] font-black uppercase text-indigo-400 tracking-widest">Active Quiz</span>
-                <h2 className="text-lg font-black uppercase text-white">{topic}</h2>
+                <span className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest">Active Quiz</span>
+                <h2 className="text-lg font-black uppercase text-slate-900 dark:text-white">{topic}</h2>
               </div>
               <div className="flex items-center gap-3">
-                <span className="text-xs font-bold text-slate-400">
-                  Answered: <strong className="text-indigo-400">{filledAnswersCount} / {questions.length}</strong>
+                <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
+                  Answered: <strong className="text-indigo-600 dark:text-indigo-400">{filledAnswersCount} / {questions.length}</strong>
                 </span>
                 <button
                   onClick={resetTest}
-                  className="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-none text-xs font-black uppercase cursor-pointer transition"
+                  className="px-3 py-1.5 bg-slate-100 dark:bg-slate-950 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-800 rounded-none text-xs font-black uppercase cursor-pointer transition"
                 >
                   <RotateCcw className="w-3.5 h-3.5 inline mr-1" /> Reset
                 </button>
@@ -290,23 +294,23 @@ Do not include any other text, just the JSON array.`;
             {/* Questions List */}
             <div className="space-y-4">
               {questions.map((q, qIndex) => (
-                <Card key={qIndex} className="border border-slate-800 rounded-none bg-slate-900 shadow-md overflow-hidden">
-                  <CardHeader className="bg-slate-950 border-b border-slate-800 py-3 px-5 flex flex-row items-center justify-between">
+                <Card key={qIndex} className="border border-slate-200 dark:border-slate-800 rounded-none bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+                  <CardHeader className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 py-3 px-5 flex flex-row items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 bg-indigo-950 border border-indigo-500/50 text-indigo-400 text-xs font-black flex items-center justify-center rounded-none">
+                      <span className="w-6 h-6 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-500/50 text-indigo-700 dark:text-indigo-400 text-xs font-black flex items-center justify-center rounded-none">
                         {qIndex + 1}
                       </span>
-                      <span className="text-xs font-black uppercase text-slate-400 tracking-wider">Question #{qIndex + 1}</span>
+                      <span className="text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">Question #{qIndex + 1}</span>
                     </div>
                     {answers[qIndex] !== -1 && (
-                      <span className="text-[10px] font-black uppercase text-green-400 flex items-center gap-1">
+                      <span className="text-[10px] font-black uppercase text-green-600 dark:text-green-400 flex items-center gap-1">
                         <Check className="w-3 h-3" /> Answered
                       </span>
                     )}
                   </CardHeader>
 
                   <CardContent className="p-5 space-y-4">
-                    <p className="text-sm font-bold text-slate-100 leading-snug">{q.question}</p>
+                    <p className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">{q.question}</p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {q.options.map((option, oIndex) => {
@@ -319,12 +323,12 @@ Do not include any other text, just the JSON array.`;
                             onClick={() => handleAnswerChange(qIndex, oIndex)}
                             className={`p-3.5 rounded-none border text-left flex items-start gap-3 transition-all cursor-pointer ${
                               isSelected
-                                ? 'border-indigo-400 bg-indigo-950/40 text-white shadow-md'
-                                : 'border-slate-800 bg-slate-950/60 hover:border-slate-700 text-slate-300 hover:bg-slate-950'
+                                ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40 text-slate-900 dark:text-white shadow-md'
+                                : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/60 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-950'
                             }`}
                           >
                             <span className={`w-5 h-5 flex-shrink-0 flex items-center justify-center text-xs font-black border ${
-                              isSelected ? 'bg-indigo-600 text-white border-indigo-400' : 'bg-slate-900 text-slate-400 border-slate-700'
+                              isSelected ? 'bg-indigo-600 text-white border-indigo-400' : 'bg-slate-200 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700'
                             }`}>
                               {optionLabels[oIndex]}
                             </span>
@@ -352,45 +356,45 @@ Do not include any other text, just the JSON array.`;
         )}
 
         {isSubmitted && (
-          <Card className="border border-emerald-500/50 rounded-none bg-slate-900 shadow-xl overflow-hidden">
-            <CardHeader className="bg-slate-950 border-b border-slate-800 py-6 text-center">
-              <Trophy className="h-10 w-10 text-amber-400 mx-auto mb-2" />
-              <CardTitle className="text-2xl font-black uppercase text-emerald-400 tracking-wider">
+          <Card className="border border-emerald-500/50 rounded-none bg-white dark:bg-slate-900 shadow-xl overflow-hidden">
+            <CardHeader className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 py-6 text-center">
+              <Trophy className="h-10 w-10 text-amber-500 dark:text-amber-400 mx-auto mb-2" />
+              <CardTitle className="text-2xl font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
                 Assessment Completed!
               </CardTitle>
             </CardHeader>
 
             <CardContent className="p-6 text-center space-y-6">
-              <div className="bg-slate-950 border border-slate-800 p-6 rounded-none max-w-xs mx-auto space-y-2">
+              <div className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 p-6 rounded-none max-w-xs mx-auto space-y-2">
                 <span className="text-[10px] font-black uppercase text-slate-500 tracking-widest block">Final Score</span>
-                <div className="text-5xl font-black text-amber-400 flex items-baseline justify-center gap-1">
-                  {score}<span className="text-2xl text-slate-500">/{questions.length}</span>
+                <div className="text-5xl font-black text-amber-500 dark:text-amber-400 flex items-baseline justify-center gap-1">
+                  {score}<span className="text-2xl text-slate-400 dark:text-slate-500">/{questions.length}</span>
                 </div>
-                <p className="text-xs font-bold text-emerald-400">
+                <p className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
                   {Math.round((score / questions.length) * 100)}% Accuracy
                 </p>
               </div>
 
               {/* Review Answers */}
               <div className="space-y-3 max-w-2xl mx-auto text-left pt-2">
-                <h4 className="text-xs font-black uppercase text-slate-300 flex items-center justify-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-amber-400" /> Answer Review
+                <h4 className="text-xs font-black uppercase text-slate-800 dark:text-slate-300 flex items-center justify-center gap-2">
+                  <Lightbulb className="h-4 w-4 text-amber-500 dark:text-amber-400" /> Answer Review
                 </h4>
                 {questions.map((q, qIndex) => {
                   const isCorrect = answers[qIndex] === q.correctAnswer;
                   return (
-                    <div key={qIndex} className={`p-4 border rounded-none text-xs space-y-2 ${isCorrect ? 'border-emerald-500/40 bg-slate-950' : 'border-red-500/40 bg-slate-950'}`}>
+                    <div key={qIndex} className={`p-4 border rounded-none text-xs space-y-2 ${isCorrect ? 'border-emerald-500/40 bg-slate-50 dark:bg-slate-950' : 'border-red-500/40 bg-slate-50 dark:bg-slate-950'}`}>
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-slate-200">
+                        <span className="font-bold text-slate-900 dark:text-slate-200">
                           Q{qIndex + 1}: {q.question}
                         </span>
-                        <span className={`font-black uppercase text-[10px] px-2 py-0.5 border ${isCorrect ? 'bg-emerald-950 text-emerald-300 border-emerald-800' : 'bg-red-950 text-red-300 border-red-800'}`}>
+                        <span className={`font-black uppercase text-[10px] px-2 py-0.5 border ${isCorrect ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'}`}>
                           {isCorrect ? 'Correct ✓' : 'Incorrect ✕'}
                         </span>
                       </div>
 
-                      <div className="text-slate-400 text-xs">
-                        Correct Answer: <strong className="text-slate-200">{q.options[q.correctAnswer]}</strong>
+                      <div className="text-slate-600 dark:text-slate-400 text-xs">
+                        Correct Answer: <strong className="text-slate-900 dark:text-slate-200">{q.options[q.correctAnswer]}</strong>
                       </div>
                     </div>
                   );

@@ -318,13 +318,13 @@ const recipientGroups = [
 ];
 
 const textfieldStyles = {
-  bgcolor: 'rgba(255, 255, 255, 0.03)',
+  bgcolor: 'action.hover',
   '& .MuiOutlinedInput-root': { borderRadius: 3 },
-  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.5)' },
+  '& .MuiInputLabel-root': { color: 'text.secondary' },
   '& .MuiInputLabel-root.Mui-focused': { color: '#6366f1' },
-  '& .MuiOutlinedInput-input': { color: 'white', fontWeight: 500 },
-  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.08)' },
-  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+  '& .MuiOutlinedInput-input': { color: 'text.primary', fontWeight: 500 },
+  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
+  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#6366f1' },
   '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#6366f1' },
 };
 
@@ -706,19 +706,19 @@ export default function BulkMailPage() {
               <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#818cf8', display: 'flex' }}>
                 <Mail size={24} />
               </Box>
-              <Typography variant="overline" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 800, letterSpacing: '0.15em' }}>
+              <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '0.15em' }}>
                 COMMUNICATIONS ENGINE
               </Typography>
             </Box>
-            <Typography variant="h2" fontWeight="900" sx={{ color: 'white', tracking: '-0.04em', mb: 1.5 }}>
+            <Typography variant="h2" fontWeight="900" sx={{ color: 'text.primary', tracking: '-0.04em', mb: 1.5 }}>
               Bulk <span className="text-indigo-500">Messaging</span>
             </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)', maxWidth: 700, fontWeight: 500, lineHeight: 1.6 }}>
+            <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 700, fontWeight: 500, lineHeight: 1.6 }}>
               Select presets, customize branding styles, preview emails instantly, select specific recipients, and schedule campaigns with safe rate limits.
             </Typography>
           </Box>
           <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
-            <Avatar sx={{ width: 80, height: 80, bgcolor: 'rgba(99, 102, 241, 0.05)', border: '1px solid rgba(99, 102, 241, 0.1)', color: '#818cf8' }}>
+            <Avatar sx={{ width: 80, height: 80, bgcolor: 'rgba(99, 102, 241, 0.05)', border: '1px solid', borderColor: 'divider', color: '#818cf8' }}>
               <Send size={40} />
             </Avatar>
           </Box>
@@ -736,24 +736,25 @@ export default function BulkMailPage() {
           <motion.div key={group.value} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: idx * 0.05 }}>
             <Box sx={{
               p: 2.5,
-              bgcolor: 'rgba(255, 255, 255, 0.02)',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
+              bgcolor: 'background.paper',
+              border: '1px solid',
+              borderColor: 'divider',
               borderRadius: 5,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               gap: 1.5,
               transition: 'all 0.3s',
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.04)', borderColor: `${group.color}40` }
+              '&:hover': { bgcolor: 'action.hover', borderColor: `${group.color}40` }
             }}>
               <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: `${group.color}15`, color: group.color, display: 'flex' }}>
                 {group.icon}
               </Box>
               <Box sx={{ textCenter: 'center', textAlign: 'center' }}>
-                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   {group.label.split(' ')[0]}
                 </Typography>
-                <Typography variant="h6" sx={{ fontWeight: 900, color: 'white' }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, color: 'text.primary' }}>
                   {statsLoading ? <CircularProgress size={16} sx={{ color: group.color }} /> : (stats?.[group.value] || 0)}
                 </Typography>
               </Box>
@@ -773,13 +774,14 @@ export default function BulkMailPage() {
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
           <Box sx={{
             p: { xs: 3, md: 5 },
-            bgcolor: 'rgba(255, 255, 255, 0.02)',
+            bgcolor: 'background.paper',
             borderRadius: 8,
-            border: '1px solid rgba(255, 255, 255, 0.05)',
+            border: '1px solid',
+            borderColor: 'divider',
             backdropFilter: 'blur(10px)'
           }}>
             {/* Template Presets selector */}
-            <Typography variant="subtitle2" sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800, letterSpacing: '0.05em' }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary', fontWeight: 800, letterSpacing: '0.05em' }}>
               SELECT DESIGN PRESET TEMPLATE
             </Typography>
             <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 2, mb: 4 }}>
@@ -791,23 +793,23 @@ export default function BulkMailPage() {
                     p: 2,
                     cursor: 'pointer',
                     borderRadius: 4,
-                    bgcolor: templateType === option.type ? 'rgba(255, 255, 255, 0.04)' : 'rgba(255, 255, 255, 0.01)',
+                    bgcolor: templateType === option.type ? 'action.selected' : 'action.hover',
                     border: '1px solid',
-                    borderColor: templateType === option.type ? option.accent : 'rgba(255, 255, 255, 0.05)',
+                    borderColor: templateType === option.type ? option.accent : 'divider',
                     boxShadow: templateType === option.type ? `0 0 12px ${option.accent}20` : 'none',
                     transition: 'all 0.2s ease',
                     '&:hover': {
-                      bgcolor: 'rgba(255, 255, 255, 0.03)',
-                      borderColor: templateType === option.type ? option.accent : 'rgba(255, 255, 255, 0.15)',
+                      bgcolor: 'action.hover',
+                      borderColor: templateType === option.type ? option.accent : '#6366f1',
                       transform: 'translateY(-2px)'
                     }
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1, color: option.accent }}>
                     {option.icon}
-                    <Typography fontWeight="800" variant="body2" sx={{ color: 'white' }}>{option.label}</Typography>
+                    <Typography fontWeight="800" variant="body2" sx={{ color: 'text.primary' }}>{option.label}</Typography>
                   </Box>
-                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 500 }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                     {option.desc}
                   </Typography>
                 </Box>
@@ -816,7 +818,7 @@ export default function BulkMailPage() {
 
             <Stack spacing={3}>
               <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1.5, color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800, letterSpacing: '0.05em' }}>
+                <Typography variant="subtitle2" sx={{ mb: 1.5, color: 'text.secondary', fontWeight: 800, letterSpacing: '0.05em' }}>
                   CAMPAIGN SUBJECT
                 </Typography>
                 <TextField
@@ -830,7 +832,7 @@ export default function BulkMailPage() {
               </Box>
 
               <Box>
-                <Typography variant="subtitle2" sx={{ mb: 1.5, color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800, letterSpacing: '0.05em' }}>
+                <Typography variant="subtitle2" sx={{ mb: 1.5, color: 'text.secondary', fontWeight: 800, letterSpacing: '0.05em' }}>
                   MESSAGE CONTENT (Supports HTML and [Name] Tag)
                 </Typography>
                 <TextField
@@ -844,14 +846,14 @@ export default function BulkMailPage() {
                   sx={{
                     ...textfieldStyles,
                     '& .MuiOutlinedInput-root': { borderRadius: 3, p: 2.5 },
-                    '& .MuiOutlinedInput-input': { color: 'white', lineHeight: 1.7, fontWeight: 500 }
+                    '& .MuiOutlinedInput-input': { color: 'text.primary', lineHeight: 1.7, fontWeight: 500 }
                   }}
                 />
               </Box>
 
               {/* Branding Customization Section */}
-              <Box sx={{ bgcolor: 'rgba(255, 255, 255, 0.01)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: 4, p: 3 }}>
-                <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 800, mb: 2.5, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ bgcolor: 'action.hover', border: '1px solid', borderColor: 'divider', borderRadius: 4, p: 3 }}>
+                <Typography variant="subtitle2" sx={{ color: 'text.primary', fontWeight: 800, mb: 2.5, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Palette size={18} className="text-indigo-400" /> Branding & Call To Action Customizer
                 </Typography>
                 <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1.5fr' }, gap: 2, mb: 2.5 }}>
@@ -918,24 +920,24 @@ export default function BulkMailPage() {
                 {/* Color Inputs */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2 }}>
                   <Box>
-                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, mb: 0.5, display: 'block' }}>ACCENT COLOR</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.02)', p: 0.8, borderRadius: 2, border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, mb: 0.5, display: 'block' }}>ACCENT COLOR</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'background.paper', p: 0.8, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                       <input type="color" value={accentColor} onChange={(e) => setAccentColor(e.target.value)} style={{ border: 'none', background: 'none', width: 28, height: 28, cursor: 'pointer', borderRadius: 4 }} />
-                      <Typography variant="caption" sx={{ color: 'white', fontWeight: 600, fontFamily: 'monospace' }}>{accentColor}</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 600, fontFamily: 'monospace' }}>{accentColor}</Typography>
                     </Box>
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, mb: 0.5, display: 'block' }}>OUTER BG COLOR</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.02)', p: 0.8, borderRadius: 2, border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, mb: 0.5, display: 'block' }}>OUTER BG COLOR</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'background.paper', p: 0.8, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                       <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} style={{ border: 'none', background: 'none', width: 28, height: 28, cursor: 'pointer', borderRadius: 4 }} />
-                      <Typography variant="caption" sx={{ color: 'white', fontWeight: 600, fontFamily: 'monospace' }}>{bgColor}</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 600, fontFamily: 'monospace' }}>{bgColor}</Typography>
                     </Box>
                   </Box>
                   <Box>
-                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, mb: 0.5, display: 'block' }}>TEXT COLOR</Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'rgba(255,255,255,0.02)', p: 0.8, borderRadius: 2, border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, mb: 0.5, display: 'block' }}>TEXT COLOR</Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: 'background.paper', p: 0.8, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                       <input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} style={{ border: 'none', background: 'none', width: 28, height: 28, cursor: 'pointer', borderRadius: 4 }} />
-                      <Typography variant="caption" sx={{ color: 'white', fontWeight: 600, fontFamily: 'monospace' }}>{textColor}</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 600, fontFamily: 'monospace' }}>{textColor}</Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -948,19 +950,20 @@ export default function BulkMailPage() {
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
           <Box sx={{
             p: 4,
-            bgcolor: 'rgba(255, 255, 255, 0.02)',
+            bgcolor: 'background.paper',
             borderRadius: 8,
-            border: '1px solid rgba(255, 255, 255, 0.05)',
+            border: '1px solid',
+            borderColor: 'divider',
             height: '100%',
             display: 'flex',
             flexDirection: 'column'
           }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="subtitle2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Eye size={18} className="text-indigo-400" /> LIVE COMPILER PREVIEW
               </Typography>
 
-              <Box sx={{ display: 'flex', gap: 0.5, bgcolor: 'rgba(255,255,255,0.03)', p: 0.5, borderRadius: 2, border: '1px solid rgba(255,255,255,0.08)' }}>
+              <Box sx={{ display: 'flex', gap: 0.5, bgcolor: 'action.hover', p: 0.5, borderRadius: 2, border: '1px solid', borderColor: 'divider' }}>
                 <Button
                   size="small"
                   variant={previewMode === 'desktop' ? 'contained' : 'text'}
@@ -971,9 +974,9 @@ export default function BulkMailPage() {
                     fontWeight: 700,
                     fontSize: '11px',
                     bgcolor: previewMode === 'desktop' ? '#6366f1' : 'transparent',
-                    color: 'white',
+                    color: previewMode === 'desktop' ? '#ffffff' : 'text.primary',
                     py: 0.3,
-                    '&:hover': { bgcolor: previewMode === 'desktop' ? '#4f46e5' : 'rgba(255,255,255,0.05)' }
+                    '&:hover': { bgcolor: previewMode === 'desktop' ? '#4f46e5' : 'action.selected' }
                   }}
                 >
                   Desktop
@@ -988,9 +991,9 @@ export default function BulkMailPage() {
                     fontWeight: 700,
                     fontSize: '11px',
                     bgcolor: previewMode === 'mobile' ? '#6366f1' : 'transparent',
-                    color: 'white',
+                    color: previewMode === 'mobile' ? '#ffffff' : 'text.primary',
                     py: 0.3,
-                    '&:hover': { bgcolor: previewMode === 'mobile' ? '#4f46e5' : 'rgba(255,255,255,0.05)' }
+                    '&:hover': { bgcolor: previewMode === 'mobile' ? '#4f46e5' : 'action.selected' }
                   }}
                 >
                   Mobile
@@ -1009,10 +1012,11 @@ export default function BulkMailPage() {
               <Box sx={{
                 width: previewMode === 'desktop' ? '100%' : '340px',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
+                border: '1px solid',
+                borderColor: 'divider',
                 borderRadius: 4,
                 overflow: 'hidden',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
               }}>
                 <Box sx={{ bgcolor: '#1f2937', p: 1.5, display: 'flex', alignItems: 'center', gap: 1, borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                   <Box sx={{ display: 'flex', gap: 0.8 }}>
@@ -1049,7 +1053,7 @@ export default function BulkMailPage() {
                 />
               </Box>
             </Box>
-            <Typography variant="caption" sx={{ mt: 1.5, color: 'rgba(255,255,255,0.3)', display: 'block', textAlign: 'center' }}>
+            <Typography variant="caption" sx={{ mt: 1.5, color: 'text.secondary', display: 'block', textAlign: 'center' }}>
               ℹ Live compiler replaces <b>[Name]</b> placeholder with a sample name (<b>John Doe</b>).
             </Typography>
           </Box>
@@ -1066,15 +1070,16 @@ export default function BulkMailPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <Box sx={{
             p: 4,
-            bgcolor: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
             borderRadius: 6,
             height: '100%',
             display: 'flex',
             flexDirection: 'column'
           }}>
             {/* Recipient selection input */}
-            <Typography variant="subtitle2" sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800, letterSpacing: '0.05em' }}>
+            <Typography variant="subtitle2" sx={{ mb: 2, color: 'text.secondary', fontWeight: 800, letterSpacing: '0.05em' }}>
               TARGET RECIPIENT GROUP
             </Typography>
             <FormControl fullWidth sx={{ mb: 3 }}>
@@ -1083,22 +1088,22 @@ export default function BulkMailPage() {
                 onChange={(e) => setRecipientType(e.target.value)}
                 displayEmpty
                 sx={{
-                  bgcolor: 'rgba(255, 255, 255, 0.03)',
-                  color: 'white',
+                  bgcolor: 'action.hover',
+                  color: 'text.primary',
                   borderRadius: 3,
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.08)' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'divider' },
+                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#6366f1' },
                   '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#6366f1' },
                   '& .MuiSelect-select': { py: 1.8, px: 2.5 }
                 }}
                 renderValue={(selected) => {
-                  if (!selected) return <span style={{ color: 'rgba(255, 255, 255, 0.2)', fontWeight: 500 }}>Select target cohort to load recipients list...</span>;
+                  if (!selected) return <span style={{ color: 'var(--muted-foreground, #94a3b8)', fontWeight: 500 }}>Select target cohort to load recipients list...</span>;
                   const group = recipientGroups.find(g => g.value === selected);
                   return (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Box sx={{ color: group?.color }}>{group?.icon}</Box>
-                      <Typography sx={{ fontWeight: 700 }}>{group?.label}</Typography>
-                      {stats && <Badge variant="outline" className="ml-auto bg-white/5 border-white/10 text-gray-400 font-bold px-3">{(stats as any)[selected as string] || 0} active</Badge>}
+                      <Typography sx={{ fontWeight: 700, color: 'text.primary' }}>{group?.label}</Typography>
+                      {stats && <Badge variant="outline" className="ml-auto bg-primary/10 border-primary/20 text-primary font-bold px-3">{(stats as any)[selected as string] || 0} active</Badge>}
                     </Box>
                   );
                 }}
@@ -1107,7 +1112,7 @@ export default function BulkMailPage() {
                   <MenuItem key={group.value} value={group.value} sx={{ py: 1.5, px: 2.5 }}>
                     <ListItemIcon sx={{ color: group.color }}>{group.icon}</ListItemIcon>
                     <ListItemText
-                      primary={<Typography fontWeight="700">{group.label}</Typography>}
+                      primary={<Typography fontWeight="700" sx={{ color: 'text.primary' }}>{group.label}</Typography>}
                       secondary={stats ? `${stats[group.value] || 0} registered recipients` : 'Calculating...'}
                     />
                   </MenuItem>
@@ -1115,9 +1120,9 @@ export default function BulkMailPage() {
               </Select>
             </FormControl>
 
-            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)', mb: 3 }} />
+            <Divider sx={{ borderColor: 'divider', mb: 3 }} />
 
-            <Typography variant="subtitle2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800, mb: 2, letterSpacing: '0.05em' }}>
+            <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 800, mb: 2, letterSpacing: '0.05em' }}>
               RECIPIENT SELECTOR ({selectedRecipients.length} / {recipients.length} Selected)
             </Typography>
 
@@ -1139,13 +1144,14 @@ export default function BulkMailPage() {
                   onClick={handleSelectAll}
                   disabled={recipients.length === 0}
                   sx={{
-                    bgcolor: 'rgba(255,255,255,0.03)',
-                    color: 'white',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    bgcolor: 'action.hover',
+                    color: 'text.primary',
+                    border: '1px solid',
+                    borderColor: 'divider',
                     textTransform: 'none',
                     fontWeight: 700,
                     px: 2,
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' }
+                    '&:hover': { bgcolor: 'action.selected' }
                   }}
                 >
                   Check All
@@ -1155,13 +1161,14 @@ export default function BulkMailPage() {
                   onClick={handleDeselectAll}
                   disabled={recipients.length === 0}
                   sx={{
-                    bgcolor: 'rgba(255,255,255,0.03)',
-                    color: 'white',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    bgcolor: 'action.hover',
+                    color: 'text.primary',
+                    border: '1px solid',
+                    borderColor: 'divider',
                     textTransform: 'none',
                     fontWeight: 700,
                     px: 2,
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.08)' }
+                    '&:hover': { bgcolor: 'action.selected' }
                   }}
                 >
                   Clear All
@@ -1175,18 +1182,19 @@ export default function BulkMailPage() {
                 <CircularProgress size={32} sx={{ color: '#6366f1' }} />
               </Box>
             ) : recipients.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 8, opacity: 0.3 }}>
+              <Box sx={{ textAlign: 'center', py: 8, opacity: 0.5 }}>
                 <Users size={36} style={{ margin: '0 auto 12px' }} />
-                <Typography variant="body2" fontWeight="700">No recipients loaded</Typography>
-                <Typography variant="caption">Select group from dropdown to list active contacts.</Typography>
+                <Typography variant="body2" fontWeight="700" sx={{ color: 'text.primary' }}>No recipients loaded</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>Select group from dropdown to list active contacts.</Typography>
               </Box>
             ) : (
               <Box sx={{
                 maxHeight: '280px',
                 overflowY: 'auto',
-                border: '1px solid rgba(255,255,255,0.05)',
+                border: '1px solid',
+                borderColor: 'divider',
                 borderRadius: 3,
-                bgcolor: 'rgba(0,0,0,0.1)',
+                bgcolor: 'action.hover',
                 p: 1
               }}>
                 <Stack spacing={0.5}>
@@ -1202,11 +1210,11 @@ export default function BulkMailPage() {
                           p: 1.2,
                           borderRadius: 2,
                           cursor: 'pointer',
-                          bgcolor: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'transparent',
+                          bgcolor: isSelected ? 'rgba(99, 102, 241, 0.12)' : 'transparent',
                           border: '1px solid',
-                          borderColor: isSelected ? 'rgba(99, 102, 241, 0.15)' : 'transparent',
+                          borderColor: isSelected ? 'rgba(99, 102, 241, 0.25)' : 'transparent',
                           '&:hover': {
-                            bgcolor: isSelected ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255,255,255,0.02)'
+                            bgcolor: isSelected ? 'rgba(99, 102, 241, 0.18)' : 'action.hover'
                           },
                           transition: 'all 0.15s'
                         }}
@@ -1215,20 +1223,20 @@ export default function BulkMailPage() {
                           checked={isSelected}
                           onChange={() => { }} // Box onClick does toggle
                           sx={{
-                            color: 'rgba(255,255,255,0.2)',
+                            color: 'text.secondary',
                             '&.Mui-checked': { color: '#6366f1' },
                             p: 0.5,
                             mr: 1.5
                           }}
                         />
-                        <Avatar sx={{ width: 28, height: 28, fontSize: '11px', fontWeight: 800, bgcolor: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
+                        <Avatar sx={{ width: 28, height: 28, fontSize: '11px', fontWeight: 800, bgcolor: 'action.selected', color: 'text.primary', border: '1px solid', borderColor: 'divider' }}>
                           {rec.fullName.charAt(0)}
                         </Avatar>
                         <Box sx={{ ml: 1.5, overflow: 'hidden' }}>
-                          <Typography variant="body2" fontWeight="700" sx={{ color: 'white', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                          <Typography variant="body2" fontWeight="700" sx={{ color: 'text.primary', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
                             {rec.fullName}
                           </Typography>
-                          <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontFamily: 'monospace', fontSize: '10px' }}>
+                          <Typography variant="caption" sx={{ color: 'text.secondary', fontFamily: 'monospace', fontSize: '10px' }}>
                             {rec.email}
                           </Typography>
                         </Box>
@@ -1261,25 +1269,26 @@ export default function BulkMailPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <Box sx={{
             p: 4,
-            bgcolor: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgba(255, 255, 255, 0.05)',
+            bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'divider',
             borderRadius: 6,
             height: '100%',
             display: 'flex',
             flexDirection: 'column'
           }}>
-            <Typography variant="subtitle2" sx={{ color: 'rgba(255, 255, 255, 0.6)', fontWeight: 800, mb: 3, letterSpacing: '0.05em' }}>
+            <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 800, mb: 3, letterSpacing: '0.05em' }}>
               TRANSMISSION BROADCAST ENGINE
             </Typography>
 
             {!queueRunning && queueIndex === 0 ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, flexGrow: 1, justifyContent: 'center' }}>
-                <Box sx={{ textAlign: 'center', opacity: 0.8, py: 2 }}>
-                  <Send size={44} className="text-indigo-400" style={{ margin: '0 auto 16px' }} />
-                  <Typography variant="h6" fontWeight="900" color="white" gutterBottom>
+                <Box sx={{ textAlign: 'center', opacity: 0.9, py: 2 }}>
+                  <Send size={44} className="text-indigo-500" style={{ margin: '0 auto 16px' }} />
+                  <Typography variant="h6" fontWeight="900" sx={{ color: 'text.primary' }} gutterBottom>
                     Engine Status: Ready
                   </Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.5)', maxWidth: 320, mx: 'auto', mb: 2 }}>
+                  <Typography variant="body2" sx={{ color: 'text.secondary', maxWidth: 320, mx: 'auto', mb: 2 }}>
                     Press below to trigger queue processing. Each email will be sent sequentially with a mandatory 2-second rate-limiting delay to prevent spam flags.
                   </Typography>
                 </Box>
@@ -1296,14 +1305,15 @@ export default function BulkMailPage() {
                     textTransform: 'none',
                     fontSize: '1rem',
                     background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                    color: '#ffffff',
                     boxShadow: '0 12px 24px -10px rgba(79, 70, 229, 0.4)',
                     '&:hover': {
                       background: 'linear-gradient(135deg, #4f46e5, #4338ca)',
                       transform: 'translateY(-2px)'
                     },
                     '&.Mui-disabled': {
-                      bgcolor: 'rgba(255, 255, 255, 0.03)',
-                      color: 'rgba(255,255,255,0.2)'
+                      bgcolor: 'action.disabledBackground',
+                      color: 'action.disabled'
                     }
                   }}
                   startIcon={<Send size={18} />}
@@ -1315,19 +1325,19 @@ export default function BulkMailPage() {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, flexGrow: 1 }}>
                 {/* Stats board */}
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1.5 }}>
-                  <Box sx={{ bgcolor: 'rgba(255,255,255,0.02)', p: 1.2, borderRadius: 2, border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: '9px' }}>QUEUE</Typography>
-                    <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 900 }}>{selectedRecipients.length}</Typography>
+                  <Box sx={{ bgcolor: 'action.hover', p: 1.2, borderRadius: 2, border: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '9px' }}>QUEUE</Typography>
+                    <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900 }}>{selectedRecipients.length}</Typography>
                   </Box>
-                  <Box sx={{ bgcolor: 'rgba(255,255,255,0.02)', p: 1.2, borderRadius: 2, border: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, fontSize: '9px' }}>DISPATCHED</Typography>
-                    <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 900 }}>{queueIndex}</Typography>
+                  <Box sx={{ bgcolor: 'action.hover', p: 1.2, borderRadius: 2, border: '1px solid', borderColor: 'divider', textAlign: 'center' }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, fontSize: '9px' }}>DISPATCHED</Typography>
+                    <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900 }}>{queueIndex}</Typography>
                   </Box>
-                  <Box sx={{ bgcolor: 'rgba(16, 185, 129, 0.03)', p: 1.2, borderRadius: 2, border: '1px solid rgba(16, 185, 129, 0.12)', textAlign: 'center' }}>
+                  <Box sx={{ bgcolor: 'rgba(16, 185, 129, 0.08)', p: 1.2, borderRadius: 2, border: '1px solid rgba(16, 185, 129, 0.2)', textAlign: 'center' }}>
                     <Typography variant="caption" sx={{ color: '#10b981', fontWeight: 700, fontSize: '9px' }}>SUCCESS</Typography>
                     <Typography variant="subtitle1" sx={{ color: '#10b981', fontWeight: 900 }}>{queueSuccessCount}</Typography>
                   </Box>
-                  <Box sx={{ bgcolor: 'rgba(239, 68, 68, 0.03)', p: 1.2, borderRadius: 2, border: '1px solid rgba(239, 68, 68, 0.12)', textAlign: 'center' }}>
+                  <Box sx={{ bgcolor: 'rgba(239, 68, 68, 0.08)', p: 1.2, borderRadius: 2, border: '1px solid rgba(239, 68, 68, 0.2)', textAlign: 'center' }}>
                     <Typography variant="caption" sx={{ color: '#ef4444', fontWeight: 700, fontSize: '9px' }}>FAILED</Typography>
                     <Typography variant="subtitle1" sx={{ color: '#ef4444', fontWeight: 900 }}>{queueFailedCount}</Typography>
                   </Box>
@@ -1336,10 +1346,10 @@ export default function BulkMailPage() {
                 {/* Progress Indicators */}
                 <Box>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
                       {queueIndex === selectedRecipients.length ? 'Transmission Complete' : queuePaused ? 'Queue Paused' : 'Broadcasting...'}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: 'white', fontWeight: 800 }}>
+                    <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 800 }}>
                       {Math.round((queueIndex / selectedRecipients.length) * 100)}%
                     </Typography>
                   </Box>
@@ -1349,7 +1359,7 @@ export default function BulkMailPage() {
                     sx={{
                       height: 6,
                       borderRadius: 3,
-                      bgcolor: 'rgba(255,255,255,0.04)',
+                      bgcolor: 'action.hover',
                       '& .MuiLinearProgress-bar': {
                         bgcolor: queueIndex === selectedRecipients.length ? '#10b981' : queuePaused ? '#f59e0b' : '#6366f1',
                         borderRadius: 3
@@ -1437,7 +1447,7 @@ export default function BulkMailPage() {
 
                 {/* Real-time terminal log pane */}
                 <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, mb: 0.8, letterSpacing: '0.05em' }}>
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, mb: 0.8, letterSpacing: '0.05em' }}>
                     TRANSMISSION ENGINE STATUS LOG
                   </Typography>
                   <Box
@@ -1447,7 +1457,8 @@ export default function BulkMailPage() {
                       maxHeight: '180px',
                       minHeight: '140px',
                       bgcolor: '#0a0f1d',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      border: '1px solid',
+                      borderColor: 'divider',
                       borderRadius: 3,
                       p: 1.5,
                       fontFamily: 'monospace',
@@ -1459,13 +1470,13 @@ export default function BulkMailPage() {
                     }}
                   >
                     {queueLog.length === 0 ? (
-                      <span style={{ color: 'rgba(255,255,255,0.2)' }}>Engine idle. No activities logged.</span>
+                      <span style={{ color: 'rgba(255,255,255,0.4)' }}>Engine idle. No activities logged.</span>
                     ) : (
                       queueLog.map((log, index) => {
                         const logColor = log.type === 'success' ? '#10b981' : log.type === 'error' ? '#ef4444' : '#818cf8';
                         return (
                           <div key={index} style={{ lineBreak: 'anywhere' }}>
-                            <span style={{ color: 'rgba(255,255,255,0.3)', marginRight: '6px' }}>[{log.timestamp}]</span>
+                            <span style={{ color: 'rgba(255,255,255,0.5)', marginRight: '6px' }}>[{log.timestamp}]</span>
                             <span style={{ color: logColor }}>{log.text}</span>
                           </div>
                         );

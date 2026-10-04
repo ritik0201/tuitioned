@@ -197,9 +197,9 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
   const availableDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0c10] text-gray-100 overflow-hidden">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden">
       {/* progress */}
-      <div className="px-6 py-4 border-b border-gray-800/50 bg-[#0d0f14] shrink-0">
+      <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/60 shrink-0">
         <div className="flex justify-between items-center max-w-sm mx-auto">
           {STEPS.map((step, idx) => {
             const Icon = step.icon;
@@ -210,15 +210,15 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                 <div className={`
                   w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-500 border
                   ${isActive ? 'bg-blue-600 border-blue-400 shadow-[0_0_15px_rgba(37,99,235,0.4)]' : 
-                    isCompleted ? 'bg-emerald-500 border-emerald-400' : 'bg-gray-800 border-gray-700'}
+                    isCompleted ? 'bg-emerald-500 border-emerald-400' : 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700'}
                 `}>
-                  {isCompleted ? <CheckCircle2 className="w-4 h-4 text-white" /> : <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-500'}`} />}
+                  {isCompleted ? <CheckCircle2 className="w-4 h-4 text-white" /> : <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500'}`} />}
                 </div>
-                <span className={`text-[8px] uppercase font-black tracking-tighter ${isActive ? 'text-blue-400' : isCompleted ? 'text-emerald-400' : 'text-gray-600'}`}>
+                <span className={`text-[8px] uppercase font-black tracking-tighter ${isActive ? 'text-blue-600 dark:text-blue-400' : isCompleted ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500'}`}>
                   {step.title}
                 </span>
                 {idx < STEPS.length - 1 && (
-                  <div className={`absolute top-4 left-8 w-[calc(400px/4)] h-[1px] -z-10 transition-colors duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-gray-800'}`} />
+                  <div className={`absolute top-4 left-8 w-[calc(400px/4)] h-[1px] -z-10 transition-colors duration-500 ${isCompleted ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-800'}`} />
                 )}
               </div>
             );
@@ -241,26 +241,26 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                 {currentStep === 0 && (
                   <div className="space-y-4">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-black text-white px-1">Course Identity</h2>
+                      <h2 className="text-xl font-black text-slate-900 dark:text-white px-1">Course Identity</h2>
                     </div>
                     <FormField control={form.control} name="title" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Subject</FormLabel>
+                        <FormLabel className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase ml-1">Subject</FormLabel>
                         <FormControl>
                           <div className="relative group">
-                            <Input placeholder="e.g. Physics Core" {...field} className="bg-gray-900 border-gray-800 h-12 pl-10 rounded-xl focus:border-blue-500 transition-all" />
-                            <BookText className="absolute left-3 top-3.5 h-4.5 w-4.5 text-gray-600 group-focus-within:text-blue-500" />
+                            <Input placeholder="e.g. Physics Core" {...field} className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 h-12 pl-10 rounded-xl focus:border-blue-500 transition-all font-medium text-sm" />
+                            <BookText className="absolute left-3 top-3.5 h-4.5 w-4.5 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500" />
                           </div>
                         </FormControl>
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="grade" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Grade</FormLabel>
+                        <FormLabel className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase ml-1">Grade</FormLabel>
                         <FormControl>
                           <div className="relative group">
-                            <Input placeholder="e.g. 12th Standard" {...field} className="bg-gray-900 border-gray-800 h-12 pl-10 rounded-xl focus:border-blue-500 transition-all" />
-                            <GraduationCap className="absolute left-3 top-3.5 h-4.5 w-4.5 text-gray-600 group-focus-within:text-blue-500" />
+                            <Input placeholder="e.g. 12th Standard" {...field} className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 h-12 pl-10 rounded-xl focus:border-blue-500 transition-all font-medium text-sm" />
+                            <GraduationCap className="absolute left-3 top-3.5 h-4.5 w-4.5 text-slate-400 dark:text-slate-500 group-focus-within:text-blue-500" />
                           </div>
                         </FormControl>
                       </FormItem>
@@ -271,33 +271,33 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                 {currentStep === 1 && (
                   <div className="space-y-4">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-black text-white px-1">Educator Assignment</h2>
+                      <h2 className="text-xl font-black text-slate-900 dark:text-white px-1">Educator Assignment</h2>
                     </div>
                     <FormField control={form.control} name="teacherId" render={({ field }) => (
                       <FormItem className="relative">
-                        <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Faculty Member</FormLabel>
+                        <FormLabel className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase ml-1">Faculty Member</FormLabel>
                         <div className="relative">
                           <div 
                             onClick={() => !isLoadingTeachers && setIsTeacherDropdownOpen(!isTeacherDropdownOpen)}
                             className={`
-                              bg-gray-900 border-gray-800 h-14 pl-10 pr-10 rounded-xl border flex items-center cursor-pointer transition-all
-                              ${isTeacherDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/10' : 'hover:border-gray-700'}
+                              bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 h-14 pl-10 pr-10 rounded-xl border flex items-center cursor-pointer transition-all
+                              ${isTeacherDropdownOpen ? 'border-blue-500 ring-2 ring-blue-500/10' : 'hover:border-slate-300 dark:hover:border-slate-700'}
                               ${isLoadingTeachers ? 'opacity-50 cursor-wait' : ''}
                             `}
                           >
-                            <User className="absolute left-3 h-5 w-5 text-gray-600" />
+                            <User className="absolute left-3 h-5 w-5 text-slate-400 dark:text-slate-500" />
                             <div className="flex flex-col">
-                              <span className={selectedTeacher ? "text-gray-100 font-bold text-sm" : "text-gray-500 text-sm"}>
+                              <span className={selectedTeacher ? "text-slate-900 dark:text-slate-100 font-bold text-sm" : "text-slate-400 dark:text-slate-500 text-sm"}>
                                 {isLoadingTeachers ? "Retrieving experts..." : (selectedTeacher ? selectedTeacher.name : "Choose educator")}
                               </span>
                               {selectedTeacher && (
-                                <span className="text-[9px] text-gray-500 truncate max-w-[250px]">
+                                <span className="text-[9px] text-slate-500 dark:text-slate-400 truncate max-w-[250px]">
                                   {selectedTeacher.listOfSubjects?.join(", ") || selectedTeacher.email}
                                 </span>
                               )}
                             </div>
                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                               <ChevronRight className={`w-4 h-4 text-gray-600 transition-transform ${isTeacherDropdownOpen ? 'rotate-90' : ''}`} />
+                               <ChevronRight className={`w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform ${isTeacherDropdownOpen ? 'rotate-90' : ''}`} />
                             </div>
                           </div>
 
@@ -307,16 +307,16 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 10 }}
-                                className="absolute top-full left-0 right-0 z-[999] mt-2 bg-[#121417] border border-gray-800 rounded-2xl shadow-2xl overflow-hidden"
+                                className="absolute top-full left-0 right-0 z-[999] mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden"
                               >
-                                <div className="p-3 border-b border-gray-800/50">
+                                <div className="p-3 border-b border-slate-100 dark:border-slate-800">
                                    <div className="relative">
-                                      <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-600" />
+                                      <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400 dark:text-slate-500" />
                                       <Input 
                                         placeholder="Search name or subject..." 
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="bg-gray-950 border-gray-800 h-9 pl-9 text-xs rounded-lg focus:ring-1 focus:ring-blue-500"
+                                        className="bg-slate-100 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 h-9 pl-9 text-xs rounded-lg focus:ring-1 focus:ring-blue-500"
                                         autoFocus
                                         onClick={(e) => e.stopPropagation()}
                                       />
@@ -333,29 +333,29 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                                       }}
                                       className={`
                                         flex items-center gap-3 p-3 cursor-pointer rounded-xl transition-colors mb-0.5 last:mb-0
-                                        ${field.value === teacher.id ? 'bg-blue-600/20 border border-blue-500/30' : 'hover:bg-white/5 border border-transparent'}
+                                        ${field.value === teacher.id ? 'bg-blue-50 dark:bg-blue-600/20 border border-blue-500/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent'}
                                       `}
                                     >
-                                      <Avatar className="h-9 w-9 border border-white/5">
+                                      <Avatar className="h-9 w-9 border border-slate-200 dark:border-slate-700">
                                         <AvatarImage src={teacher.profileImage} />
                                         <AvatarFallback className="bg-blue-600 text-[10px] text-white font-bold">{teacher.name.charAt(0)}</AvatarFallback>
                                       </Avatar>
                                       <div className="flex flex-col min-w-0">
-                                        <span className={`font-bold text-sm ${field.value === teacher.id ? 'text-blue-400' : 'text-gray-200'}`}>{teacher.name}</span>
+                                        <span className={`font-bold text-sm ${field.value === teacher.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-800 dark:text-slate-200'}`}>{teacher.name}</span>
                                         <div className="flex flex-wrap gap-1 mt-1">
                                            {teacher.listOfSubjects?.slice(0, 2).map((sub, i) => (
-                                             <span key={i} className="text-[8px] bg-white/5 px-1.5 py-0.5 rounded text-gray-500 uppercase font-black tracking-tighter">{sub}</span>
+                                             <span key={i} className="text-[8px] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-400 uppercase font-black tracking-tighter">{sub}</span>
                                            ))}
                                            {(teacher.listOfSubjects?.length || 0) > 2 && (
-                                             <span className="text-[8px] text-gray-600">+{(teacher.listOfSubjects?.length || 0) - 2}</span>
+                                             <span className="text-[8px] text-slate-400 dark:text-slate-500">+{(teacher.listOfSubjects?.length || 0) - 2}</span>
                                            )}
                                         </div>
                                       </div>
                                     </div>
                                   )) : (
                                     <div className="py-10 text-center flex flex-col items-center gap-2">
-                                       <Search size={24} className="text-gray-800" />
-                                       <p className="text-xs text-gray-600 italic font-medium">No educators match your search</p>
+                                       <Search size={24} className="text-slate-300 dark:text-slate-700" />
+                                       <p className="text-xs text-slate-400 dark:text-slate-500 italic font-medium">No educators match your search</p>
                                     </div>
                                   )}
                                 </div>
@@ -371,38 +371,38 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                 {currentStep === 2 && (
                   <div className="space-y-4">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-black text-white px-1">Class Schedule</h2>
+                      <h2 className="text-xl font-black text-slate-900 dark:text-white px-1">Class Schedule</h2>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <FormField control={form.control} name="classTime" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Timing</FormLabel>
+                          <FormLabel className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase ml-1">Timing</FormLabel>
                           <FormControl>
-                            <Input placeholder="05:00 PM" {...field} className="bg-gray-900 border-gray-800 h-12 rounded-xl" />
+                            <Input placeholder="05:00 PM" {...field} className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 h-12 rounded-xl text-sm font-medium" />
                           </FormControl>
                         </FormItem>
                       )} />
                       <FormField control={form.control} name="noOfClasses" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Sessions</FormLabel>
+                          <FormLabel className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase ml-1">Sessions</FormLabel>
                           <FormControl>
-                            <Input type="number" {...field} className="bg-gray-900 border-gray-800 h-12 rounded-xl" />
+                            <Input type="number" {...field} className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 h-12 rounded-xl text-sm font-medium" />
                           </FormControl>
                         </FormItem>
                       )} />
                     </div>
                     <div className="space-y-2">
-                       <FormLabel className="text-gray-500 text-[10px] font-bold uppercase ml-1">Weekly Cadence</FormLabel>
+                       <FormLabel className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase ml-1">Weekly Cadence</FormLabel>
                       <div className="flex flex-wrap gap-1.5">
                         {availableDays.map((day) => (
                           <button
                             key={day}
                             type="button"
                             onClick={() => toggleDay(day)}
-                            className={`flex-1 h-10 rounded-lg text-[9px] font-black uppercase border transition-all ${
+                            className={`flex-1 h-10 rounded-lg text-[9px] font-black uppercase border transition-all cursor-pointer ${
                               selectedDays.includes(day)
-                                ? "bg-blue-600 border-blue-400 text-white"
-                                : "bg-gray-900 border-gray-800 text-gray-600"
+                                ? "bg-blue-600 border-blue-400 text-white shadow-sm"
+                                : "bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800"
                             }`}
                           >
                             {day}
@@ -416,39 +416,39 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                 {currentStep === 3 && (
                   <div className="space-y-4">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-black text-white px-1">Final Launch</h2>
+                      <h2 className="text-xl font-black text-slate-900 dark:text-white px-1">Final Launch</h2>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <FormField control={form.control} name="perClassPrice" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-emerald-500 text-[9px] font-black uppercase ml-1">Price / Class</FormLabel>
+                          <FormLabel className="text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase ml-1">Price / Class</FormLabel>
                           <FormControl>
-                            <Input type="number" {...field} className="bg-gray-900 border-emerald-500/20 h-11 rounded-lg" />
+                            <Input type="number" {...field} className="bg-slate-100 dark:bg-slate-900 border-emerald-500/30 text-slate-900 dark:text-slate-100 h-11 rounded-lg text-sm font-bold" />
                           </FormControl>
                         </FormItem>
                       )} />
                       <FormField control={form.control} name="teacherPerClassPrice" render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-emerald-500 text-[9px] font-black uppercase ml-1">Expert Pay</FormLabel>
+                          <FormLabel className="text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase ml-1">Expert Pay</FormLabel>
                           <FormControl>
-                            <Input type="number" {...field} className="bg-gray-900 border-emerald-500/20 h-11 rounded-lg" />
+                            <Input type="number" {...field} className="bg-slate-100 dark:bg-slate-900 border-emerald-500/30 text-slate-900 dark:text-slate-100 h-11 rounded-lg text-sm font-bold" />
                           </FormControl>
                         </FormItem>
                       )} />
                     </div>
                     <FormField control={form.control} name="joinLink" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-500 text-[9px] font-black uppercase ml-1">G-Meet / Zoom Link</FormLabel>
+                        <FormLabel className="text-slate-500 dark:text-slate-400 text-[9px] font-black uppercase ml-1">G-Meet / Zoom Link</FormLabel>
                         <FormControl>
-                          <Input placeholder="URL..." {...field} className="bg-gray-900 border-gray-800 h-10 rounded-lg text-xs" />
+                          <Input placeholder="URL..." {...field} className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 h-10 rounded-lg text-xs" />
                         </FormControl>
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="classroomLink" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-500 text-[9px] font-black uppercase ml-1">Classroom URL (Optional)</FormLabel>
+                        <FormLabel className="text-slate-500 dark:text-slate-400 text-[9px] font-black uppercase ml-1">Classroom URL (Optional)</FormLabel>
                         <FormControl>
-                          <Input placeholder="URL..." {...field} className="bg-gray-900 border-gray-800 h-10 rounded-lg text-xs" />
+                          <Input placeholder="URL..." {...field} className="bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 h-10 rounded-lg text-xs" />
                         </FormControl>
                       </FormItem>
                     )} />
@@ -458,13 +458,13 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
             </AnimatePresence>
           </div>
 
-          <div className="p-4 bg-[#0d0f14] border-t border-gray-800/20 flex gap-3 shrink-0">
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-800 flex gap-3 shrink-0">
             {currentStep > 0 && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={prevStep}
-                className="h-10 px-5 border-gray-800 text-gray-500 hover:text-white rounded-xl"
+                className="h-10 px-5 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -474,7 +474,7 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
               <Button
                 type="button"
                 onClick={nextStep}
-                className="grow h-10 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all"
+                className="grow h-10 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
               >
                 <span className="uppercase tracking-widest text-[10px]">Continue</span>
                 <ChevronRight className="w-4 h-4" />
@@ -483,7 +483,7 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="grow h-10 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg"
+                className="grow h-10 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg cursor-pointer"
               >
                 {isSubmitting ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

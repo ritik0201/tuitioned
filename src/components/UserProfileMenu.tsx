@@ -130,16 +130,18 @@ export default function UserProfileMenu({
         PaperProps={{
           sx: {
             mt: 1.5,
-            bgcolor: '#1f2937',
-            color: 'white',
+            bgcolor: 'background.paper',
+            color: 'text.primary',
             borderRadius: 0,
             minWidth: 280,
-            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.5)',
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
           }
         }}
       >
         {/* User Info Header */}
-        <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
           <Box sx={{ display: 'flex', items: 'center', gap: 2 }}>
             <Avatar
               sx={{
@@ -172,19 +174,19 @@ export default function UserProfileMenu({
         </Box>
 
         {/* User Details */}
-        <Box sx={{ p: 2, borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
+        <Box sx={{ p: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
             {userEmail && (
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Mail size={16} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                <Mail size={16} className="text-slate-500 dark:text-slate-400" />
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   {userEmail}
                 </Typography>
               </Box>
             )}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Calendar size={16} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
-              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+              <Calendar size={16} className="text-slate-500 dark:text-slate-400" />
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Member since {new Date().getFullYear()}
               </Typography>
             </Box>
@@ -200,7 +202,7 @@ export default function UserProfileMenu({
             sx={{ py: 1.5 }}
           >
             <ListItemIcon>
-              <LayoutDashboard size={18} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+              <LayoutDashboard size={18} />
             </ListItemIcon>
             <ListItemText>Dashboard</ListItemText>
           </MenuItem>
@@ -213,16 +215,16 @@ export default function UserProfileMenu({
           sx={{ py: 1.5 }}
         >
           <ListItemIcon>
-            <User size={18} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+            <User size={18} />
           </ListItemIcon>
           <ListItemText>{getProfileLabel()}</ListItemText>
         </MenuItem>
 
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
+        <Divider sx={{ borderColor: 'divider' }} />
 
         <MenuItem onClick={handleLogout} sx={{ py: 1.5 }}>
           <ListItemIcon>
-            <LogOut size={18} style={{ color: 'rgba(255, 255, 255, 0.7)' }} />
+            <LogOut size={18} />
           </ListItemIcon>
           <ListItemText>Logout</ListItemText>
         </MenuItem>

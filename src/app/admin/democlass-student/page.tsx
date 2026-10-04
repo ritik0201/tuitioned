@@ -87,19 +87,19 @@ export default function DemoClassStudentTable() {
       id: "studentName",
       accessorFn: (row) => row.studentName || row.studentId?.fullName,
       header: ({ column }) => (
-        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Student <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-4">
-          <Avatar className="h-10 w-10 border border-white/10 ring-2 ring-indigo-500/10">
+          <Avatar className="h-10 w-10 border border-slate-200 dark:border-slate-800 ring-2 ring-indigo-500/10">
             <AvatarImage src={row.original.studentId?.profileImage} />
             <AvatarFallback className="bg-indigo-600 text-xs text-white font-black">{(row.getValue("studentName") as string || "U").charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-             <span className="font-bold text-sm text-white">{row.getValue("studentName") || "Unknown Student"}</span>
-             <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{row.original.studentId?.email}</span>
+             <span className="font-bold text-sm text-slate-900 dark:text-white">{row.getValue("studentName") || "Unknown Student"}</span>
+             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">{row.original.studentId?.email}</span>
           </div>
         </div>
       ),
@@ -109,11 +109,11 @@ export default function DemoClassStudentTable() {
       header: "Session Details",
       cell: ({ row }) => (
         <div className="flex flex-col gap-1">
-           <div className="flex items-center gap-2 text-xs font-bold text-gray-200">
-              <BookOpen size={12} className="text-indigo-400" />
+           <div className="flex items-center gap-2 text-xs font-bold text-slate-800 dark:text-slate-200">
+              <BookOpen size={12} className="text-indigo-500 dark:text-indigo-400" />
               {row.original.subject}
            </div>
-           <div className="text-[10px] text-gray-500 line-clamp-1">{row.original.topic}</div>
+           <div className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">{row.original.topic}</div>
         </div>
       )
     },
@@ -126,14 +126,14 @@ export default function DemoClassStudentTable() {
         const date = new Date(dateVal);
         return (
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-xs text-gray-300 font-medium">
-               <Calendar size={12} className="text-blue-400" />
+            <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 font-medium">
+               <Calendar size={12} className="text-blue-500 dark:text-blue-400" />
                {date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
             </div>
-            <div className="flex items-center gap-2 text-[10px] text-gray-500">
-               <Clock size={12} className="text-gray-600" />
+            <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
+               <Clock size={12} className="text-slate-400" />
                {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-               {timeZone && <span className="bg-white/5 px-1.5 rounded text-[8px] uppercase">{timeZone}</span>}
+               {timeZone && <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 rounded text-[8px] uppercase">{timeZone}</span>}
             </div>
           </div>
         );

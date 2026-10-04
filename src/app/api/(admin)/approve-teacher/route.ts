@@ -9,7 +9,7 @@ export async function GET() {
     const approvedTeachers = await User.find({ 
       role: 'teacher', 
       teacherStatus: 'approved' 
-    }).sort({ createdAt: -1 });
+    }).sort({ createdAt: -1, _id: -1 });
 
     const teachers = approvedTeachers.map(teacher => ({
       id: teacher._id.toString(),

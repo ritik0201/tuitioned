@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     await dbConnect();
 
     const studentsFromDb = await User.find({ role: 'student' })
+      .sort({ createdAt: -1, _id: -1 })
       .select('fullName email mobile studentStatus')
       .lean();
 

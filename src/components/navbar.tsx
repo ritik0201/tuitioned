@@ -15,6 +15,8 @@ import TeacherSignUpModal from './TeacherSignUpModal';
 import UserProfileMenu from './UserProfileMenu';
 import { useUI } from '@/provider/UIProvider';
 
+import ThemeToggle from './ThemeToggle';
+
 const Logo = () => (
     <Link href="/" className="font-bold text-xl tracking-tight text-foreground">
         Tuition-ed
@@ -40,7 +42,7 @@ const Navbar = () => {
     }, []);
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-lg">
+        <header className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-lg transition-colors duration-200">
             <nav className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
                 <div className="flex items-center space-x-8">
                     <Logo />
@@ -49,7 +51,8 @@ const Navbar = () => {
                     </div>
                 </div>
                 {/* Desktop right side */}
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-3">
+                    <ThemeToggle />
                     {status === 'authenticated' ? (
                         <>
                             <UserProfileMenu userType="student" showDashboardLink={true} dashboardHref="/dashboard" />
@@ -70,17 +73,18 @@ const Navbar = () => {
                             onClick={() => openModal('login')} 
                             sx={{
                                 height: '40px',
-                                backgroundColor: '#fff',
-                                color: '#000',
-                                '&:hover': { backgroundColor: '#f0f0f0' }
+                                backgroundColor: 'primary.main',
+                                color: '#fff',
+                                '&:hover': { opacity: 0.9 }
                             }}>
                                 Login
                         </Button></>)}
                 </div>
 
-                {/* Mobile menu button */}
-                <div className="md:hidden flex items-center">
-                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-foreground hover:text-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary" aria-expanded="false">
+                {/* Mobile menu button & ThemeToggle */}
+                <div className="md:hidden flex items-center gap-2">
+                    <ThemeToggle />
+                    <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="inline-flex items-center justify-center p-2 rounded-md text-foreground hover:text-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary cursor-pointer" aria-expanded="false">
                         <span className="sr-only">Open main menu</span>
                         {isMobileMenuOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
                     </button>
@@ -89,7 +93,7 @@ const Navbar = () => {
             {/* Mobile Menu Dropdown */}
             {isClient && (
                 <div
-                    className={`md:hidden absolute top-full left-0 w-full bg-[#0b1220] backdrop-blur-none shadow-lg transition-all duration-300 ease-in-out
+                    className={`md:hidden absolute top-full left-0 w-full bg-background/95 backdrop-blur-lg border-b border-border shadow-lg transition-all duration-300 ease-in-out
               ${isMobileMenuOpen
                             ? 'opacity-100 translate-y-0 visible'
                             : 'opacity-0 -translate-y-4 invisible'
@@ -104,7 +108,11 @@ const Navbar = () => {
                             </Link>
                         ))}
                     </div>
-                    <div className="border-t pt-4">
+                    <div className="flex items-center justify-between border-t border-border pt-4 px-3">
+                        <span className="text-sm font-medium text-foreground">Theme</span>
+                        <ThemeToggle showText />
+                    </div>
+                    <div className="border-t border-border pt-4">
                         {status === 'authenticated' ? (
                             <Button
                                 component={Link}
@@ -112,7 +120,7 @@ const Navbar = () => {
                                 variant="outlined"
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 fullWidth
-                                sx={{ color: 'text.primary', borderColor: 'rgba(255, 255, 255, 0.23)' }}
+                                sx={{ color: 'text.primary', borderColor: 'divider' }}
                             >
                                 Dashboard
                             </Button>
@@ -123,7 +131,7 @@ const Navbar = () => {
                                 fullWidth
                                 sx={{
                                     color: 'text.primary',
-                                    borderColor: 'rgba(255, 255, 255, 0.23)'
+                                    borderColor: 'divider'
                                 }}
                             >
                                 Become a Teacher
@@ -136,9 +144,9 @@ const Navbar = () => {
                                 variant="contained"
                                 onClick={() => { signOut({ callbackUrl: '/' }); setIsMobileMenuOpen(false); }}
                                 fullWidth sx={{
-                                    backgroundColor: '#fff',
-                                    color: '#000',
-                                    '&:hover': { backgroundColor: '#f0f0f0' }
+                                    backgroundColor: 'primary.main',
+                                    color: '#fff',
+                                    '&:hover': { opacity: 0.9 }
                                 }}
                             >
                                 Logout
@@ -148,9 +156,9 @@ const Navbar = () => {
                                 variant="contained"
                                 onClick={() => { openModal('login'); setIsMobileMenuOpen(false); }}
                                 fullWidth sx={{
-                                    backgroundColor: '#fff',
-                                    color: '#000',
-                                    '&:hover': { backgroundColor: '#f0f0f0' }
+                                    backgroundColor: 'primary.main',
+                                    color: '#fff',
+                                    '&:hover': { opacity: 0.9 }
                                 }}
                             >
                                 Login / Sign Up

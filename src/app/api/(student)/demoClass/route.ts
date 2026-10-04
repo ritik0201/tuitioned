@@ -26,11 +26,11 @@ export async function GET(request: Request) {
       demoClasses = await DemoClass.find({})
         .populate({ path: 'studentId', model: User, select: 'email fullName' })
         .populate({ path: 'teacherId', model: User, select: 'fullName email' })
-        .sort({ bookingDateAndTime: -1 });
+        .sort({ createdAt: -1, _id: -1 });
     } else {
       demoClasses = await DemoClass.find({ studentId: session.user.id })
         .populate({ path: 'teacherId', model: User, select: 'fullName email' })
-        .sort({ bookingDateAndTime: -1 });
+        .sort({ createdAt: -1, _id: -1 });
     }
 
     // The data is returned as a plain array, not nested in a `data` property.
@@ -104,6 +104,34 @@ export async function POST(request: Request) {
       // teacherId can be assigned later by an admin
     });
 
+    const calendarStartDate = new Date(bookingDateAndTime);
+    if (isNaN(calendarStartDate.getTime())) {
+      calendarStartDate.setTime(dateObj.getTime());
+    }
+    if (typeof bookingDateAndTime === 'string' && bookingDateAndTime.includes('-') && !bookingDateAndTime.includes('T')) {
+      const parts = bookingDateAndTime.split('-').map(Number);
+      if (parts.length === 3) {
+        calendarStartDate.setFullYear(parts[0], parts[1] - 1, parts[2]);
+        calendarStartDate.setHours(10, 0, 0, 0);
+      }
+    }
+
+    const calendarEndDate = new Date(calendarStartDate.getTime() + 60 * 60 * 1000);
+    const formatISO = (d: Date) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+
+    const calTitle = encodeURIComponent(`Tuitioned 1-on-1 Demo Class - ${resolvedSubject}`);
+    const calDetails = encodeURIComponent(
+      `Tuitioned Live 1-on-1 Demo Class Session.\n\n` +
+      `Student Name: ${session.user.fullName}\n` +
+      `Grade/Class: ${grade || "N/A"}\n` +
+      `Subject: ${resolvedSubject}\n` +
+      (topic ? `Topic: ${topic}\n` : "") +
+      `\nWe look forward to having you in class!`
+    );
+    const calLocation = encodeURIComponent("Tuitioned Online Classroom (https://tuitioned.com)");
+    const calDates = `${formatISO(calendarStartDate)}/${formatISO(calendarEndDate)}`;
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&details=${calDetails}&location=${calLocation}&dates=${calDates}`;
+
     // Send confirmation email
     const transporter = nodemailer.createTransport({
       host: "smtp.hostinger.com",
@@ -130,6 +158,11 @@ export async function POST(request: Request) {
             <div style="background-color: #f0f9ff; border-left: 5px solid #0EA5E9; padding: 15px; margin: 20px 0;">
               <p style="margin: 5px 0; font-size: 16px;"><strong>Subject:</strong> ${resolvedSubject}</p>
               <p style="margin: 5px 0; font-size: 16px;"><strong>Date:</strong> ${dateObj.toDateString()}</p>
+            </div>
+            <div style="text-align: center; margin: 25px 0;">
+              <a href="${googleCalendarUrl}" target="_blank" style="background-color: #4F46E5; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.25);">
+                📅 Add to Google Calendar
+              </a>
             </div>
             <p style="font-size: 16px; color: #555;">We look forward to seeing you there! And Our team contact you within 24 hours.</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />

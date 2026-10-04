@@ -63,24 +63,24 @@ export type StudentFromAPI = {
 function StudentDetailSkeleton() {
   return (
     <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1600, mx: 'auto' }}>
-      <Skeleton className="h-10 w-48 mb-8 bg-white/5 rounded-xl" />
+      <Skeleton className="h-10 w-48 mb-8 bg-slate-200 dark:bg-white/5 rounded-xl" />
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 8 }}>
         {/* Sidebar Skeleton */}
         <Box sx={{ flex: '0 0 450px' }}>
-          <Box sx={{ p: 6, bgcolor: 'rgba(255, 255, 255, 0.02)', borderRadius: 8, border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+          <Box sx={{ p: 6, bgcolor: 'background.paper', borderRadius: 8, border: '1px solid', borderColor: 'divider' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 6 }}>
-              <Skeleton className="w-[140px] h-[140px] rounded-full bg-white/5 mb-4" />
-              <Skeleton className="h-10 w-3/4 bg-white/5 mb-2" />
-              <Skeleton className="h-5 w-1/2 bg-white/5" />
+              <Skeleton className="w-[140px] h-[140px] rounded-full bg-slate-200 dark:bg-white/5 mb-4" />
+              <Skeleton className="h-10 w-3/4 bg-slate-200 dark:bg-white/5 mb-2" />
+              <Skeleton className="h-5 w-1/2 bg-slate-200 dark:bg-white/5" />
             </Box>
-            <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+            <Divider sx={{ my: 4, borderColor: 'divider' }} />
             <Stack spacing={3}>
               {[...Array(5)].map((_, i) => (
                 <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-                  <Skeleton className="w-10 h-10 rounded-xl bg-white/5" />
+                  <Skeleton className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-white/5" />
                   <Box className="flex-1">
-                    <Skeleton className="h-3 w-1/3 bg-white/5 mb-2" />
-                    <Skeleton className="h-5 w-3/4 bg-white/5" />
+                    <Skeleton className="h-3 w-1/3 bg-slate-200 dark:bg-white/5 mb-2" />
+                    <Skeleton className="h-5 w-3/4 bg-slate-200 dark:bg-white/5" />
                   </Box>
                 </Box>
               ))}
@@ -90,12 +90,12 @@ function StudentDetailSkeleton() {
         {/* Content Skeleton */}
         <Box sx={{ flex: 1 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6 }}>
-            <Skeleton className="h-12 w-64 bg-white/5" />
-            <Skeleton className="h-12 w-40 bg-white/5 rounded-xl" />
+            <Skeleton className="h-12 w-64 bg-slate-200 dark:bg-white/5" />
+            <Skeleton className="h-12 w-40 bg-slate-200 dark:bg-white/5 rounded-xl" />
           </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', xl: '1fr 1fr' }, gap: 4 }}>
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-[280px] bg-white/5 rounded-3xl" />
+              <Skeleton key={i} className="h-[280px] bg-slate-200 dark:bg-white/5 rounded-3xl" />
             ))}
           </Box>
         </Box>
@@ -162,14 +162,14 @@ export default function StudentDetailPage({
 
   const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value?: string | null }) => (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, py: 2 }}>
-      <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'rgba(255, 255, 255, 0.03)', color: 'rgba(255, 255, 255, 0.4)', display: 'flex' }}>
+      <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: 'action.hover', color: 'text.secondary', display: 'flex' }}>
         {icon}
       </Box>
       <Box>
-        <Typography variant="overline" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 800, letterSpacing: '0.1em', display: 'block', mb: 0.5 }}>
+        <Typography variant="overline" sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: '0.1em', display: 'block', mb: 0.5 }}>
           {label}
         </Typography>
-        <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
+        <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600 }}>
           {value || 'Not specified'}
         </Typography>
       </Box>
@@ -183,7 +183,7 @@ export default function StudentDetailPage({
           component={Link}
           href="/admin/students"
           startIcon={<ArrowLeft size={18} />}
-          sx={{ mb: 6, color: 'rgba(255, 255, 255, 0.4)', '&:hover': { color: 'white', bgcolor: 'transparent' }, fontWeight: 800, textTransform: 'none' }}
+          sx={{ mb: 6, color: 'text.secondary', '&:hover': { color: 'text.primary', bgcolor: 'transparent' }, fontWeight: 800, textTransform: 'none' }}
         >
           Back to Student Directory
         </Button>
@@ -195,9 +195,10 @@ export default function StudentDetailPage({
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <Box sx={{ 
               p: 6, 
-              bgcolor: 'rgba(255, 255, 255, 0.02)', 
+              bgcolor: 'background.paper', 
               borderRadius: 8, 
-              border: '1px solid rgba(255, 255, 255, 0.05)',
+              border: '1px solid',
+              borderColor: 'divider',
               position: 'sticky',
               top: 100
             }}>
@@ -211,17 +212,18 @@ export default function StudentDetailPage({
                     mb: 4, 
                     fontSize: '4rem', 
                     fontWeight: 900,
-                    bgcolor: 'indigo.600',
-                    border: '4px solid rgba(255, 255, 255, 0.05)',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
+                    bgcolor: '#3b82f6',
+                    border: '4px solid',
+                    borderColor: 'divider',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
                   }}
                 >
                   {student.name.charAt(0).toUpperCase()}
                 </Avatar>
-                <Typography variant="h3" fontWeight="900" sx={{ color: 'white', tracking: '-0.04em', mb: 1 }}>
+                <Typography variant="h3" fontWeight="900" sx={{ color: 'text.primary', tracking: '-0.04em', mb: 1 }}>
                   {student.name}
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600 }}>
+                <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                   {student.email}
                 </Typography>
                 <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
@@ -230,7 +232,7 @@ export default function StudentDetailPage({
                 </Box>
               </Box>
 
-              <Divider sx={{ my: 4, borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+              <Divider sx={{ my: 4, borderColor: 'divider' }} />
 
               <Stack spacing={1}>
                 <InfoItem icon={<Phone size={18} />} label="CONTACT NUMBER" value={student.mobile} />
@@ -248,11 +250,11 @@ export default function StudentDetailPage({
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
             <Box sx={{ mb: 6, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Box>
-                <Typography variant="h3" fontWeight="900" sx={{ color: 'white', display: 'flex', alignItems: 'center', gap: 2.5 }}>
+                <Typography variant="h3" fontWeight="900" sx={{ color: 'text.primary', display: 'flex', alignItems: 'center', gap: 2.5 }}>
                   <Layers className="text-indigo-500" size={32} />
                   Enrolled Courses
                 </Typography>
-                <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.4)', mt: 1, fontWeight: 500 }}>
+                <Typography variant="body1" sx={{ color: 'text.secondary', mt: 1, fontWeight: 500 }}>
                   Managing academic progress and enrollments
                 </Typography>
               </Box>
@@ -266,8 +268,8 @@ export default function StudentDetailPage({
                       borderRadius: 4, 
                       px: 4, 
                       py: 1.5, 
-                      bgcolor: 'indigo.600', 
-                      '&:hover': { bgcolor: 'indigo.700' }, 
+                      bgcolor: '#4f46e5', 
+                      '&:hover': { bgcolor: '#4338ca' }, 
                       fontWeight: 900, 
                       textTransform: 'none',
                       fontSize: '0.9rem',
@@ -277,14 +279,14 @@ export default function StudentDetailPage({
                     New Enrollment
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl bg-[#030712] border border-white/10 text-white shadow-2xl p-0 gap-0 overflow-hidden z-[1200] max-h-[90vh] flex flex-col rounded-[2rem]">
-                  <DialogHeader className="p-8 border-b border-white/5 bg-white/[0.02] shrink-0 text-left">
-                    <DialogTitle className="text-3xl font-black text-white flex items-center gap-3">
+                <DialogContent className="sm:max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-2xl p-0 gap-0 overflow-hidden z-[1200] max-h-[90vh] flex flex-col rounded-[2rem]">
+                  <DialogHeader className="p-8 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0 text-left">
+                    <DialogTitle className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
                        <Sparkles className="text-amber-500" />
                        Create New Course
                     </DialogTitle>
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', mt: 1, fontWeight: 500 }}>
-                      Configure specialized curriculum for <span className="text-white font-black">{student.name}</span>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1, fontWeight: 500 }}>
+                      Configure specialized curriculum for <span className="text-slate-900 dark:text-white font-black">{student.name}</span>
                     </Typography>
                   </DialogHeader>
                   <div className="p-8 overflow-y-auto scrollbar-hide">
@@ -308,21 +310,22 @@ export default function StudentDetailPage({
                   >
                     <Box sx={{ 
                       p: 4, 
-                      bgcolor: 'rgba(255, 255, 255, 0.02)', 
+                      bgcolor: 'background.paper', 
                       borderRadius: 6, 
-                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                      border: '1px solid',
+                      borderColor: 'divider',
                       height: '100%',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
                       transition: 'all 0.3s',
-                      '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.04)', transform: 'translateY(-4px)', borderColor: 'rgba(99, 102, 241, 0.2)' }
+                      '&:hover': { bgcolor: 'action.hover', transform: 'translateY(-4px)', borderColor: '#6366f1' }
                     }}>
                       <Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
                           <Box>
-                            <Typography variant="h5" fontWeight="900" sx={{ color: 'white', mb: 0.5 }}>{course.title}</Typography>
-                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                            <Typography variant="h5" fontWeight="900" sx={{ color: 'text.primary', mb: 0.5 }}>{course.title}</Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
                               {course.grade} Grade Level
                             </Typography>
                           </Box>
@@ -340,7 +343,7 @@ export default function StudentDetailPage({
                             <IconButton 
                               onClick={() => handleDeleteCourse(course._id.toString())} 
                               sx={{ 
-                                color: 'rgba(244, 63, 94, 0.4)', 
+                                color: 'rgba(244, 63, 94, 0.6)', 
                                 '&:hover': { color: '#f43f5e', bgcolor: 'rgba(244, 63, 94, 0.1)' },
                                 borderRadius: 3,
                                 transition: 'all 0.2s'
@@ -352,16 +355,16 @@ export default function StudentDetailPage({
                           </Box>
                         </Box>
                         
-                        <Divider sx={{ mb: 3, borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+                        <Divider sx={{ mb: 3, borderColor: 'divider' }} />
                         
                         <Stack spacing={2} sx={{ mb: 4 }}>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                             <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600 }}>Active Classes Remaining</Typography>
-                             <Typography variant="body1" sx={{ color: 'white', fontWeight: 800 }}>{course.noOfClasses}</Typography>
+                             <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>Active Classes Remaining</Typography>
+                             <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800 }}>{course.noOfClasses}</Typography>
                           </Box>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                             <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600 }}>Tuition Rate</Typography>
-                             <Typography variant="body1" sx={{ color: 'white', fontWeight: 800 }}>₹{course.perClassPrice}/session</Typography>
+                             <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>Tuition Rate</Typography>
+                             <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800 }}>₹{course.perClassPrice}/session</Typography>
                           </Box>
                         </Stack>
                       </Box>
@@ -375,11 +378,11 @@ export default function StudentDetailPage({
                         sx={{ 
                           borderRadius: 4, 
                           py: 2, 
-                          borderColor: 'rgba(255, 255, 255, 0.1)', 
-                          color: 'white', 
+                          borderColor: 'divider', 
+                          color: 'text.primary', 
                           fontWeight: 800, 
                           textTransform: 'none',
-                          '&:hover': { bgcolor: 'white', color: 'black', borderColor: 'white' },
+                          '&:hover': { bgcolor: 'primary.main', color: 'white', borderColor: 'primary.main' },
                           transition: 'all 0.3s'
                         }}
                       >
@@ -393,12 +396,13 @@ export default function StudentDetailPage({
               <Box sx={{ 
                 p: 12, 
                 textAlign: 'center', 
-                bgcolor: 'rgba(255, 255, 255, 0.01)', 
+                bgcolor: 'action.hover', 
                 borderRadius: 8, 
-                border: '1px dashed rgba(255, 255, 255, 0.05)' 
+                border: '1px dashed',
+                borderColor: 'divider'
               }}>
-                 <GraduationCap size={64} className="mx-auto mb-6 text-gray-700 opacity-20" />
-                 <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 700 }}>
+                 <GraduationCap size={64} className="mx-auto mb-6 text-gray-400 opacity-40" />
+                 <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 700 }}>
                    No course enrollments detected for this student.
                  </Typography>
               </Box>

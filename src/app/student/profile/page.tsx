@@ -43,10 +43,10 @@ interface ProfileData {
 function ProfileSkeleton() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 animate-pulse">
-      <div className="h-40 w-full bg-slate-900 border-4 border-slate-800 rounded-[2.5rem]" />
+      <div className="h-40 w-full bg-slate-200 dark:bg-slate-900 border-4 border-slate-300 dark:border-slate-800 rounded-[2.5rem]" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="h-[500px] w-full bg-slate-900 border-4 border-slate-800 rounded-[2.5rem]" />
-        <div className="h-[500px] w-full bg-slate-900 border-4 border-slate-800 rounded-[2.5rem]" />
+        <div className="h-[500px] w-full bg-slate-200 dark:bg-slate-900 border-4 border-slate-300 dark:border-slate-800 rounded-[2.5rem]" />
+        <div className="h-[500px] w-full bg-slate-200 dark:bg-slate-900 border-4 border-slate-300 dark:border-slate-800 rounded-[2.5rem]" />
       </div>
     </div>
   );
@@ -70,12 +70,12 @@ const NeonInput = ({
   icon?: any;
 }) => (
   <div className="space-y-2 group">
-    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 group-focus-within:text-indigo-400 transition-colors">
+    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 ml-1 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors">
       {label}
     </label>
     <div className="relative">
       {Icon && (
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 dark:group-focus-within:text-indigo-400 transition-colors">
           <Icon className="h-4 w-4" />
         </div>
       )}
@@ -85,7 +85,7 @@ const NeonInput = ({
         value={value || ''}
         onChange={onChange}
         disabled={disabled}
-        className="w-full h-14 bg-slate-950/50 border-2 border-slate-800 rounded-2xl px-12 text-slate-100 placeholder:text-slate-600 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 disabled:bg-slate-900/50 disabled:cursor-not-allowed transition-all font-bold"
+        className="w-full h-14 bg-slate-100 dark:bg-slate-950/50 border-2 border-slate-200 dark:border-slate-800 rounded-2xl px-12 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 disabled:bg-slate-50 dark:disabled:bg-slate-900/50 disabled:cursor-not-allowed transition-all font-bold"
       />
     </div>
   </div>
@@ -182,11 +182,11 @@ const StudentProfilePage = () => {
     setIsEditing(false);
   };
 
-  if (loading) return <div className="min-h-screen bg-slate-950 p-8"><ProfileSkeleton /></div>;
+  if (loading) return <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-8"><ProfileSkeleton /></div>;
 
   if (error && !profile) {
     return (
-      <div className="min-h-screen bg-slate-950 p-8">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-8">
         <Alert variant="destructive" className="max-w-2xl mx-auto border-2 border-red-500/30 bg-red-500/5">
           <AlertDescription className="font-bold">{error}</AlertDescription>
         </Alert>
@@ -197,39 +197,39 @@ const StudentProfilePage = () => {
   if (!profile) return null;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 selection:bg-indigo-500/30">
+    <div className="max-w-6xl mx-auto space-y-10 selection:bg-indigo-500/30 font-sans">
       {/* Profile Header Card */}
-      <div className="relative group overflow-hidden bg-slate-900 border-4 border-slate-800 p-8 md:p-12 rounded-[3rem] shadow-2xl">
+      <div className="relative group overflow-hidden bg-white dark:bg-slate-900 border-4 border-slate-200 dark:border-slate-800 p-8 md:p-12 rounded-[3rem] shadow-xl">
         <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/5 rounded-full -mr-40 -mt-40 blur-3xl group-hover:bg-indigo-500/10 transition-colors"></div>
         <div className="relative z-10 flex flex-col md:flex-row items-center gap-10">
           <div className="relative">
             <div className="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-tr from-indigo-500 via-purple-500 to-cyan-500 rounded-[2.5rem] p-1 shadow-2xl">
-              <div className="w-full h-full bg-slate-950 rounded-[2.2rem] flex items-center justify-center">
-                <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-t from-indigo-400 to-cyan-400">
+              <div className="w-full h-full bg-slate-50 dark:bg-slate-950 rounded-[2.2rem] flex items-center justify-center">
+                <span className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-t from-indigo-500 to-cyan-500 dark:from-indigo-400 dark:to-cyan-400">
                   {profile.fullName.charAt(0)}
                 </span>
               </div>
             </div>
-            <div className="absolute -bottom-2 -right-2 p-3 bg-slate-950 border-4 border-slate-900 rounded-2xl shadow-xl">
-               <ShieldCheck className="h-6 w-6 text-green-400" />
+            <div className="absolute -bottom-2 -right-2 p-3 bg-white dark:bg-slate-950 border-4 border-slate-200 dark:border-slate-900 rounded-2xl shadow-xl">
+               <ShieldCheck className="h-6 w-6 text-green-500" />
             </div>
           </div>
 
           <div className="flex-1 text-center md:text-left space-y-4">
             <div className="space-y-1">
-              <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-slate-100">
+              <h1 className="text-4xl md:text-5xl font-black italic tracking-tighter text-slate-900 dark:text-slate-100">
                 {profile.fullName}
               </h1>
-              <p className="text-slate-400 font-bold tracking-wide italic flex items-center justify-center md:justify-start gap-2">
-                <Sparkles className="h-4 w-4 text-yellow-400" />
+              <p className="text-slate-600 dark:text-slate-400 font-bold tracking-wide italic flex items-center justify-center md:justify-start gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" />
                 Elite Cadet • Grade {profile.grade}
               </p>
             </div>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-              <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/30 px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest">
+              <Badge className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30 px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest">
                 Student Portal V2
               </Badge>
-              <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest">
+              <Badge className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30 px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest">
                 Academic Verified
               </Badge>
             </div>
@@ -250,7 +250,7 @@ const StudentProfilePage = () => {
                   disabled={isSaving}
                   onClick={handleCancel}
                   variant="ghost"
-                  className="h-16 px-8 rounded-2xl bg-slate-950/50 border-2 border-slate-800 hover:border-red-500/30 text-slate-400 hover:text-red-400 font-black transition-all flex items-center gap-3 text-lg"
+                  className="h-16 px-8 rounded-2xl bg-slate-100 dark:bg-slate-950/50 border-2 border-slate-300 dark:border-slate-800 hover:border-red-500/30 text-slate-700 dark:text-slate-400 hover:text-red-500 font-black transition-all flex items-center gap-3 text-lg"
                 >
                   <X className="h-5 w-5" />
                   Cancel
@@ -272,10 +272,10 @@ const StudentProfilePage = () => {
       {/* Main Form Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Basic Information Card */}
-        <div className="bg-slate-900 border-4 border-slate-800 p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+        <div className="bg-white dark:bg-slate-900 border-4 border-slate-200 dark:border-slate-800 p-8 md:p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full -mb-32 -ml-32 blur-3xl"></div>
           <div className="relative z-10 space-y-8">
-            <h3 className="text-2xl font-black italic tracking-tight text-cyan-400 flex items-center gap-3">
+            <h3 className="text-2xl font-black italic tracking-tight text-cyan-600 dark:text-cyan-400 flex items-center gap-3">
               <User className="h-6 w-6" />
               Identity Protocol
             </h3>
@@ -322,10 +322,10 @@ const StudentProfilePage = () => {
 
         <div className="space-y-10">
           {/* Academic Profile */}
-          <div className="bg-slate-900 border-4 border-slate-800 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+          <div className="bg-white dark:bg-slate-900 border-4 border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/5 rounded-full -mt-24 -mr-24 blur-2xl"></div>
             <div className="relative z-10 space-y-8">
-              <h3 className="text-2xl font-black italic tracking-tight text-purple-400 flex items-center gap-3">
+              <h3 className="text-2xl font-black italic tracking-tight text-purple-600 dark:text-purple-400 flex items-center gap-3">
                 <BookOpen className="h-6 w-6" />
                 Academic Registry
               </h3>
@@ -352,10 +352,10 @@ const StudentProfilePage = () => {
           </div>
 
           {/* Residence Protocol */}
-          <div className="bg-slate-900 border-4 border-slate-800 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
+          <div className="bg-white dark:bg-slate-900 border-4 border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-xl relative overflow-hidden group">
             <div className="absolute bottom-0 right-0 w-48 h-48 bg-green-500/5 rounded-full -mb-24 -mr-24 blur-2xl"></div>
             <div className="relative z-10 space-y-8">
-              <h3 className="text-2xl font-black italic tracking-tight text-emerald-400 flex items-center gap-3">
+              <h3 className="text-2xl font-black italic tracking-tight text-emerald-600 dark:text-emerald-400 flex items-center gap-3">
                 <MapPin className="h-6 w-6" />
                 Residence Protocol
               </h3>

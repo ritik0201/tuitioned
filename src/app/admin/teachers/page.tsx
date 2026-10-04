@@ -78,19 +78,19 @@ export default function TeacherDataTable() {
     {
       accessorKey: "name",
       header: ({ column }) => (
-        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Teacher Profile <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12 border border-white/10 shadow-lg ring-2 ring-emerald-500/10">
+          <Avatar className="h-12 w-12 border border-slate-200 dark:border-slate-800 shadow-lg ring-2 ring-emerald-500/10">
             <AvatarImage src={row.original.profileImage} />
             <AvatarFallback className="bg-emerald-600 text-sm text-white font-black">{row.original.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
-             <span className="font-black text-base text-white tracking-tight">{row.original.name}</span>
-             <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mt-0.5">{row.original.id}</span>
+             <span className="font-black text-base text-slate-900 dark:text-white tracking-tight">{row.original.name}</span>
+             <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] font-bold mt-0.5">{row.original.id}</span>
           </div>
         </div>
       ),
@@ -101,10 +101,10 @@ export default function TeacherDataTable() {
       cell: ({ row }) => {
         const status = row.getValue("teacherStatus") as string;
         const config = {
-          approved: { color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", icon: <ShieldCheck size={12} /> },
-          rejected: { color: "bg-rose-500/10 text-rose-500 border-rose-500/20", icon: <ShieldAlert size={12} /> },
-          pending: { color: "bg-orange-500/10 text-orange-500 border-orange-500/20", icon: <Clock size={12} /> },
-        }[status || 'pending'] || { color: "bg-gray-500/10 text-gray-500 border-gray-500/20", icon: <Clock size={12} /> };
+          approved: { color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", icon: <ShieldCheck size={12} /> },
+          rejected: { color: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20", icon: <ShieldAlert size={12} /> },
+          pending: { color: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20", icon: <Clock size={12} /> },
+        }[status || 'pending'] || { color: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20", icon: <Clock size={12} /> };
 
         return (
           <Badge className={`${config.color} border flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider`}>
@@ -120,12 +120,12 @@ export default function TeacherDataTable() {
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1 max-w-[200px]">
           {row.original.listOfSubjects?.slice(0, 3).map((sub, i) => (
-            <Badge key={i} variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+            <Badge key={i} variant="outline" className="bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">
               {sub}
             </Badge>
           ))}
           {(row.original.listOfSubjects?.length || 0) > 3 && (
-            <Badge variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+            <Badge variant="outline" className="bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">
               +{(row.original.listOfSubjects?.length || 0) - 3}
             </Badge>
           )}
@@ -142,32 +142,32 @@ export default function TeacherDataTable() {
              <Button 
                 variant="outline" 
                 size="sm" 
-                className="rounded-xl border-white/5 bg-white/5 hover:bg-emerald-600 hover:text-white transition-all font-bold px-4 h-9"
+                className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:bg-emerald-600 hover:text-white transition-all font-bold px-4 h-9 cursor-pointer"
                 onClick={() => router.push(`/admin/teachers/${teacher.id}`)}
              >
                 <Eye size={14} className="mr-2" /> View
              </Button>
              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10"><MoreHorizontal size={18} /></Button>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"><MoreHorizontal size={18} /></Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
-                  <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-3 py-2">Account Control</DropdownMenuLabel>
-                  <DropdownMenuItem className="rounded-xl focus:bg-emerald-500/10 focus:text-emerald-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'approved')}>
+                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#111827] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl shadow-2xl p-2">
+                  <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-black px-3 py-2">Account Control</DropdownMenuLabel>
+                  <DropdownMenuItem className="rounded-xl focus:bg-emerald-50 dark:focus:bg-emerald-500/10 focus:text-emerald-600 dark:focus:text-emerald-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'approved')}>
                     <ShieldCheck size={16} className="mr-3" /> Approve Account
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="rounded-xl focus:bg-rose-500/10 focus:text-rose-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'rejected')}>
+                  <DropdownMenuItem className="rounded-xl focus:bg-rose-50 dark:focus:bg-rose-500/10 focus:text-rose-600 dark:focus:text-rose-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'rejected')}>
                     <ShieldAlert size={16} className="mr-3" /> Reject Account
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="rounded-xl focus:bg-orange-500/10 focus:text-orange-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'pending')}>
+                  <DropdownMenuItem className="rounded-xl focus:bg-orange-50 dark:focus:bg-orange-500/10 focus:text-orange-600 dark:focus:text-orange-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'pending')}>
                     <Clock size={16} className="mr-3" /> Set to Pending
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-white/5 my-1" />
-                  <DropdownMenuItem className="rounded-xl focus:bg-white/5 focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(teacher.id)}>
-                    <Copy size={16} className="mr-3 text-gray-400" /> Copy System ID
+                  <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 my-1" />
+                  <DropdownMenuItem className="rounded-xl focus:bg-slate-100 dark:focus:bg-slate-800 focus:text-blue-600 dark:focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(teacher.id)}>
+                    <Copy size={16} className="mr-3 text-slate-400" /> Copy System ID
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-white/5 my-1" />
-                  <DropdownMenuItem onClick={() => handleDelete(teacher.id)} className="rounded-xl text-red-500 focus:bg-red-500/10 focus:text-red-500 cursor-pointer py-2.5">
+                  <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 my-1" />
+                  <DropdownMenuItem onClick={() => handleDelete(teacher.id)} className="rounded-xl text-red-600 dark:text-red-500 focus:bg-red-50 dark:focus:bg-red-500/10 focus:text-red-600 cursor-pointer py-2.5">
                     <Trash2 size={16} className="mr-3" /> Remove Record
                   </DropdownMenuItem>
                 </DropdownMenuContent>

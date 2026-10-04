@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative overflow-hidden rounded-[2rem] p-8 md:p-12 mb-10 bg-[#111827] border border-white/5 shadow-2xl"
+        className="relative overflow-hidden rounded-[2rem] p-8 md:p-12 mb-10 bg-slate-900 text-white border border-slate-800 shadow-2xl"
       >
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blue-600/20 to-transparent pointer-events-none" />
         <div className="relative z-10">
@@ -168,14 +168,14 @@ export default function AdminDashboardPage() {
           <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight mb-4">
             System <span className="text-blue-500">Overview</span>
           </h1>
-          <p className="text-lg text-gray-400 max-w-2xl">
+          <p className="text-lg text-slate-300 max-w-2xl">
             Welcome back! You have <span className="text-white font-bold">{pendingTeachers} pending teacher approvals</span> and <span className="text-white font-bold">{data.recentDemos.length} new demo requests</span> waiting for review.
           </p>
           <div className="flex flex-wrap gap-4 mt-8">
-             <Button onClick={() => router.push('/admin/teachers')} className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 h-12 font-bold shadow-lg shadow-blue-600/20">
+             <Button onClick={() => router.push('/admin/teachers')} className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 h-12 font-bold shadow-lg shadow-blue-600/20 cursor-pointer">
                 Review Teachers
              </Button>
-             <Button variant="outline" onClick={() => router.push('/admin/mail')} className="border-white/10 text-white hover:bg-white/5 rounded-full px-8 h-12 font-bold">
+             <Button variant="outline" onClick={() => router.push('/admin/mail')} className="border-slate-700 text-white hover:bg-slate-800 rounded-full px-8 h-12 font-bold cursor-pointer">
                 Send Bulk Mail
              </Button>
           </div>
@@ -195,46 +195,46 @@ export default function AdminDashboardPage() {
       <div className="grid gap-8 grid-cols-1 xl:grid-cols-3">
         {/* Recent Demos List - Premium Version */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }} className="xl:col-span-2">
-          <Card className="bg-[#111827] border-white/5 text-white rounded-[2rem] overflow-hidden shadow-2xl">
-            <CardHeader className="p-8 border-b border-white/5 flex flex-row items-center justify-between">
+          <Card className="bg-white dark:bg-[#111827] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[2rem] overflow-hidden shadow-sm dark:shadow-2xl">
+            <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800 flex flex-row items-center justify-between">
               <div>
                 <CardTitle className="text-2xl font-black flex items-center gap-3">
-                   <Zap className="text-yellow-500" fill="currentColor" />
+                   <Zap className="text-amber-500" fill="currentColor" />
                    Recent Demo Requests
                 </CardTitle>
-                <p className="text-gray-500 text-sm mt-1">Direct inquiries from prospective students</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Direct inquiries from prospective students</p>
               </div>
               <Link href="/admin/democlass-student">
-                <Button variant="ghost" className="text-blue-500 hover:text-blue-400 hover:bg-blue-500/10">View All</Button>
+                <Button variant="ghost" className="text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 font-bold">View All</Button>
               </Link>
             </CardHeader>
             <CardContent className="p-0">
-               <div className="divide-y divide-white/5">
+               <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {data.recentDemos.filter(demo => demo.studentId).slice(0, 5).map((demo) => (
-                  <div key={demo._id} className="p-6 flex items-center justify-between hover:bg-white/5 transition-colors group">
+                  <div key={demo._id} className="p-6 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors group">
                     <div className="flex items-center gap-4">
-                      <Avatar className="h-14 w-14 border-2 border-white/10 group-hover:border-blue-500/50 transition-colors">
+                      <Avatar className="h-14 w-14 border-2 border-slate-200 dark:border-slate-700 group-hover:border-blue-500/50 transition-colors">
                         <AvatarImage src={demo.studentId.profileImage} />
-                        <AvatarFallback className="bg-blue-500 text-white font-bold">{demo.studentId.fullName.charAt(0)}</AvatarFallback>
+                        <AvatarFallback className="bg-blue-600 text-white font-bold">{demo.studentId.fullName.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <h4 className="font-bold text-lg">{demo.studentId.fullName}</h4>
+                        <h4 className="font-bold text-lg text-slate-900 dark:text-white">{demo.studentId.fullName}</h4>
                         <div className="flex items-center gap-2 mt-0.5">
-                           <Badge variant="outline" className="text-[10px] uppercase border-white/10 text-gray-400">{demo.subject}</Badge>
-                           <span className="text-xs text-gray-600">•</span>
-                           <span className="text-xs text-gray-500">{demo.studentId.email}</span>
+                           <Badge variant="outline" className="text-[10px] uppercase border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400">{demo.subject}</Badge>
+                           <span className="text-xs text-slate-400">•</span>
+                           <span className="text-xs text-slate-500 dark:text-slate-400">{demo.studentId.email}</span>
                         </div>
                       </div>
                     </div>
                     <Link href={`/admin/democlass-student/${demo._id}`}>
-                       <IconButton className="bg-white/5 hover:bg-blue-600 hover:text-white transition-all">
+                       <IconButton className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-blue-600 hover:text-white transition-all">
                           <ArrowUpRight size={20} />
                        </IconButton>
                     </Link>
                   </div>
                 ))}
                 {data.recentDemos.length === 0 && (
-                  <div className="p-20 text-center text-gray-500 flex flex-col items-center">
+                  <div className="p-20 text-center text-slate-400 dark:text-slate-500 flex flex-col items-center">
                      <Activity size={48} className="mb-4 opacity-20" />
                      <p>No recent demo requests found.</p>
                   </div>
@@ -246,34 +246,34 @@ export default function AdminDashboardPage() {
 
         {/* Recently Joined Students - Premium Version */}
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }}>
-          <Card className="bg-[#111827] border-white/5 text-white rounded-[2rem] overflow-hidden shadow-2xl h-full">
-            <CardHeader className="p-8 border-b border-white/5">
+          <Card className="bg-white dark:bg-[#111827] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-[2rem] overflow-hidden shadow-sm dark:shadow-2xl h-full">
+            <CardHeader className="p-8 border-b border-slate-100 dark:border-slate-800">
                 <CardTitle className="text-2xl font-black flex items-center gap-3">
                    <Target className="text-emerald-500" />
                    New Students
                 </CardTitle>
-                <p className="text-gray-500 text-sm mt-1">Latest members to join the platform</p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Latest members to join the platform</p>
             </CardHeader>
             <CardContent className="p-0">
-               <div className="divide-y divide-white/5">
+               <div className="divide-y divide-slate-100 dark:divide-slate-800/60">
                 {data.recentStudents.slice(0, 6).map((student) => (
-                  <div key={student._id} className="p-6 flex items-center gap-4 hover:bg-white/5 transition-colors">
-                    <Avatar className="h-12 w-12 rounded-2xl border-2 border-white/10">
+                  <div key={student._id} className="p-6 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <Avatar className="h-12 w-12 rounded-2xl border-2 border-slate-200 dark:border-slate-700">
                       <AvatarImage src={student.profileImage} />
-                      <AvatarFallback className="bg-emerald-500 text-white font-bold">{student.fullName.charAt(0)}</AvatarFallback>
+                      <AvatarFallback className="bg-emerald-600 text-white font-bold">{student.fullName.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold truncate">{student.fullName}</h4>
-                      <p className="text-xs text-gray-500 truncate">{new Date(student.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                      <h4 className="font-bold truncate text-slate-900 dark:text-white">{student.fullName}</h4>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{new Date(student.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                     </div>
                     <Link href={`/admin/students/${student._id}`}>
-                       <Button size="sm" variant="outline" className="rounded-full border-white/10 hover:bg-blue-600 hover:border-blue-600 hover:text-white">Profile</Button>
+                       <Button size="sm" variant="outline" className="rounded-full border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-blue-600 hover:border-blue-600 hover:text-white font-bold cursor-pointer">Profile</Button>
                     </Link>
                   </div>
                 ))}
                </div>
                <div className="p-6">
-                  <Button variant="outline" onClick={() => router.push('/admin/students')} className="w-full border-white/5 bg-white/5 hover:bg-white/10 text-white rounded-xl py-6">
+                  <Button variant="outline" onClick={() => router.push('/admin/students')} className="w-full border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-900 dark:text-white rounded-xl py-6 font-bold cursor-pointer">
                      Browse All Students
                   </Button>
                </div>

@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         model: User,
         select: 'fullName',
       })
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, _id: -1 })
       .lean<PopulatedTransaction[]>();
 
     const formattedTransactions = transactions.map(tx => {

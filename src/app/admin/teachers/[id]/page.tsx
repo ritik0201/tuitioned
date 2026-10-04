@@ -99,10 +99,10 @@ export default function TeacherDetailPage({
 
   const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value?: string | null }) => (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1.5 }}>
-      <Box sx={{ color: 'text.secondary' }}>{icon}</Box>
+      <Box sx={{ color: 'primary.main' }}>{icon}</Box>
       <Box>
         <Typography variant="body2" color="text.secondary">{label}</Typography>
-        <Typography variant="body1" fontWeight="medium">{value || 'N/A'}</Typography>
+        <Typography variant="body1" fontWeight="bold" color="text.primary">{value || 'N/A'}</Typography>
       </Box>
     </Box>
   );
@@ -114,49 +114,50 @@ export default function TeacherDetailPage({
         <Box sx={{ flex: '1 1 400px', minWidth: 300 }}>
           <Paper
             elevation={0}
-            className="border-2 border-blue-500"
-            sx={{ p: 3, borderRadius: 4, bgcolor: '#1f2937', height: '100%' }}
+            className="border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl"
+            sx={{ p: 4, borderRadius: 5, bgcolor: 'background.paper', height: '100%' }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3 }}>
               <Avatar
                 src={`https://api.dicebear.com/7.x/initials/svg?seed=${teacher.fullName}`}
-                sx={{ width: 80, height: 80, fontSize: '2.5rem' }}
+                sx={{ width: 72, height: 72, fontSize: '2rem', bgcolor: 'primary.main', fontWeight: 'bold' }}
               >
                 {teacher.fullName.charAt(0).toUpperCase()}
               </Avatar>
               <Box>
-                <Typography variant="h4" fontWeight="bold">{teacher.fullName}</Typography>
-                <Typography variant="body1" color="text.secondary">{teacher.listOfSubjects?.join(", ") || "No subjects"}</Typography>
+                <Typography variant="h5" fontWeight="bold" color="text.primary">{teacher.fullName}</Typography>
+                <Typography variant="body2" color="text.secondary">{teacher.listOfSubjects?.join(", ") || "No subjects"}</Typography>
               </Box>
             </Box>
-            <Divider sx={{ my: 2 }} />
-            <InfoItem icon={<Mail size={20} />} label="Email" value={teacher.email} />
-            <InfoItem icon={<Book size={20} />} label="Subject" value={teacher.listOfSubjects?.join(", ")} />
-            <InfoItem icon={<Phone size={20} />} label="Mobile" value={teacher.mobile} />
-            <InfoItem icon={<GraduationCap size={20} />} label="Qualification" value={teacher.qualification} />
-            <InfoItem icon={<Briefcase size={20} />} label="Experience" value={teacher.experience} />
+            <Divider sx={{ my: 2, borderColor: 'divider' }} />
+            <InfoItem icon={<Mail size={18} />} label="Email" value={teacher.email} />
+            <InfoItem icon={<Book size={18} />} label="Subject" value={teacher.listOfSubjects?.join(", ")} />
+            <InfoItem icon={<Phone size={18} />} label="Mobile" value={teacher.mobile} />
+            <InfoItem icon={<GraduationCap size={18} />} label="Qualification" value={teacher.qualification} />
+            <InfoItem icon={<Briefcase size={18} />} label="Experience" value={teacher.experience} />
 
             {teacher.cvUrl && (
               <Box sx={{ mt: 3 }}>
                 <Button
                   variant="outlined"
-                  color="secondary"
+                  color="primary"
                   component="a"
                   href={teacher.cvUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   startIcon={<FileText size={16} />}
+                  sx={{ borderRadius: 3, textTransform: 'none', fontWeight: 'bold' }}
                 >
-                  View CV
+                  View CV Document
                 </Button>
               </Box>
             )}
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="body2" color="text.secondary" mb={1}>Subjects</Typography>
+            <Divider sx={{ my: 2, borderColor: 'divider' }} />
+            <Typography variant="body2" color="text.secondary" fontWeight="bold" mb={1.5}>Subjects</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {teacher.listOfSubjects && teacher.listOfSubjects.length > 0 ? (
                 teacher.listOfSubjects.map(subject => (
-                  <Chip key={subject} label={subject} variant="outlined" />
+                  <Chip key={subject} label={subject} variant="outlined" sx={{ borderRadius: 2, fontWeight: 600 }} />
                 ))
               ) : (
                 <Typography variant="body2" color="text.secondary">No subjects listed.</Typography>
@@ -169,43 +170,45 @@ export default function TeacherDetailPage({
         <Box sx={{ flex: '2 1 600px' }}>
           <Paper
             elevation={0}
-            className="border-2 border-blue-500"
-            sx={{ p: 3, borderRadius: 4, bgcolor: '#1f2937' }}
+            className="border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl"
+            sx={{ p: 4, borderRadius: 5, bgcolor: 'background.paper' }}
           >
-            <Typography variant="h5" fontWeight="bold">Assigned Courses</Typography>
-            <Divider sx={{ my: 2 }} />
+            <Typography variant="h5" fontWeight="bold" color="text.primary">Assigned Courses</Typography>
+            <Divider sx={{ my: 2.5, borderColor: 'divider' }} />
             {courses.length > 0 ? (
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
                 {courses.map((course) => (
                   <Paper
                     key={course._id.toString()}
                     elevation={0}
-                    sx={{ p: 2.5, borderRadius: 3, bgcolor: '#374151', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+                    className="border border-slate-200 dark:border-slate-800"
+                    sx={{ p: 3, borderRadius: 4, bgcolor: 'action.hover', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
                   >
                     <Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                        <Typography variant="h6" fontWeight="bold">{course.title}</Typography>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                        <Typography variant="h6" fontWeight="bold" color="text.primary">{course.title}</Typography>
                         <Chip
                           label={course.noOfClasses > 0 ? "Running" : "Pending"}
                           size="small"
                           color={course.noOfClasses > 0 ? 'success' : 'warning'}
+                          sx={{ fontWeight: 'bold' }}
                         />
                       </Box>
                       <Typography variant="body2" color="text.secondary" gutterBottom>
-                        Student: {(course.studentId as any)?.fullName || 'N/A'}
+                        Student: <span className="font-bold text-slate-900 dark:text-slate-100">{(course.studentId as any)?.fullName || 'N/A'}</span>
                       </Typography>
-                      <Divider sx={{ my: 1.5 }} />
-                      <Typography variant="body2">
-                        <span className="font-semibold">Classes Left:</span> {course.noOfClasses}
+                      <Divider sx={{ my: 1.5, borderColor: 'divider' }} />
+                      <Typography variant="body2" color="text.primary">
+                        <span className="font-semibold text-slate-500 dark:text-slate-400">Classes Left:</span> <span className="font-bold">{course.noOfClasses}</span>
                       </Typography>
                     </Box>
                     <Button
                       component={Link}
                       href={`/admin/teachers/${id}/${course._id.toString()}`}
                       variant="outlined"
-                      color="secondary"
+                      color="primary"
                       endIcon={<ArrowRight size={16} />}
-                      sx={{ mt: 2, width: '100%' }}
+                      sx={{ mt: 2.5, width: '100%', borderRadius: 3, fontWeight: 'bold', textTransform: 'none' }}
                     >
                       View Details
                     </Button>
@@ -213,7 +216,7 @@ export default function TeacherDetailPage({
                 ))}
               </Box>
             ) : (
-              <Alert severity="info" sx={{ bgcolor: 'transparent', border: '1px solid', borderColor: 'info.main' }}>
+              <Alert severity="info" sx={{ borderRadius: 3 }}>
                 This teacher has not been assigned to any courses yet.
               </Alert>
             )}

@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
         { _id: { $in: studentIds } },
         { studentStatus: 'approved' }
       ]
-    }).select('fullName email mobile').lean();
+    }).sort({ createdAt: -1, _id: -1 }).select('fullName email mobile').lean();
 
     const formattedStudents = students.map(student => ({
       id: student._id.toString(),

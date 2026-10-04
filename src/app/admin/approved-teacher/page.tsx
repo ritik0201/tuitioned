@@ -12,7 +12,6 @@ import {
   Phone, 
   Copy, 
   Eye,
-  ShieldCheck,
   BookOpen
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -65,31 +64,21 @@ export default function ApprovedTeachersPage() {
     {
       accessorKey: "name",
       header: ({ column }) => (
-        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 p-0 font-bold" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Teacher Profile <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
       cell: ({ row }) => (
-        <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12 border border-white/10 shadow-lg ring-2 ring-emerald-500/10">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10 border border-slate-200 dark:border-slate-800 shadow-md ring-2 ring-emerald-500/10 shrink-0">
             <AvatarImage src={row.original.profileImage} />
             <AvatarFallback className="bg-emerald-600 text-sm text-white font-black">{row.original.name.charAt(0)}</AvatarFallback>
           </Avatar>
-          <div className="flex flex-col">
-             <span className="font-black text-base text-white tracking-tight">{row.original.name}</span>
-             <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] font-bold mt-0.5">{row.original.id}</span>
+          <div className="flex flex-col min-w-0">
+             <span className="font-black text-sm text-slate-900 dark:text-white tracking-tight truncate">{row.original.name}</span>
+             <span className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] font-bold mt-0.5 truncate">{row.original.id}</span>
           </div>
         </div>
-      ),
-    },
-    {
-      accessorKey: "teacherStatus",
-      header: "Trust Status",
-      cell: ({ row }) => (
-        <Badge className="bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
-          <ShieldCheck size={12} />
-          Verified Account
-        </Badge>
       ),
     },
     {
@@ -98,12 +87,12 @@ export default function ApprovedTeachersPage() {
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1 max-w-[220px]">
           {row.original.listOfSubjects?.slice(0, 3).map((sub, i) => (
-            <Badge key={i} variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+            <Badge key={i} variant="outline" className="bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">
               {sub}
             </Badge>
           ))}
           {(row.original.listOfSubjects?.length || 0) > 3 && (
-            <Badge variant="outline" className="bg-white/5 border-white/10 text-gray-400 text-[10px]">
+            <Badge variant="outline" className="bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">
               +{(row.original.listOfSubjects?.length || 0) - 3}
             </Badge>
           )}
@@ -114,14 +103,14 @@ export default function ApprovedTeachersPage() {
       accessorKey: "email",
       header: "Contact",
       cell: ({ row }) => (
-        <div className="flex flex-col gap-1">
-           <div className="flex items-center gap-2 text-xs text-gray-300">
-              <Mail size={12} className="text-blue-400" />
-              {row.original.email}
+        <div className="flex flex-col gap-1 min-w-0">
+           <div className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300 truncate">
+              <Mail size={12} className="text-blue-500 dark:text-blue-400 shrink-0" />
+              <span className="truncate">{row.original.email}</span>
            </div>
-           <div className="flex items-center gap-2 text-xs text-gray-400">
-              <Phone size={12} className="text-emerald-400" />
-              {row.original.mobile}
+           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 truncate">
+              <Phone size={12} className="text-emerald-500 dark:text-emerald-400 shrink-0" />
+              <span className="truncate">{row.original.mobile}</span>
            </div>
         </div>
       )
@@ -130,23 +119,23 @@ export default function ApprovedTeachersPage() {
       id: "actions",
       header: "Ops",
       cell: ({ row }) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
            <Button 
               variant="outline" 
               size="sm" 
-              className="rounded-xl border-white/5 bg-white/5 hover:bg-emerald-600 hover:text-white transition-all font-bold px-4 h-9"
+              className="rounded-xl border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 hover:bg-emerald-600 hover:text-white transition-all font-bold px-3.5 h-8 cursor-pointer text-xs"
               onClick={() => router.push(`/admin/teachers/${row.original.id}`)}
            >
-              <Eye size={14} className="mr-2" /> Profile
+              <Eye size={13} className="mr-1.5" /> Profile
            </Button>
            <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10"><MoreHorizontal size={18} /></Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"><MoreHorizontal size={16} /></Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
-                <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-3 py-2">Quick Access</DropdownMenuLabel>
-                <DropdownMenuItem className="rounded-xl focus:bg-white/5 focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(row.original.id)}>
-                  <Copy size={16} className="mr-3 text-gray-400" /> Copy System ID
+              <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#111827] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl shadow-2xl p-2">
+                <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-black px-3 py-2">Quick Access</DropdownMenuLabel>
+                <DropdownMenuItem className="rounded-xl focus:bg-slate-100 dark:focus:bg-slate-800 focus:text-blue-600 dark:focus:text-blue-400 cursor-pointer py-2.5 text-xs" onClick={() => navigator.clipboard.writeText(row.original.id)}>
+                  <Copy size={15} className="mr-2.5 text-slate-400" /> Copy System ID
                 </DropdownMenuItem>
               </DropdownMenuContent>
            </DropdownMenu>
@@ -156,7 +145,7 @@ export default function ApprovedTeachersPage() {
   ]
 
   return (
-    <div className="p-4 md:p-8 max-w-[1600px] mx-auto">
+    <div className="p-2 sm:p-4 md:p-6 w-full max-w-[1600px] mx-auto">
       <AdminDataTable
         columns={columns}
         data={data}

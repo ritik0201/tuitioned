@@ -48,16 +48,16 @@ export default function TransactionDataTable() {
     {
       accessorKey: "studentName",
       header: ({ column }) => (
-        <Button variant="ghost" className="hover:bg-white/5 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button variant="ghost" className="hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 p-0" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
           Payer Name <ArrowUpDown className="ml-2 h-3 w-3" />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
-           <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-500 border border-blue-500/20 font-black text-xs">
+           <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-500/20 font-black text-xs">
               {row.original.studentName.charAt(0)}
            </div>
-           <span className="font-bold text-white text-sm">{row.original.studentName}</span>
+           <span className="font-bold text-slate-900 dark:text-white text-sm">{row.original.studentName}</span>
         </div>
       ),
     },
@@ -65,8 +65,8 @@ export default function TransactionDataTable() {
       accessorKey: "amount",
       header: "Value",
       cell: ({ row }) => (
-        <div className="flex items-center gap-1.5 font-black text-white text-lg tracking-tighter">
-           <span className="text-xs text-gray-500 font-normal">₹</span>
+        <div className="flex items-center gap-1.5 font-black text-slate-900 dark:text-white text-lg tracking-tighter">
+           <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">₹</span>
            {row.original.amount.toLocaleString()}
         </div>
       ),
@@ -77,10 +77,10 @@ export default function TransactionDataTable() {
       cell: ({ row }) => {
         const status = row.getValue("status") as string;
         const config = {
-          completed: { color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20", icon: <CheckCircle2 size={12} />, label: "Success" },
-          failed: { color: "bg-rose-500/10 text-rose-500 border-rose-500/20", icon: <XCircle size={12} />, label: "Failed" },
-          pending: { color: "bg-orange-500/10 text-orange-500 border-orange-500/20", icon: <Clock size={12} />, label: "Processing" },
-        }[status] || { color: "bg-gray-500/10 text-gray-500 border-gray-500/20", icon: <Clock size={12} />, label: status };
+          completed: { color: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20", icon: <CheckCircle2 size={12} />, label: "Success" },
+          failed: { color: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20", icon: <XCircle size={12} />, label: "Failed" },
+          pending: { color: "bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/20", icon: <Clock size={12} />, label: "Processing" },
+        }[status] || { color: "bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20", icon: <Clock size={12} />, label: status };
 
         return (
           <Badge className={`${config.color} border flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest`}>
@@ -95,8 +95,8 @@ export default function TransactionDataTable() {
       header: "Timestamp",
       cell: ({ row }) => (
         <div className="flex flex-col">
-           <span className="text-xs text-gray-300 font-medium">{new Date(row.original.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-           <span className="text-[10px] text-gray-500">{new Date(row.original.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
+           <span className="text-xs text-slate-700 dark:text-slate-300 font-medium">{new Date(row.original.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+           <span className="text-[10px] text-slate-400 dark:text-slate-500">{new Date(row.original.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
       ),
     },
@@ -104,7 +104,7 @@ export default function TransactionDataTable() {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => (
-        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-600/10 hover:text-blue-500 transition-all rounded-lg">
+        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-blue-600/10 hover:text-blue-500 text-slate-500 dark:text-slate-400 transition-all rounded-lg cursor-pointer">
            <ExternalLink size={16} />
         </Button>
       )

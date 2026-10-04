@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
         model: User,
         select: 'fullName email' // Select only the fields you need from the User model
       })
+      .sort({ createdAt: -1, _id: -1 })
       .lean<PopulatedCourse[]>();
 
     if (teacherCourses.length === 0) {

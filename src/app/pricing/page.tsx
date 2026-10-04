@@ -246,7 +246,7 @@ export default function PricingPage() {
   const activeCountryObj = COUNTRIES.find(c => c.code === selectedCountry)!;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-blue-500 selection:text-white transition-colors duration-200">
       <Navbar />
 
       {/* Hero Header Section */}
@@ -254,30 +254,30 @@ export default function PricingPage() {
         {/* Subtle background glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-600/10 blur-[130px] rounded-full pointer-events-none" />
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-950/60 border border-blue-800/60 text-blue-400 text-xs font-semibold tracking-wide mb-6">
-          <ShieldCheck className="w-4 h-4 text-blue-400" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100 dark:bg-blue-950/60 border border-blue-300 dark:border-blue-800/60 text-blue-700 dark:text-blue-400 text-xs font-semibold tracking-wide mb-6">
+          <ShieldCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           <span>Simple, Transparent Pricing</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white max-w-3xl mx-auto leading-tight">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white max-w-3xl mx-auto leading-tight">
           Invest in Your Child’s Academic Success
         </h1>
-        <p className="mt-4 text-base sm:text-lg text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
+        <p className="mt-4 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto font-normal leading-relaxed">
           1-on-1 live personalized tutoring tailored to your child’s grade and learning pace. Choose long-term packages or flexible hourly plans.
         </p>
 
         {/* Plan Type Selector Toggle (Long Term vs Short Term) */}
-        <div className="mt-8 inline-flex items-center bg-slate-900 border border-slate-800 p-1.5 rounded-2xl shadow-xl">
+        <div className="mt-8 inline-flex items-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1.5 rounded-2xl shadow-xl">
           <button
             onClick={() => setActivePlanType('long-term')}
             className={`py-2.5 px-6 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${activePlanType === 'long-term'
               ? 'bg-blue-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
           >
             <Calendar className="w-4 h-4" />
             <span>Long-Term Packages</span>
-            <span className="text-[10px] bg-blue-950/80 border border-blue-400/40 text-blue-200 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] bg-blue-100 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-400/40 text-blue-700 dark:text-blue-200 px-2 py-0.5 rounded-full">
               Save up to 18%
             </span>
           </button>
@@ -286,26 +286,26 @@ export default function PricingPage() {
             onClick={() => setActivePlanType('short-term')}
             className={`py-2.5 px-6 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-2 ${activePlanType === 'short-term'
               ? 'bg-blue-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-white'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
           >
             <Clock className="w-4 h-4" />
             <span>Short-Term Hourly Plans</span>
-            <span className="text-[10px] bg-emerald-950/80 border border-emerald-400/40 text-emerald-300 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] bg-emerald-100 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-400/40 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full">
               Pay-As-You-Go
             </span>
           </button>
         </div>
 
         {/* Filter Bar Controls (Grade & Country) */}
-        <div className="mt-8 max-w-3xl mx-auto bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-5">
+        <div className="mt-8 max-w-3xl mx-auto bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-center justify-between gap-5">
           {/* Grade Selector */}
           <div className="w-full md:w-3/5 text-left">
-            <label className="text-xs font-semibold uppercase text-slate-400 tracking-wider flex items-center gap-1.5 mb-2.5">
-              <GraduationCap className="w-4 h-4 text-blue-400" />
+            <label className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1.5 mb-2.5">
+              <GraduationCap className="w-4 h-4 text-blue-500 dark:text-blue-400" />
               <span>Select Student Grade</span>
             </label>
-            <div className="grid grid-cols-3 gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800">
+            <div className="grid grid-cols-3 gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800">
               {GRADES.map(g => {
                 const isActive = selectedGrade === g.key;
                 return (
@@ -314,7 +314,7 @@ export default function PricingPage() {
                     onClick={() => setSelectedGrade(g.key)}
                     className={`py-2 px-3 rounded-lg transition-all duration-200 cursor-pointer text-center flex flex-col items-center justify-center ${isActive
                       ? 'bg-blue-600 text-white font-bold shadow-md'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-900/50'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-900/50'
                       }`}
                   >
                     <span className="text-xs font-bold">{g.label}</span>
@@ -327,18 +327,18 @@ export default function PricingPage() {
 
           {/* Country Currency Selector */}
           <div className="w-full md:w-2/5 text-left">
-            <label className="text-xs font-semibold uppercase text-slate-400 tracking-wider flex items-center gap-1.5 mb-2.5">
-              <Globe className="w-4 h-4 text-blue-400" />
+            <label className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1.5 mb-2.5">
+              <Globe className="w-4 h-4 text-blue-500 dark:text-blue-400" />
               <span>Country & Currency</span>
             </label>
             <div className="relative">
               <select
                 value={selectedCountry}
                 onChange={e => setSelectedCountry(e.target.value as CountryKey)}
-                className="w-full py-2.5 px-4 pl-11 bg-slate-950 border border-slate-800 rounded-xl focus:border-blue-500 text-sm font-semibold text-white appearance-none cursor-pointer outline-none transition"
+                className="w-full py-2.5 px-4 pl-11 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl focus:border-blue-500 text-sm font-semibold text-slate-900 dark:text-white appearance-none cursor-pointer outline-none transition"
               >
                 {COUNTRIES.map(c => (
-                  <option key={c.code} value={c.code} className="bg-slate-950 text-white font-medium py-2">
+                  <option key={c.code} value={c.code} className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium py-2">
                     {c.flag} {c.name} ({c.currencyLabel})
                   </option>
                 ))}
@@ -358,36 +358,36 @@ export default function PricingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
 
             {/* 6 MONTHS PLAN */}
-            <div className="bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-lg transition duration-200">
+            <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-lg transition duration-200">
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 bg-slate-800 px-3 py-1 rounded-md">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-md">
                     Semester Plan
                   </span>
-                  <span className="text-xs font-medium text-slate-400 flex items-center gap-1">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400 flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-slate-400" /> 52 Live Classes
                   </span>
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-1">6 Months</h3>
-                <p className="text-xs text-slate-400 mb-6">2 1-on-1 sessions per week</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">6 Months</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">2 1-on-1 sessions per week</p>
 
                 {/* Price display */}
-                <div className="mb-6 pb-6 border-b border-slate-800">
+                <div className="mb-6 pb-6 border-b border-slate-200 dark:border-slate-800">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                    <span className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
                       {activePricing.sixMonths.perClass}
                     </span>
-                    <span className="text-sm text-slate-400 font-medium">/ class</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">/ class</span>
                   </div>
-                  <p className="text-xs text-slate-400 mt-2 font-medium">
-                    Total package: <span className="text-slate-200 font-bold">{activePricing.sixMonths.totalPackage}</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+                    Total package: <span className="text-slate-900 dark:text-slate-200 font-bold">{activePricing.sixMonths.totalPackage}</span>
                   </p>
                 </div>
 
                 {/* Features List */}
                 <div className="space-y-3 mb-8">
-                  <p className="text-xs font-semibold uppercase text-slate-400 tracking-wider mb-3">Includes:</p>
+                  <p className="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400 tracking-wider mb-3">Includes:</p>
                   {[
                     '52 Live 1-on-1 Tutoring Classes',
                     'Customized School Curriculum Alignment',
@@ -396,8 +396,8 @@ export default function PricingPage() {
                     'Flexible Class Rescheduling & Rollover',
                     'Quarterly Progress Diagnostic Reports'
                   ].map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-3 text-sm text-slate-300 font-normal">
-                      <Check className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                    <div key={idx} className="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300 font-normal">
+                      <Check className="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
                       <span>{feature}</span>
                     </div>
                   ))}
@@ -408,7 +408,7 @@ export default function PricingPage() {
               <div>
                 <Link
                   href="/get-a-free-trial"
-                  className="w-full py-3.5 px-6 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-sm transition active:scale-[0.99] flex items-center justify-center gap-2 group cursor-pointer border border-slate-700"
+                  className="w-full py-3.5 px-6 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold text-sm transition active:scale-[0.99] flex items-center justify-center gap-2 group cursor-pointer border border-slate-800 dark:border-slate-700"
                 >
                   Book Free Trial
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform text-slate-400 group-hover:text-white" />
@@ -418,7 +418,7 @@ export default function PricingPage() {
             </div>
 
             {/* 12 MONTHS PLAN (RECOMMENDED) */}
-            <div className="relative bg-gradient-to-b from-blue-950/40 via-slate-900 to-slate-900 border-2 border-blue-500/60 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl shadow-blue-500/5 transition duration-200">
+            <div className="relative bg-gradient-to-b from-blue-50 dark:from-blue-950/40 via-white dark:via-slate-900 to-white dark:to-slate-900 border-2 border-blue-500/60 rounded-2xl p-6 sm:p-8 flex flex-col justify-between shadow-2xl shadow-blue-500/5 transition duration-200">
               {/* Top Badge */}
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-blue-600 text-white font-bold text-[11px] uppercase tracking-wider px-3.5 py-0.5 rounded-full shadow-md flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-white fill-white" />
@@ -427,38 +427,38 @@ export default function PricingPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-blue-300 bg-blue-900/50 px-3 py-1 rounded-md border border-blue-700/40">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 px-3 py-1 rounded-md border border-blue-300 dark:border-blue-700/40">
                     Academic Year
                   </span>
-                  <span className="text-xs font-medium text-blue-300 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-blue-400" /> 104 Live Classes
+                  <span className="text-xs font-medium text-blue-600 dark:text-blue-300 flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" /> 104 Live Classes
                   </span>
                 </div>
 
-                <h3 className="text-2xl font-bold text-white mb-1">12 Months</h3>
-                <p className="text-xs text-blue-200/80 mb-6">2-3 1-on-1 sessions per week</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">12 Months</h3>
+                <p className="text-xs text-blue-700/80 dark:text-blue-200/80 mb-6">2-3 1-on-1 sessions per week</p>
 
                 {/* Price display */}
-                <div className="mb-6 pb-6 border-b border-slate-800">
+                <div className="mb-6 pb-6 border-b border-slate-200 dark:border-slate-800">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                    <span className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
                       {activePricing.twelveMonths.perClass}
                     </span>
-                    <span className="text-sm text-slate-400 font-medium">/ class</span>
+                    <span className="text-sm text-slate-500 dark:text-slate-400 font-medium">/ class</span>
                     {activePricing.twelveMonths.savings && (
-                      <span className="ml-auto text-xs font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">
+                      <span className="ml-auto text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800/60">
                         {activePricing.twelveMonths.savings}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-slate-400 mt-2 font-medium">
-                    Total package: <span className="text-white font-bold">{activePricing.twelveMonths.totalPackage}</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 font-medium">
+                    Total package: <span className="text-slate-900 dark:text-white font-bold">{activePricing.twelveMonths.totalPackage}</span>
                   </p>
                 </div>
 
                 {/* Features List */}
                 <div className="space-y-3 mb-8">
-                  <p className="text-xs font-semibold uppercase text-blue-400 tracking-wider mb-3">Everything in 6-Months, Plus:</p>
+                  <p className="text-xs font-semibold uppercase text-blue-600 dark:text-blue-400 tracking-wider mb-3">Everything in 6-Months, Plus:</p>
                   {[
                     '104 Live 1-on-1 Tutoring Classes',
                     'Priority Tutor Selection & Preferred Time Slots',
@@ -467,8 +467,8 @@ export default function PricingPage() {
                     'Mental Math & Problem-Solving Modules',
                     '30-Day Money-Back Guarantee'
                   ].map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-3 text-sm text-slate-200 font-normal">
-                      <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+                    <div key={idx} className="flex items-start gap-3 text-sm text-slate-800 dark:text-slate-200 font-normal">
+                      <CheckCircle2 className="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
                       <span>{feature}</span>
                     </div>
                   ))}
@@ -484,7 +484,7 @@ export default function PricingPage() {
                   Get Started Now
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
-                <p className="text-[11px] text-center text-slate-400 mt-2.5">Risk-free trial • 30-day refund policy</p>
+                <p className="text-[11px] text-center text-slate-500 dark:text-slate-400 mt-2.5">Risk-free trial • 30-day refund policy</p>
               </div>
             </div>
 
@@ -495,27 +495,27 @@ export default function PricingPage() {
       {/* SHORT-TERM HOURLY PLANS SECTION */}
       {activePlanType === 'short-term' && (
         <section className="py-6 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto animate-fadeIn">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
+          <div className="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200 dark:border-slate-800">
               <div>
-                <h3 className="text-2xl font-bold text-white flex items-center gap-2 flex-wrap">
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2 flex-wrap">
                   Short-Term Hourly Rates
-                  <span className="text-xs bg-emerald-950/80 text-emerald-300 border border-emerald-800/60 font-semibold px-2.5 py-0.5 rounded-full">
+                  <span className="text-xs bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60 font-semibold px-2.5 py-0.5 rounded-full">
                     Pay-As-You-Go
                   </span>
-                  <span className="text-xs bg-blue-950/80 text-blue-300 border border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-blue-400" />
+                  <span className="text-xs bg-blue-100 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-800/60 font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400" />
                     Flexible class sessions
                   </span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Flexible per-hour pricing tailored to your weekly schedule with zero long-term commitment.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800 text-xs font-semibold text-slate-300 shrink-0">
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
                 <span>Displaying rates in:</span>
-                <span className="text-blue-400 font-bold">{selectedCountry === 'IN' ? 'INR (₹)' : 'USD ($)'}</span>
+                <span className="text-blue-600 dark:text-blue-400 font-bold">{selectedCountry === 'IN' ? 'INR (₹)' : 'USD ($)'}</span>
               </div>
             </div>
 
@@ -524,22 +524,22 @@ export default function PricingPage() {
               {SHORT_TERM_DATA.map((item) => (
                 <div
                   key={item.id}
-                  className="bg-slate-950 border border-slate-800/90 hover:border-slate-700 rounded-xl p-6 transition flex flex-col justify-between"
+                  className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800/90 hover:border-slate-300 dark:hover:border-slate-700 rounded-xl p-6 transition flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2.5">
-                        <div className="p-2 rounded-lg bg-slate-900 border border-slate-800">
+                        <div className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                           {item.icon}
                         </div>
-                        <h4 className="text-base font-bold text-white">{item.category}</h4>
+                        <h4 className="text-base font-bold text-slate-900 dark:text-white">{item.category}</h4>
                       </div>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider bg-slate-900 text-slate-400 border border-slate-800 px-2.5 py-1 rounded-md">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 px-2.5 py-1 rounded-md">
                         {item.badge}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-400 mb-5 font-normal leading-relaxed">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-5 font-normal leading-relaxed">
                       {item.description}
                     </p>
 
@@ -548,19 +548,19 @@ export default function PricingPage() {
                       {item.rates.map((rate, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between p-3 rounded-lg bg-slate-900/60 border border-slate-800/80"
+                          className="flex items-center justify-between p-3 rounded-lg bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-slate-300">{rate.frequency}</span>
+                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{rate.frequency}</span>
                             {rate.discountNote && (
-                              <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-800/60">
+                              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800/60">
                                 {rate.discountNote}
                               </span>
                             )}
                           </div>
 
                           <div className="text-right">
-                            <span className="text-sm font-extrabold text-white">
+                            <span className="text-sm font-extrabold text-slate-900 dark:text-white">
                               {selectedCountry === 'IN' ? rate.inr : rate.usd}
                             </span>
                             {selectedCountry !== 'IN' && (
@@ -576,7 +576,7 @@ export default function PricingPage() {
 
                   <Link
                     href="/get-a-free-trial"
-                    className="w-full py-2.5 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 group cursor-pointer border border-slate-700"
+                    className="w-full py-2.5 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 group cursor-pointer border border-slate-800 dark:border-slate-700"
                   >
                     <span>Book Short-Term Trial</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform text-slate-400 group-hover:text-white" />
@@ -591,23 +591,23 @@ export default function PricingPage() {
       {/* Standalone Short-Term Section for users scrolling long-term view */}
       {activePlanType === 'long-term' && (
         <section className="py-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
-          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 sm:p-8">
+          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-md border border-emerald-800/60">
+                <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/80 px-2.5 py-1 rounded-md border border-emerald-300 dark:border-emerald-800/60">
                   Flexible Option
                 </span>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mt-2">
+                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-2">
                   Looking for Short-Term or Hourly Classes?
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   Pay per hour with zero long-term commitment. Discounted rates available for 3+ classes per week.
                 </p>
               </div>
 
               <button
                 onClick={() => setActivePlanType('short-term')}
-                className="py-2.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs transition border border-slate-700 shrink-0 flex items-center gap-2 cursor-pointer"
+                className="py-2.5 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-semibold text-xs transition border border-slate-800 dark:border-slate-700 shrink-0 flex items-center gap-2 cursor-pointer"
               >
                 <span>View Short-Term Rates</span>
                 <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
@@ -615,9 +615,9 @@ export default function PricingPage() {
             </div>
 
             {/* Quick Short-Term Summary Table */}
-            <div className="overflow-x-auto rounded-xl border border-slate-800">
-              <table className="w-full text-left text-xs text-slate-300">
-                <thead className="bg-slate-950 text-slate-400 font-semibold border-b border-slate-800 uppercase text-[10px] tracking-wider">
+            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
+              <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
+                <thead className="bg-slate-100 dark:bg-slate-950 text-slate-600 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800 uppercase text-[10px] tracking-wider">
                   <tr>
                     <th className="py-3 px-4">Category</th>
                     <th className="py-3 px-4">Classes / Week</th>
@@ -625,60 +625,60 @@ export default function PricingPage() {
                     <th className="py-3 px-4">Rate (INR)*</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/80 font-medium">
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">K – Grade 2 (All Subjects)</td>
+                <tbody className="divide-y divide-slate-200 dark:divide-slate-800/80 font-medium">
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">K – Grade 2 (All Subjects)</td>
                     <td className="py-3 px-4">0–3 Classes</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">$9 / hr</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">₹828 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">$9 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">₹828 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">K – Grade 2 (All Subjects)</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 11%)</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">$8 / hr</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">₹736 / hr</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">K – Grade 2 (All Subjects)</td>
+                    <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">3+ Classes (Save 11%)</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">$8 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">₹736 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
                     <td className="py-3 px-4">0–3 Classes</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">$10 / hr</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">₹920 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">$10 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">₹920 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 10%)</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">$9 / hr</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">₹828 / hr</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">Grade 3 – 8 (All Subjects)</td>
+                    <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">3+ Classes (Save 10%)</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">$9 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">₹828 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">9-12 (All Subjects)</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">9-12 (All Subjects)</td>
                     <td className="py-3 px-4">0–3 Classes</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">$11 / hr</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">₹1,012 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">$11 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">₹1,012 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">9-12 (All Subjects)</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 9%)</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">$10 / hr</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">₹920 / hr</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">9-12 (All Subjects)</td>
+                    <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">3+ Classes (Save 9%)</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">$10 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">₹920 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">Coding, Instruments & Languages</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">Coding, Instruments & Languages</td>
                     <td className="py-3 px-4">0–3 Classes</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">$13 / hr</td>
-                    <td className="py-3 px-4 font-bold text-slate-200">₹1,196 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">$13 / hr</td>
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-200">₹1,196 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">Coding, Instruments & Languages</td>
-                    <td className="py-3 px-4 text-emerald-400 font-semibold">3+ Classes (Save 8%)</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">$12 / hr</td>
-                    <td className="py-3 px-4 font-bold text-emerald-400">₹1,104 / hr</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">Coding, Instruments & Languages</td>
+                    <td className="py-3 px-4 text-emerald-600 dark:text-emerald-400 font-semibold">3+ Classes (Save 8%)</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">$12 / hr</td>
+                    <td className="py-3 px-4 font-bold text-emerald-600 dark:text-emerald-400">₹1,104 / hr</td>
                   </tr>
-                  <tr className="hover:bg-slate-950/50 transition">
-                    <td className="py-3 px-4 text-white font-semibold">Advanced Tech (AI, ML, Web Dev)</td>
-                    <td className="py-3 px-4 font-semibold text-purple-400">Flex Schedule</td>
-                    <td className="py-3 px-4 font-bold text-purple-300">$15 – $20 / hr</td>
-                    <td className="py-3 px-4 font-bold text-purple-300">₹1,380 – ₹1,840 / hr</td>
+                  <tr className="hover:bg-slate-50 dark:hover:bg-slate-950/50 transition">
+                    <td className="py-3 px-4 text-slate-900 dark:text-white font-semibold">Advanced Tech (AI, ML, Web Dev)</td>
+                    <td className="py-3 px-4 font-semibold text-purple-600 dark:text-purple-400">Flex Schedule</td>
+                    <td className="py-3 px-4 font-bold text-purple-600 dark:text-purple-300">$15 – $20 / hr</td>
+                    <td className="py-3 px-4 font-bold text-purple-600 dark:text-purple-300">₹1,380 – ₹1,840 / hr</td>
                   </tr>
                 </tbody>
               </table>
@@ -690,47 +690,47 @@ export default function PricingPage() {
       {/* Trust & Guarantee Grid */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Why Parents Trust Us</h2>
-          <p className="text-sm text-slate-400 mt-1">Peace of mind guaranteed with every subscription</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Why Parents Trust Us</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Peace of mind guaranteed with every subscription</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 text-left">
-            <div className="w-10 h-10 rounded-lg bg-blue-950/80 border border-blue-800/60 flex items-center justify-center mb-3">
-              <ShieldCheck className="w-5 h-5 text-blue-400" />
+          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-xl p-5 text-left">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-800/60 flex items-center justify-center mb-3">
+              <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h4 className="text-sm font-bold text-white mb-1">30-Day Guarantee</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-normal">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">30-Day Guarantee</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
               Not satisfied within the first 30 days? Get a full refund for unused sessions.
             </p>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 text-left">
-            <div className="w-10 h-10 rounded-lg bg-blue-950/80 border border-blue-800/60 flex items-center justify-center mb-3">
-              <RotateCcw className="w-5 h-5 text-blue-400" />
+          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-xl p-5 text-left">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-800/60 flex items-center justify-center mb-3">
+              <RotateCcw className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h4 className="text-sm font-bold text-white mb-1">Pause & Resume</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-normal">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Pause & Resume</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
               Pause your plan anytime during school exams or holidays with zero penalty.
             </p>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 text-left">
-            <div className="w-10 h-10 rounded-lg bg-blue-950/80 border border-blue-800/60 flex items-center justify-center mb-3">
-              <Clock className="w-5 h-5 text-blue-400" />
+          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-xl p-5 text-left">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-800/60 flex items-center justify-center mb-3">
+              <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h4 className="text-sm font-bold text-white mb-1">Flexible Schedule</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-normal">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Flexible Schedule</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
               Reschedule classes effortlessly with 24 hours advance notice via portal.
             </p>
           </div>
 
-          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-5 text-left">
-            <div className="w-10 h-10 rounded-lg bg-blue-950/80 border border-blue-800/60 flex items-center justify-center mb-3">
-              <Lock className="w-5 h-5 text-blue-400" />
+          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-xl p-5 text-left">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-800/60 flex items-center justify-center mb-3">
+              <Lock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
-            <h4 className="text-sm font-bold text-white mb-1">No Hidden Fees</h4>
-            <p className="text-xs text-slate-400 leading-relaxed font-normal">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-1">No Hidden Fees</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
               All learning materials, practice tests, and portal features are 100% included.
             </p>
           </div>
@@ -738,15 +738,15 @@ export default function PricingPage() {
       </section>
 
       {/* Social Proof Section */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-slate-800/80">
+      <section className="py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-slate-200 dark:border-slate-800/80">
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-1 mb-2">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
             ))}
-            <span className="text-sm font-bold text-white ml-1.5">4.9 / 5.0 Rating</span>
+            <span className="text-sm font-bold text-slate-900 dark:text-white ml-1.5">4.9 / 5.0 Rating</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Loved by Parents & Students Worldwide</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Loved by Parents & Students Worldwide</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -767,13 +767,13 @@ export default function PricingPage() {
               quote: 'Exam preparation worksheets helped me clear my board exams with confidence. Highly recommended!'
             }
           ].map((item, idx) => (
-            <div key={idx} className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 flex flex-col justify-between">
-              <p className="text-xs text-slate-300 leading-relaxed font-normal italic mb-4">
+            <div key={idx} className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-xl p-6 flex flex-col justify-between">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal italic mb-4">
                 "{item.quote}"
               </p>
               <div>
-                <p className="text-sm font-bold text-white">{item.name}</p>
-                <p className="text-xs text-slate-400">{item.sub}</p>
+                <p className="text-sm font-bold text-slate-900 dark:text-white">{item.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{item.sub}</p>
               </div>
             </div>
           ))}
@@ -781,10 +781,10 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ Accordion Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto border-t border-slate-800/80">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto border-t border-slate-200 dark:border-slate-800/80">
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">Frequently Asked Questions</h2>
-          <p className="text-sm text-slate-400 mt-1">Have questions before getting started? We have answers.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Frequently Asked Questions</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Have questions before getting started? We have answers.</p>
         </div>
 
         <div className="space-y-3">
@@ -793,18 +793,18 @@ export default function PricingPage() {
             return (
               <div
                 key={idx}
-                className="bg-slate-900/70 border border-slate-800 rounded-xl overflow-hidden transition"
+                className="bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden transition"
               >
                 <button
                   onClick={() => setExpandedFaq(isOpen ? null : idx)}
-                  className="w-full p-4 text-left flex items-center justify-between text-sm font-bold text-white hover:text-blue-400 transition cursor-pointer"
+                  className="w-full p-4 text-left flex items-center justify-between text-sm font-bold text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition cursor-pointer"
                 >
                   <span>{faq.q}</span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-blue-400' : ''}`} />
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-blue-600 dark:text-blue-400' : ''}`} />
                 </button>
 
                 {isOpen && (
-                  <div className="px-4 pb-4 text-xs text-slate-300 leading-relaxed font-normal border-t border-slate-800/60 pt-3">
+                  <div className="px-4 pb-4 text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal border-t border-slate-200 dark:border-slate-800/60 pt-3">
                     {faq.a}
                   </div>
                 )}

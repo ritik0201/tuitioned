@@ -19,7 +19,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   if (isDashboard) {
     return (
-      <div className="min-h-screen bg-slate-950">
+      <div className="min-h-screen bg-background text-foreground transition-colors duration-200">
         {children}
       </div>
     );

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all documents from the User collection where the role is 'teacher'
-    const teachersFromDb = await User.find(query);
+    const teachersFromDb = await User.find(query).sort({ createdAt: -1, _id: -1 });
 
     // Map the data to match the frontend's expected 'Teacher' type
     const teachers = teachersFromDb.map(teacher => ({

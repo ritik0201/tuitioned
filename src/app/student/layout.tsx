@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import UserProfileMenu from '@/components/UserProfileMenu';
+import ThemeToggle from '@/components/ThemeToggle';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -45,22 +46,23 @@ export default function StudentLayout({
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500/30 font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-indigo-500/30 font-sans transition-colors duration-200">
       {/* Top Header - Full Width and Topmost */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex h-20 items-center justify-between px-6 md:px-10 bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
+      <header className="fixed top-0 left-0 right-0 z-50 flex h-20 items-center justify-between px-6 md:px-10 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 transition-colors duration-200">
         <div className="flex items-center gap-8">
           <Link href="/" className="inline-block">
-            <span className="text-2xl font-bold text-white tracking-tight">
+            <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
               TuitionEd
             </span>
           </Link>
         </div>
 
         <div className="flex items-center gap-4">
+           <ThemeToggle />
            <UserProfileMenu userType="student" />
            <button 
              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-             className="p-2 bg-slate-900 border border-slate-800 rounded-none lg:hidden text-slate-400 hover:text-white"
+             className="p-2 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none lg:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
            >
              {isSidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
            </button>
@@ -77,7 +79,7 @@ export default function StudentLayout({
 
       {/* Sidebar with Sharp Edges */}
       <aside className={cn(
-        "fixed top-20 left-0 h-[calc(100vh-5rem)] w-72 bg-slate-900/90 backdrop-blur-2xl border-r border-slate-800 z-40 transition-transform duration-300 lg:translate-x-0 overflow-y-auto scrollbar-hide",
+        "fixed top-20 left-0 h-[calc(100vh-5rem)] w-72 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border-r border-slate-200 dark:border-slate-800 z-40 transition-transform duration-300 lg:translate-x-0 overflow-y-auto scrollbar-hide",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full py-6">
@@ -93,8 +95,8 @@ export default function StudentLayout({
                   className={cn(
                     "flex items-center justify-between p-4 rounded-none transition-all group relative overflow-hidden border border-transparent",
                     isActive 
-                      ? "bg-indigo-500/10 border-indigo-500/30 text-white shadow-sm" 
-                      : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 hover:border-slate-800"
+                      ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-600 dark:text-white shadow-sm" 
+                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-200 hover:border-slate-200 dark:hover:border-slate-800"
                   )}
                 >
                   {isActive && (
@@ -103,24 +105,24 @@ export default function StudentLayout({
                   <div className="flex items-center gap-4 relative z-10">
                     <Icon className={cn(
                       "h-5 w-5 transition-transform group-hover:scale-110",
-                      isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-indigo-400"
+                      isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 dark:group-hover:text-indigo-400"
                     )} />
                     <span className="font-bold tracking-tight">{item.text}</span>
                   </div>
-                  {isActive && <ChevronRight className="h-4 w-4 text-indigo-400/50" />}
+                  {isActive && <ChevronRight className="h-4 w-4 text-indigo-500/50 dark:text-indigo-400/50" />}
                 </Link>
               );
             })}
           </nav>
 
           {/* User Section (Bottom) */}
-          <div className="p-6 mt-auto border-t border-slate-800">
-            <div className="p-4 bg-slate-950/50 rounded-none border border-slate-800 mb-4 flex items-center gap-3">
+          <div className="p-6 mt-auto border-t border-slate-200 dark:border-slate-800">
+            <div className="p-4 bg-slate-100 dark:bg-slate-950/50 rounded-none border border-slate-200 dark:border-slate-800 mb-4 flex items-center gap-3">
               <div className="h-10 w-10 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-none flex items-center justify-center font-black text-white shadow-lg border border-indigo-400">
                 {userInitial}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-black text-white truncate">{userName}</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white truncate">{userName}</p>
                 <div className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 bg-green-500 rounded-none animate-pulse" />
                   <span className="text-[10px] uppercase font-black tracking-widest text-slate-500">Online</span>
@@ -130,7 +132,7 @@ export default function StudentLayout({
             <Button 
               variant="ghost" 
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="w-full h-12 rounded-none bg-red-500/5 hover:bg-red-500/10 text-red-400 hover:text-red-300 border border-red-500/20 font-bold transition-all flex items-center justify-center gap-2"
+              className="w-full h-12 rounded-none bg-red-500/5 hover:bg-red-500/10 text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 border border-red-500/20 font-bold transition-all flex items-center justify-center gap-2"
             >
               <LogOut className="h-4 w-4" />
               Sign Out

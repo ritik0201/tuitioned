@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import UserProfileMenu from '@/components/UserProfileMenu';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const drawerWidth = 240;
 
@@ -60,7 +61,7 @@ export default function AdminLayout({
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
+          <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
             TuitionEd
           </Typography>
         </Link>
@@ -73,13 +74,13 @@ export default function AdminLayout({
             <ListItem key={item.text} disablePadding component={Link} href={item.href} sx={{ color: 'inherit', textDecoration: 'none' }}>
               <ListItemButton
                 sx={{
-                  bgcolor: isActive ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
-                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.04)' },
+                  bgcolor: isActive ? 'action.selected' : 'transparent',
+                  '&:hover': { bgcolor: 'action.hover' },
                   m: 1,
                   borderRadius: 2,
                 }}
               >
-                <ListItemIcon sx={{ color: isActive ? '#3b82f6' : 'rgba(255, 255, 255, 0.5)', minWidth: 40 }}>
+                <ListItemIcon sx={{ color: isActive ? '#3b82f6' : 'text.secondary', minWidth: 40 }}>
                   {item.icon}
                 </ListItemIcon>
                 <ListItemText 
@@ -87,7 +88,7 @@ export default function AdminLayout({
                   primaryTypographyProps={{ 
                     fontSize: '0.875rem', 
                     fontWeight: isActive ? 600 : 400,
-                    color: isActive ? 'white' : 'rgba(255, 255, 255, 0.6)'
+                    color: isActive ? 'text.primary' : 'text.secondary'
                   }} 
                 />
               </ListItemButton>
@@ -96,17 +97,17 @@ export default function AdminLayout({
         })}
       </List>
       <List sx={{ marginTop: 'auto' }}>
-        <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.12)' }} />
+        <Divider sx={{ borderColor: 'divider' }} />
         <ListItem disablePadding>
           <ListItemButton
             onClick={() => signOut({ callbackUrl: '/' })}
             sx={{
-              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.04)' },
+              '&:hover': { bgcolor: 'action.hover' },
               m: 1,
               borderRadius: 2,
             }}
           >
-            <ListItemIcon sx={{ color: 'rgba(255, 255, 255, 0.7)' }}><LogOut size={20} /></ListItemIcon>
+            <ListItemIcon sx={{ color: 'text.secondary' }}><LogOut size={20} /></ListItemIcon>
             <ListItemText primary="Logout" />
           </ListItemButton>
         </ListItem>
@@ -135,11 +136,11 @@ export default function AdminLayout({
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: '#111827', // Dark background
-          color: 'white',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
           boxShadow: 'none',
           borderBottom: '1px solid',
-          borderColor: 'rgba(255, 255, 255, 0.12)'
+          borderColor: 'divider'
         }}
       >
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -156,6 +157,7 @@ export default function AdminLayout({
             <Typography variant="h6" noWrap component="div">Admin Panel</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <ThemeToggle />
             <Typography variant="body1" sx={{ display: { xs: 'none', sm: 'block' } }}>{userName}</Typography>
             <UserProfileMenu userType="admin" />
           </Box>
@@ -167,12 +169,12 @@ export default function AdminLayout({
           width: { sm: drawerWidth },
           flexShrink: { sm: 0 },
           '& .MuiDrawer-paper': {
-            bgcolor: '#111827', // Dark background
-            color: 'white',
+            bgcolor: 'background.paper',
+            color: 'text.primary',
             width: drawerWidth,
             boxSizing: 'border-box',
-            borderRight: '1px solid rgba(255, 255, 255, 0.05)',
-            boxShadow: '4px 0 24px rgba(0,0,0,0.5)'
+            borderRight: '1px solid',
+            borderColor: 'divider',
           },
         }}
       >
@@ -188,8 +190,8 @@ export default function AdminLayout({
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              bgcolor: '#111827',
-              color: 'white'
+              bgcolor: 'background.paper',
+              color: 'text.primary'
             },
           }}
         >
@@ -202,8 +204,8 @@ export default function AdminLayout({
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              bgcolor: '#111827',
-              color: 'white'
+              bgcolor: 'background.paper',
+              color: 'text.primary'
             },
           }}
           open
@@ -215,7 +217,7 @@ export default function AdminLayout({
         component="main"
         sx={{ 
           flexGrow: 1, 
-          bgcolor: '#030712', 
+          bgcolor: 'background.default', 
           p: 3, 
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           minHeight: '100vh',

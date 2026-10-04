@@ -64,7 +64,7 @@ export default function AssignedDemoClassesPage() {
           <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(236, 72, 153, 0.1)', color: '#f472b6', fontSize: '0.875rem' }}>
             <User size={16} />
           </Avatar>
-          <span className="font-semibold text-white">{row.original.studentId?.fullName || "N/A"}</span>
+          <span className="font-semibold text-slate-900 dark:text-white">{row.original.studentId?.fullName || "N/A"}</span>
         </div>
       ),
     },
@@ -72,8 +72,8 @@ export default function AssignedDemoClassesPage() {
       accessorKey: "subject",
       header: "Subject",
       cell: ({ row }) => (
-        <div className="flex items-center gap-2 text-gray-300">
-          <BookOpen size={14} className="text-pink-400" />
+        <div className="flex items-center gap-2 text-slate-700 dark:text-gray-300 font-medium">
+          <BookOpen size={14} className="text-pink-500 dark:text-pink-400" />
           {row.getValue("subject")}
         </div>
       ),
@@ -85,7 +85,7 @@ export default function AssignedDemoClassesPage() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-white/5 text-gray-300"
+            className="hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-gray-300"
           >
             Date & Time
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -100,18 +100,18 @@ export default function AssignedDemoClassesPage() {
 
         return (
           <div className="space-y-1">
-            <div className="flex items-center gap-2 text-gray-300">
-              <Calendar className="h-3.5 w-3.5 text-gray-500" />
-              <span className="text-sm">{date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+            <div className="flex items-center gap-2 text-slate-700 dark:text-gray-300">
+              <Calendar className="h-3.5 w-3.5 text-slate-400 dark:text-gray-500" />
+              <span className="text-sm font-medium">{date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
             </div>
-            <div className="flex items-center gap-2 text-gray-300">
-              <Clock className="h-3.5 w-3.5 text-gray-500" />
-              <span className="text-sm font-medium">
+            <div className="flex items-center gap-2 text-slate-700 dark:text-gray-300">
+              <Clock className="h-3.5 w-3.5 text-slate-400 dark:text-gray-500" />
+              <span className="text-sm font-semibold">
                 {status === 'confirmed' || status === 'completed'
                   ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                   : "Time Pending"}
               </span>
-              {timeZone && <span className="text-[10px] text-gray-500 uppercase">({timeZone})</span>}
+              {timeZone && <span className="text-[10px] text-slate-500 dark:text-gray-500 uppercase">({timeZone})</span>}
             </div>
           </div>
         )
@@ -127,10 +127,10 @@ export default function AssignedDemoClassesPage() {
         let bgColor = 'rgba(156, 163, 175, 0.1)';
         let textColor = '#9ca3af';
 
-        if (normalizedStatus === 'confirmed') { bgColor = 'rgba(16, 185, 129, 0.1)'; textColor = '#34d399'; }
-        else if (normalizedStatus === 'pending') { bgColor = 'rgba(245, 158, 11, 0.1)'; textColor = '#fbbf24'; }
-        else if (normalizedStatus === 'completed') { bgColor = 'rgba(59, 130, 246, 0.1)'; textColor = '#60a5fa'; }
-        else if (normalizedStatus === 'cancelled') { bgColor = 'rgba(239, 68, 68, 0.1)'; textColor = '#f87171'; }
+        if (normalizedStatus === 'confirmed') { bgColor = 'rgba(16, 185, 129, 0.1)'; textColor = '#10b981'; }
+        else if (normalizedStatus === 'pending') { bgColor = 'rgba(245, 158, 11, 0.1)'; textColor = '#f59e0b'; }
+        else if (normalizedStatus === 'completed') { bgColor = 'rgba(59, 130, 246, 0.1)'; textColor = '#3b82f6'; }
+        else if (normalizedStatus === 'cancelled') { bgColor = 'rgba(239, 68, 68, 0.1)'; textColor = '#ef4444'; }
 
         return (
           <Chip 
@@ -208,28 +208,29 @@ export default function AssignedDemoClassesPage() {
         sx={{ 
           p: { xs: 2, md: 4 }, 
           borderRadius: 4, 
-          bgcolor: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
         }}
       >
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 1 }}>
+          <Typography variant="h4" fontWeight="bold" sx={{ color: 'text.primary', mb: 1 }}>
             Assigned Demo Classes
           </Typography>
-          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             Your upcoming trial sessions with potential students.
           </Typography>
         </Box>
         
-        <div className="rounded-2xl border border-white/5 overflow-hidden bg-white/[0.01] mt-4">
+        <div className="rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden bg-white dark:bg-slate-900/50 mt-4">
           <Table>
-            <TableHeader className="bg-white/[0.02]">
+            <TableHeader className="bg-slate-50 dark:bg-white/[0.02]">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="border-white/5 hover:bg-transparent">
+                <TableRow key={headerGroup.id} className="border-slate-200 dark:border-white/5 hover:bg-transparent">
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id} className="text-gray-400 font-medium py-4">
+                      <TableHead key={header.id} className="text-slate-600 dark:text-gray-400 font-semibold py-4">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -248,13 +249,13 @@ export default function AssignedDemoClassesPage() {
                   <TableCell colSpan={columns.length} className="h-40 text-center">
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                       <CircularProgress size={24} sx={{ color: '#ec4899' }} />
-                      <span className="text-gray-500 font-medium">Loading assigned classes...</span>
+                      <span className="text-slate-500 dark:text-gray-500 font-medium">Loading assigned classes...</span>
                     </Box>
                   </TableCell>
                 </TableRow>
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-40 text-center text-red-400 font-medium">
+                  <TableCell colSpan={columns.length} className="h-40 text-center text-red-500 font-medium">
                     {error}
                   </TableCell>
                 </TableRow>
@@ -263,7 +264,7 @@ export default function AssignedDemoClassesPage() {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="border-white/5 hover:bg-white/[0.02] transition-colors"
+                    className="border-slate-200 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-colors"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="py-4">
@@ -279,7 +280,7 @@ export default function AssignedDemoClassesPage() {
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-40 text-center text-gray-500 font-medium"
+                    className="h-40 text-center text-slate-500 dark:text-gray-500 font-medium"
                   >
                     No assigned demo classes found at the moment.
                   </TableCell>
@@ -295,7 +296,7 @@ export default function AssignedDemoClassesPage() {
             size="sm"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white disabled:opacity-30 rounded-lg"
+            className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 rounded-lg"
           >
             Previous
           </Button>
@@ -304,7 +305,7 @@ export default function AssignedDemoClassesPage() {
             size="sm"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white disabled:opacity-30 rounded-lg"
+            className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-700 dark:text-gray-300 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white disabled:opacity-30 rounded-lg"
           >
             Next
           </Button>

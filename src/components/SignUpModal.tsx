@@ -72,20 +72,20 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
 
     const textFieldStyles = {
         '& .MuiInputBase-input': {
-            color: '#fff',
+            color: 'text.primary',
         },
         '& .MuiInputLabel-root': {
-            color: 'rgba(255, 255, 255, 0.7)',
+            color: 'text.secondary',
         },
         '& .MuiOutlinedInput-root': {
             '& fieldset': {
-                borderColor: 'rgba(255, 255, 255, 0.23)',
+                borderColor: 'divider',
             },
             '&:hover fieldset': {
-                borderColor: '#fff',
+                borderColor: '#3b82f6',
             },
             '&.Mui-focused fieldset': {
-                borderColor: '#fff',
+                borderColor: '#3b82f6',
             },
         },
     };
@@ -199,8 +199,8 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                     p: { xs: 3, sm: 4 }, 
                     position: 'relative', 
                     width: { xs: '100%', md: 450 }, 
-                    bgcolor: '#1f2937', 
-                    color: '#fff',
+                    bgcolor: 'background.paper', 
+                    color: 'text.primary',
                     overflowY: { xs: 'visible', md: 'auto' },
                     maxHeight: { xs: 'none', md: '95vh' }
                 }}>
@@ -258,7 +258,7 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
 
                     {step === 'otp' && (
                         <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 4 }}>
-                            <Typography variant="h6" component="h3">Enter OTP</Typography> {error && <Typography color="error" variant="body2">{error}</Typography>}<Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                            <Typography variant="h6" component="h3">Enter OTP</Typography> {error && <Typography color="error" variant="body2">{error}</Typography>}<Typography variant="body2" sx={{ color: 'text.secondary' }}>
                                 An OTP has been sent to {email}.
                             </Typography>
                             <TextField
@@ -293,7 +293,7 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                                     variant="text" 
                                     onClick={handleVerify} 
                                     disabled={timer > 0 || loading} 
-                                    sx={{ color: 'primary.light', textTransform: 'none' }}
+                                    sx={{ color: 'primary.main', textTransform: 'none' }}
                                 >
                                     {timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP'}
                                 </Button>

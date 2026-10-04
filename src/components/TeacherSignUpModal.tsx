@@ -29,7 +29,7 @@ const style = {
   width: { xs: '95%', sm: '90%', md: 'auto' },
   maxWidth: 800,
   maxHeight: '95vh',
-  bgcolor: '#1f2937', // bg-gray-800
+  bgcolor: 'background.paper',
   boxShadow: 24,
   p: 0,
   borderRadius: 2,
@@ -39,12 +39,12 @@ const style = {
 };
 
 const textFieldStyles = {
-  '& .MuiInputBase-input': { color: '#fff' },
-  '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.7)' },
+  '& .MuiInputBase-input': { color: 'text.primary' },
+  '& .MuiInputLabel-root': { color: 'text.secondary' },
   '& .MuiOutlinedInput-root': {
-    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.23)' },
-    '&:hover fieldset': { borderColor: '#fff' },
-    '&.Mui-focused fieldset': { borderColor: '#fff' },
+    '& fieldset': { borderColor: 'divider' },
+    '&:hover fieldset': { borderColor: '#3b82f6' },
+    '&.Mui-focused fieldset': { borderColor: '#3b82f6' },
   },
 };
 
@@ -155,7 +155,6 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       }
 
       const data = await response.json();
-      // Helpful debug: check resource_type and secure_url
       console.debug('Cloudinary upload response:', { resource_type: data.resource_type, secure_url: data.secure_url });
       return data.secure_url;
     } catch (uploadError: any) {
@@ -200,13 +199,11 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         body: JSON.stringify({ email }),
       });
 
-      // A 404 is expected for a new user, so we only fail on other error codes.
       if (!roleCheckRes.ok && roleCheckRes.status !== 404) {
         const errorData = await roleCheckRes.json();
         throw new Error('Failed to check user status.');
       }
 
-      // Only check the role if the user was found (status is not 404)
       if (roleCheckRes.status === 200) {
         const { role } = await roleCheckRes.json();
         if (role === 'teacher') {
@@ -214,15 +211,12 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         }
       }
       
-      // Upload image to Cloudinary and get the URL
       const profileImageUrl = await handleFileUpload(profileImageFile, 'image');
       if (!profileImageUrl) {
-        // Error is already set in handleFileUpload
         setLoading(false);
         return;
       }
 
-      // Add any pending subject from input before submitting
       let finalSubjects = [...listOfSubjects];
       if (subjectInputValue.trim() && !listOfSubjects.includes(subjectInputValue.trim())) {
         finalSubjects.push(subjectInputValue.trim());
@@ -292,7 +286,6 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
           overflow: 'hidden',
           minHeight: { xs: '150px', md: 'auto' }
         }}>
-          {/* Subtle background decoration */}
           <Box sx={{ position: 'absolute', top: -20, left: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(20px)' }} />
           <Box sx={{ position: 'absolute', bottom: -30, right: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(30px)' }} />
           
@@ -311,7 +304,8 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
           p: { xs: 3, sm: 4, md: 5 }, 
           position: 'relative', 
           width: { xs: '100%', md: 500 }, 
-          color: '#fff',
+          bgcolor: 'background.paper',
+          color: 'text.primary',
           overflowY: { xs: 'visible', md: 'auto' },
           maxHeight: { xs: 'none', md: '95vh' }
         }}>
@@ -358,7 +352,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => {
                           const { key, ...tagProps } = getTagProps({ index });
-                          return <Chip key={key} variant="outlined" label={option} {...tagProps} sx={{ color: 'white', borderColor: 'rgba(255,255,255,0.5)' }} />;
+                          return <Chip key={key} variant="outlined" label={option} {...tagProps} sx={{ color: 'text.primary', borderColor: 'divider' }} />;
                         })
                       }
                       renderInput={(params) => (
@@ -381,8 +375,8 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                           transform: 'scale(1.05)'
                         },
                         '&.Mui-disabled': {
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                          color: 'rgba(255, 255, 255, 0.3)'
+                          backgroundColor: 'action.disabledBackground',
+                          color: 'action.disabled'
                         },
                         transition: 'all 0.2s ease-in-out',
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
@@ -399,13 +393,13 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   <label htmlFor="profile-image-input">
                     <Box
                       sx={{
-                        width: 140, height: 140, borderRadius: 2, border: '2px dashed rgba(255, 255, 255, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                        width: 140, height: 140, borderRadius: 2, border: '2px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                         backgroundImage: imagePreview ? `url(${imagePreview})` : 'none',
                         backgroundSize: 'cover', backgroundPosition: 'center',
                         '&:hover': { borderColor: 'primary.main' }
                       }}
                     >
-                      {!imagePreview && <Camera color="rgba(255, 255, 255, 0.7)" />}
+                      {!imagePreview && <Camera className="text-gray-400" />}
                     </Box>
                   </label>
                   {imagePreview ? (
@@ -419,7 +413,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                     variant="outlined"
                     startIcon={<Edit size={16} />}
                     onClick={() => setIsAboutModalOpen(true)}
-                    sx={{ mt: 2, textTransform: 'none', borderColor: 'rgba(255,255,255,0.5)', color: 'white', '&:hover': { borderColor: 'white' } }}
+                    sx={{ mt: 2, textTransform: 'none', borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'primary.main' } }}
                   >
                     {aboutTeacher ? "Edit Bio" : "Write Bio"}
                   </Button>
@@ -432,7 +426,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                 '& > div': { 
                   borderRadius: '4px',
                   overflow: 'hidden',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                 }
               }}>
                 <ReCAPTCHA
@@ -448,7 +442,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
           )}
           {step === 'otp' && (
             <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 4 }}>
-              <Typography variant="h6" component="h3">Enter OTP</Typography> {error && <Typography color="error" variant="body2">{error}</Typography>}<Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>An OTP has been sent to {email}.</Typography>
+              <Typography variant="h6" component="h3">Enter OTP</Typography> {error && <Typography color="error" variant="body2">{error}</Typography>}<Typography variant="body2" sx={{ color: 'text.secondary' }}>An OTP has been sent to {email}.</Typography>
               <TextField
                 label="OTP"
                 variant="outlined"
@@ -466,7 +460,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   variant="text" 
                   onClick={handleVerify} 
                   disabled={timer > 0 || loading} 
-                  sx={{ color: 'primary.light', textTransform: 'none' }}
+                  sx={{ color: 'primary.main', textTransform: 'none' }}
                 >
                   {timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP'}
                 </Button>
@@ -476,7 +470,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
         </Box>
         
         {/* About Teacher Modal */}
-        <Dialog open={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} fullWidth maxWidth="md" PaperProps={{ sx: { bgcolor: '#1f2937', color: 'white' } }}>
+        <Dialog open={isAboutModalOpen} onClose={() => setIsAboutModalOpen(false)} fullWidth maxWidth="md" PaperProps={{ sx: { bgcolor: 'background.paper', color: 'text.primary' } }}>
           <DialogTitle>About Yourself</DialogTitle>
           <DialogContent>
             <TextField
@@ -496,7 +490,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setIsAboutModalOpen(false)} sx={{ color: 'grey.400' }}>Cancel</Button>
+            <Button onClick={() => setIsAboutModalOpen(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
             <Button onClick={() => setIsAboutModalOpen(false)} variant="contained">Save</Button>
           </DialogActions>
         </Dialog>

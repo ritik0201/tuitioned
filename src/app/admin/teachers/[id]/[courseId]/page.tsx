@@ -151,10 +151,10 @@ export default function TeacherCourseDetailPage() {
 
   const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value?: string | null }) => (
     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, py: 1 }}>
-      <Box sx={{ color: 'text.secondary' }}>{icon}</Box>
+      <Box sx={{ color: 'primary.main' }}>{icon}</Box>
       <Box>
         <Typography variant="body2" color="text.secondary">{label}</Typography>
-        <Typography variant="body1" fontWeight="medium">{value || 'N/A'}</Typography>
+        <Typography variant="body1" fontWeight="bold" color="text.primary">{value || 'N/A'}</Typography>
       </Box>
     </Box>
   );
@@ -163,7 +163,7 @@ export default function TeacherCourseDetailPage() {
     <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
       <Button
         startIcon={<ArrowLeft size={16} />} 
-        href={`/admin/teachers/${teacherId}`} sx={{ mb: 3, textTransform: "none", color: "text.secondary" }}
+        href={`/admin/teachers/${teacherId}`} sx={{ mb: 3, textTransform: "none", color: "text.secondary", fontWeight: 700 }}
       >
         Back to Teacher Details
       </Button>
@@ -230,34 +230,34 @@ export default function TeacherCourseDetailPage() {
         <Box sx={{ flex: '1 1 400px', minWidth: 300 }}>
           <Paper
             elevation={0}
-            className="border-2 border-blue-500"
-            sx={{ p: 3, borderRadius: 4, bgcolor: '#1f2937', height: '100%' }}
+            className="border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl"
+            sx={{ p: 4, borderRadius: 5, bgcolor: 'background.paper', height: '100%' }}
           >
-            <Typography variant="h5" fontWeight="bold" gutterBottom>Course & Payment Info</Typography>
-            <Divider sx={{ my: 2 }} />
+            <Typography variant="h5" fontWeight="bold" color="text.primary" gutterBottom>Course & Payment Info</Typography>
+            <Divider sx={{ my: 2, borderColor: 'divider' }} />
             <InfoItem icon={<BookOpen size={20} />} label="Classes Left" value={String(course.noOfClasses)} />
             <InfoItem icon={<Clock size={20} />} label="Class Time" value={course.classTime} />
             <InfoItem icon={<Calendar size={20} />} label="Class Days" value={course.classDays} />
             <InfoItem icon={<IndianRupee size={20} />} label="Price Per Class" value={`₹${course.perClassPrice.toFixed(2)}`} />
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="h6" fontWeight="medium" gutterBottom>Payment Status</Typography>
-            <Paper elevation={0} sx={{ p: 2, bgcolor: 'action.hover', borderRadius: 2, textAlign: 'center' }}>
+            <Divider sx={{ my: 2, borderColor: 'divider' }} />
+            <Typography variant="h6" fontWeight="bold" color="text.primary" gutterBottom>Payment Status</Typography>
+            <Paper elevation={0} sx={{ p: 2.5, bgcolor: 'action.hover', borderRadius: 3, textAlign: 'center' }}>
               <Typography
-                variant="h5"
+                variant="h4"
                 component="p"
-                fontWeight={700}
-                color="secondary.main"
+                fontWeight={800}
+                color="primary.main"
               >
                 ₹{teacherEarning.toFixed(2)}
               </Typography>
-              <Typography variant="body2" color="text.secondary">Pending Teacher Payment</Typography>
+              <Typography variant="body2" color="text.secondary" fontWeight={600}>Pending Teacher Payment</Typography>
             </Paper>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="h6" fontWeight="medium" gutterBottom>Student</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: 'action.hover', borderRadius: 2 }}>
-              <Avatar sx={{ bgcolor: 'secondary.main' }}>{course.studentId.fullName.charAt(0)}</Avatar>
+            <Divider sx={{ my: 2, borderColor: 'divider' }} />
+            <Typography variant="h6" fontWeight="bold" color="text.primary" gutterBottom>Student</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, bgcolor: 'action.hover', borderRadius: 3 }}>
+              <Avatar sx={{ bgcolor: 'primary.main', fontWeight: 'bold' }}>{course.studentId.fullName.charAt(0)}</Avatar>
               <Box>
-                <Typography variant="body1" fontWeight="bold">{course.studentId.fullName}</Typography>
+                <Typography variant="body1" fontWeight="bold" color="text.primary">{course.studentId.fullName}</Typography>
                 <Typography variant="body2" color="text.secondary">{course.studentId.email}</Typography>
               </Box>
             </Box>
@@ -268,11 +268,11 @@ export default function TeacherCourseDetailPage() {
         <Box sx={{ flex: '2 1 600px' }}>
           <Paper
             elevation={0}
-            className="border-2 border-blue-500"
-            sx={{ p: 3, borderRadius: 4, bgcolor: '#1f2937' }}
+            className="border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl"
+            sx={{ p: 4, borderRadius: 5, bgcolor: 'background.paper' }}
           >
-            <Typography variant="h5" fontWeight="bold">Completed Class History</Typography>
-            <Divider sx={{ my: 2 }} />
+            <Typography variant="h5" fontWeight="bold" color="text.primary">Completed Class History</Typography>
+            <Divider sx={{ my: 2.5, borderColor: 'divider' }} />
             {completedClasses.length > 0 ? (
               <Box
                 sx={{
@@ -309,21 +309,21 @@ export default function TeacherCourseDetailPage() {
                         borderRadius: "50%",
                         bgcolor: "primary.main",
                         border: "3px solid",
-                        borderColor: "#1f2937",
+                        borderColor: "background.paper",
                         zIndex: 1,
                       }}
                     />
                     <Box sx={{ pl: 3, flex: 1 }}>
-                      <Typography variant="subtitle1" fontWeight={600}>{c.topic}</Typography>
+                      <Typography variant="subtitle1" fontWeight={700} color="text.primary">{c.topic}</Typography>
                       <Box sx={{ display: "flex", alignItems: "center", gap: 2, color: "text.secondary", mt: 0.5 }}>
                         <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                           <Calendar size={14} />
-                          <Typography variant="caption">{new Date(c.completedAt).toLocaleDateString()}</Typography>
+                          <Typography variant="caption" fontWeight={600}>{new Date(c.completedAt).toLocaleDateString()}</Typography>
                         </Box>
                         {c.duration && (
                           <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                             <Clock size={14} />
-                            <Typography variant="caption">{c.duration} minutes</Typography>
+                            <Typography variant="caption" fontWeight={600}>{c.duration} minutes</Typography>
                           </Box>
                         )}
                       </Box>
@@ -332,7 +332,7 @@ export default function TeacherCourseDetailPage() {
                 ))}
               </Box>
             ) : (
-              <Alert severity="info" sx={{ bgcolor: 'transparent', border: '1px solid', borderColor: 'info.main' }}>
+              <Alert severity="info" sx={{ borderRadius: 3 }}>
                 No classes have been marked as complete for this course yet.
               </Alert>
             )}

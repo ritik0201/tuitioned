@@ -237,7 +237,7 @@ export default function StudentGamesPage() {
   });
 
   return (
-    <div className="w-full bg-slate-950 text-white font-sans select-none">
+    <div className="w-full min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white font-sans select-none transition-colors duration-200">
       {/* Header - shown on Hub dashboard */}
       {!activeGameId && (
         <GamesHubHeader
@@ -274,11 +274,11 @@ export default function StudentGamesPage() {
               <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 scrollbar-none">
                 {[
                   { id: 'all', label: 'ALL GAMES', icon: <Gamepad2 className="w-3.5 h-3.5" /> },
-                  { id: 'math', label: 'MATH', icon: <Brain className="w-3.5 h-3.5 text-purple-400" /> },
-                  { id: 'space', label: 'SPACE', icon: <Rocket className="w-3.5 h-3.5 text-indigo-400" /> },
-                  { id: 'words', label: 'WORDS', icon: <Sparkles className="w-3.5 h-3.5 text-amber-400" /> },
-                  { id: 'arcade', label: 'ARCADE', icon: <Zap className="w-3.5 h-3.5 text-emerald-400" /> },
-                  { id: 'logic', label: 'LOGIC', icon: <Music className="w-3.5 h-3.5 text-pink-400" /> }
+                  { id: 'math', label: 'MATH', icon: <Brain className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> },
+                  { id: 'space', label: 'SPACE', icon: <Rocket className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> },
+                  { id: 'words', label: 'WORDS', icon: <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" /> },
+                  { id: 'arcade', label: 'ARCADE', icon: <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> },
+                  { id: 'logic', label: 'LOGIC', icon: <Music className="w-3.5 h-3.5 text-pink-600 dark:text-pink-400" /> }
                 ].map(tab => (
                   <button
                     key={tab.id}
@@ -289,7 +289,7 @@ export default function StudentGamesPage() {
                     className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider cursor-pointer border transition ${
                       selectedCategory === tab.id
                         ? 'bg-indigo-600 border-indigo-400 text-white'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                        : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 text-slate-700 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     {tab.icon}
@@ -300,13 +300,13 @@ export default function StudentGamesPage() {
 
               {/* Search */}
               <div className="relative w-full md:w-56">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                 <input
                   type="text"
                   placeholder="Search games..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-800 focus:border-indigo-500 text-xs font-bold text-white placeholder-slate-500 outline-none"
+                  className="w-full pl-9 pr-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-800 focus:border-indigo-500 text-xs font-bold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none"
                 />
               </div>
             </div>
