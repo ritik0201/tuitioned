@@ -2,6 +2,7 @@
 
 import { signIn } from 'next-auth/react';
 import React, { useRef, useState } from 'react';
+import Image from 'next/image';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -21,21 +22,22 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../app/get-a-free-trial/phone-input.css';
 import ReCAPTCHA from 'react-google-recaptcha';
+
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: { xs: '95%', sm: '90%', md: 'auto' },
-  maxWidth: 800,
-  maxHeight: '95vh',
+  width: { xs: '95%', sm: '92%', md: '90%' },
+  maxWidth: 850,
+  maxHeight: '92vh',
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 0,
   borderRadius: 2,
   display: 'flex',
   flexDirection: { xs: 'column', md: 'row' },
-  overflow: { xs: 'auto', md: 'hidden' },
+  overflow: 'hidden',
 };
 
 const textFieldStyles = {
@@ -102,8 +104,10 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
 
   const handleAddSubject = () => {
     const subject = subjectInputValue.trim();
-    if (subject && !listOfSubjects.includes(subject)) {
-      setListOfSubjects([...listOfSubjects, subject]);
+    if (subject) {
+      if (!listOfSubjects.includes(subject)) {
+        setListOfSubjects((prev) => [...prev, subject]);
+      }
       setSubjectInputValue('');
     }
   };
@@ -289,36 +293,55 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
           <Box sx={{ position: 'absolute', top: -20, left: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(20px)' }} />
           <Box sx={{ position: 'absolute', bottom: -30, right: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(30px)' }} />
           
-          <Box sx={{ position: 'relative', zIndex: 1 }}>
-            <School size={width && width < 600 ? 40 : 80} strokeWidth={1.5} />
-            <Typography variant={width && width < 600 ? "h5" : "h4"} component="h2" sx={{ mt: { xs: 1, md: 3 }, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+          <Box sx={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{ bgcolor: 'white', p: 1.5, borderRadius: 3, display: 'inline-flex', boxShadow: '0 4px 14px rgba(0,0,0,0.15)', mb: 1 }}>
+              <Image
+                src="/logo.png"
+                alt="Tuition-ed Logo"
+                width={width && width < 600 ? 50 : 80}
+                height={width && width < 600 ? 50 : 80}
+                style={{ objectFit: 'contain' }}
+              />
+            </Box>
+            <Typography variant={width && width < 600 ? "h5" : "h4"} component="h2" sx={{ mt: { xs: 1, md: 2 }, fontWeight: 900, letterSpacing: '-0.02em', lineHeight: 1.2 }}>
               Join Our Team
             </Typography>
-            <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: { xs: 1.5, md: 3 }, mx: 'auto', borderRadius: 2 }} />
+            <Box sx={{ width: 40, height: 4, bgcolor: 'rgba(255,255,255,0.3)', my: { xs: 1.5, md: 2 }, mx: 'auto', borderRadius: 2 }} />
             <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, display: { xs: 'none', sm: 'block' } }}>
               Share your knowledge and inspire the next generation of learners.
             </Typography>
           </Box>
         </Box>
         <Box sx={{ 
-          p: { xs: 3, sm: 4, md: 5 }, 
+          p: { xs: 2.5, sm: 3.5, md: 4 }, 
           position: 'relative', 
-          width: { xs: '100%', md: 500 }, 
+          flex: 1,
+          width: { xs: '100%', md: 540 }, 
           bgcolor: 'background.paper',
           color: 'text.primary',
-          overflowY: { xs: 'visible', md: 'auto' },
-          maxHeight: { xs: 'none', md: '95vh' }
+          overflowY: 'auto',
+          maxHeight: { xs: 'calc(92vh - 120px)', md: '92vh' },
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
         }}>
-          <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.500' }}><X /></IconButton>
+          <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 12, right: 12, color: 'grey.500', zIndex: 10 }}><X size={20} /></IconButton>
           {step === 'details' && (
-            <Box component="form" sx={{ mt: 4 }}>
-              <Typography variant="h6" component="h3" mb={1}>Become a Teacher</Typography>
+            <Box component="form" sx={{ mt: { xs: 1, sm: 2 }, display: 'flex', flexDirection: 'column' }}>
+              <Typography variant="h6" component="h3" mb={2} fontWeight={700}>Become a Teacher</Typography>
               {error && <Alert severity="error" sx={{ mb: 2, bgcolor: 'error.dark', color: 'white' }}>{error}</Alert>}
-              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 4, mt: 2.5 }}>
-                {/* Left side for inputs */}
-                <Stack spacing={2.5} sx={{ flex: 1 }}>
+              
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2, width: '100%' }}>
+                {/* Full Name */}
+                <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
                   <TextField label="Full Name" variant="outlined" fullWidth required value={fullName} onChange={(e) => setFullName(e.target.value)} sx={textFieldStyles} />
+                </Box>
+
+                {/* Email & Mobile */}
+                <Box>
                   <TextField label="Email ID" variant="outlined" fullWidth required type="email" value={email} onChange={(e) => setEmail(e.target.value)} sx={textFieldStyles} />
+                </Box>
+                <Box>
                   <PhoneInput
                     placeholder="Mobile Number"
                     value={mobile}
@@ -326,10 +349,26 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                     international
                     className="phone-input-container"
                   />
+                </Box>
+
+                {/* Qualification & Experience */}
+                <Box>
                   <TextField label="Highest Qualification" variant="outlined" fullWidth value={qualification} onChange={(e) => setQualification(e.target.value)} sx={textFieldStyles} />
+                </Box>
+                <Box>
                   <TextField label="Years of Experience" variant="outlined" fullWidth value={experiance} onChange={(e) => setExperiance(e.target.value)} sx={textFieldStyles} />
+                </Box>
+
+                {/* Meeting Link & CV Link */}
+                <Box>
                   <TextField label="Default Meeting Link (e.g. G-Meet)" placeholder="https://meet.google.com/..." variant="outlined" fullWidth value={joinLink} onChange={(e) => setJoinLink(e.target.value)} sx={textFieldStyles} />
-                  <TextField label="Google Drive CV Link (Optional)" placeholder="Paste your CV link here" variant="outlined" fullWidth value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
+                </Box>
+                <Box>
+                  <TextField label="Google Drive CV Link (Optional)" placeholder="Paste CV link" variant="outlined" fullWidth value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
+                </Box>
+
+                {/* Subjects You Teach */}
+                <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
                   <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1 }}>
                     <Autocomplete
                       multiple
@@ -337,14 +376,30 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                       options={[]}
                       value={listOfSubjects}
                       inputValue={subjectInputValue}
-                      onInputChange={(event, newInputValue) => {
+                      onInputChange={(event, newInputValue, reason) => {
+                        if (newInputValue.includes(',')) {
+                          const parts = newInputValue.split(',');
+                          const lastPart = parts.pop() || '';
+                          const newSubjects = parts
+                            .map((s) => s.trim())
+                            .filter((s) => s.length > 0);
+
+                          if (newSubjects.length > 0) {
+                            setListOfSubjects((prev) => {
+                              const unique = newSubjects.filter((s) => !prev.includes(s));
+                              return [...prev, ...unique];
+                            });
+                          }
+                          setSubjectInputValue(lastPart.trimStart());
+                          return;
+                        }
                         setSubjectInputValue(newInputValue);
                       }}
                       onChange={(event, newValue) => {
                         setListOfSubjects(newValue);
                       }}
                       onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
+                        if (event.key === ',' || event.key === 'Enter') {
                           event.preventDefault();
                           handleAddSubject();
                         }
@@ -352,7 +407,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                       renderTags={(value, getTagProps) =>
                         value.map((option, index) => {
                           const { key, ...tagProps } = getTagProps({ index });
-                          return <Chip key={key} variant="outlined" label={option} {...tagProps} sx={{ color: 'text.primary', borderColor: 'divider' }} />;
+                          return <Chip key={key} variant="outlined" size="small" label={option} {...tagProps} sx={{ color: 'text.primary', borderColor: 'divider' }} />;
                         })
                       }
                       renderInput={(params) => (
@@ -386,14 +441,15 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                       <Plus size={20} />
                     </IconButton>
                   </Box>
-                </Stack>
-                {/* Right side for image */}
-                <Stack spacing={2} sx={{ alignItems: 'center', pt: 2 }}>
+                </Box>
+
+                {/* Profile Photo & Bio */}
+                <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' }, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 1 }}>
                   <input type="file" accept="image/*" onChange={handleFileChange} ref={fileInputRef} style={{ display: 'none' }} id="profile-image-input" />
                   <label htmlFor="profile-image-input">
                     <Box
                       sx={{
-                        width: 140, height: 140, borderRadius: 2, border: '2px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                        width: 110, height: 110, borderRadius: 2, border: '2px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                         backgroundImage: imagePreview ? `url(${imagePreview})` : 'none',
                         backgroundSize: 'cover', backgroundPosition: 'center',
                         '&:hover': { borderColor: 'primary.main' }
@@ -403,26 +459,28 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                     </Box>
                   </label>
                   {imagePreview ? (
-                    <Button size="small" onClick={handleRemoveImage} sx={{ mt: 1, textTransform: 'none', color: 'text.secondary' }}>
+                    <Button size="small" onClick={handleRemoveImage} sx={{ mt: 0.5, textTransform: 'none', color: 'text.secondary', fontSize: '0.75rem' }}>
                       Remove Image
                     </Button>
                   ) : (
-                    <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1 }}>Upload Profile Photo</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', mt: 0.5 }}>Upload Profile Photo *</Typography>
                   )}
                   <Button
                     variant="outlined"
-                    startIcon={<Edit size={16} />}
+                    size="small"
+                    startIcon={<Edit size={14} />}
                     onClick={() => setIsAboutModalOpen(true)}
-                    sx={{ mt: 2, textTransform: 'none', borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'primary.main' } }}
+                    sx={{ mt: 1, textTransform: 'none', fontSize: '0.8rem', borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'primary.main' } }}
                   >
                     {aboutTeacher ? "Edit Bio" : "Write Bio"}
                   </Button>
-                </Stack>
+                </Box>
               </Box>
+
               <Box sx={{ 
                 display: 'flex', 
                 justifyContent: 'center', 
-                my: 4,
+                my: 2.5,
                 '& > div': { 
                   borderRadius: '4px',
                   overflow: 'hidden',
@@ -435,7 +493,23 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   theme="dark"
                 />
               </Box>
-              <Button variant="contained" onClick={handleVerify} disabled={loading} fullWidth sx={{ mt: 3, mb: 4, py: 1.8, bgcolor: 'primary.main', color: 'primary.contrastText', fontWeight: 'bold', fontSize: '1rem', '&:hover': { bgcolor: 'primary.dark' }, borderRadius: 2 }}>
+              <Button
+                variant="contained"
+                onClick={handleVerify}
+                disabled={loading}
+                fullWidth
+                sx={{
+                  mt: 1,
+                  mb: 2,
+                  py: 1.5,
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  '&:hover': { bgcolor: 'primary.dark' },
+                  borderRadius: 2
+                }}
+              >
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Get OTP'}
               </Button>
             </Box>
@@ -452,7 +526,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                 sx={textFieldStyles}
                 inputProps={{ maxLength: 6, style: { textAlign: 'center', letterSpacing: '0.5rem' } }}
               />
-              <Button variant="contained" onClick={handleSignUp} disabled={loading} sx={{ mt: 2, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' } }}>
+              <Button variant="contained" onClick={handleSignUp} disabled={loading} sx={{ mt: 2, bgcolor: 'primary.main', color: 'primary.contrastText', '&:hover': { bgcolor: 'primary.dark' }, py: 1.5, borderRadius: 2 }}>
                 {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign Up'}
               </Button>
               <Box sx={{ mt: 2, textAlign: 'center' }}>

@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/table"
 import { Box, Typography, Chip, Avatar, CircularProgress } from "@mui/material"
 import { motion } from "framer-motion"
+import { getTimezoneDisplay } from "@/lib/timezone"
 
 export type DemoClass = {
   _id: string
@@ -111,7 +112,7 @@ export default function AssignedDemoClassesPage() {
                   ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                   : "Time Pending"}
               </span>
-              {timeZone && <span className="text-[10px] text-slate-500 dark:text-gray-500 uppercase">({timeZone})</span>}
+              {timeZone && <span className="text-[10px] text-slate-500 dark:text-gray-400 font-semibold uppercase">({getTimezoneDisplay(timeZone)})</span>}
             </div>
           </div>
         )
@@ -123,7 +124,7 @@ export default function AssignedDemoClassesPage() {
       cell: ({ row }) => {
         const status = row.getValue("status") as string
         const normalizedStatus = status?.toLowerCase() || 'pending';
-        
+
         let bgColor = 'rgba(156, 163, 175, 0.1)';
         let textColor = '#9ca3af';
 
@@ -133,16 +134,16 @@ export default function AssignedDemoClassesPage() {
         else if (normalizedStatus === 'cancelled') { bgColor = 'rgba(239, 68, 68, 0.1)'; textColor = '#ef4444'; }
 
         return (
-          <Chip 
-            label={status || "Pending"} 
-            size="small" 
-            sx={{ 
+          <Chip
+            label={status || "Pending"}
+            size="small"
+            sx={{
               bgcolor: bgColor,
               color: textColor,
               fontWeight: 600,
               borderRadius: 1.5,
               textTransform: 'capitalize'
-            }} 
+            }}
           />
         )
       },
@@ -205,9 +206,9 @@ export default function AssignedDemoClassesPage() {
       transition={{ duration: 0.5 }}
     >
       <Box
-        sx={{ 
-          p: { xs: 2, md: 4 }, 
-          borderRadius: 4, 
+        sx={{
+          p: { xs: 2, md: 4 },
+          borderRadius: 4,
           bgcolor: 'background.paper',
           border: '1px solid',
           borderColor: 'divider',
@@ -222,7 +223,7 @@ export default function AssignedDemoClassesPage() {
             Your upcoming trial sessions with potential students.
           </Typography>
         </Box>
-        
+
         <div className="rounded-2xl border border-slate-200 dark:border-white/5 overflow-hidden bg-white dark:bg-slate-900/50 mt-4">
           <Table>
             <TableHeader className="bg-slate-50 dark:bg-white/[0.02]">
@@ -234,9 +235,9 @@ export default function AssignedDemoClassesPage() {
                         {header.isPlaceholder
                           ? null
                           : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                       </TableHead>
                     )
                   })}
@@ -289,7 +290,7 @@ export default function AssignedDemoClassesPage() {
             </TableBody>
           </Table>
         </div>
-        
+
         <div className="flex items-center justify-end space-x-2 py-6">
           <Button
             variant="outline"
@@ -313,4 +314,4 @@ export default function AssignedDemoClassesPage() {
       </Box>
     </motion.div>
   )
-}
+}

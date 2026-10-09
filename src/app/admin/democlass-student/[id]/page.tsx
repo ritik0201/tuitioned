@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { SearchableSelect, SearchableOption } from "@/components/ui/searchable-select";
+import { getTimezoneDisplay, getTimezoneSelectOptions } from "@/lib/timezone";
 
 export type DemoClassDetails = {
   _id: string;
@@ -178,27 +179,7 @@ export default function DemoClassDetailPage({
   }, [teachers, booking]);
 
   const timeZoneSelectOptions = React.useMemo(() => {
-    let list: string[] = [];
-    try {
-      // @ts-ignore
-      list = Intl.supportedValuesOf("timeZone");
-    } catch (e) {
-      list = [
-        "UTC",
-        "Asia/Kolkata",
-        "America/New_York",
-        "America/Los_Angeles",
-        "Europe/London",
-        "Europe/Paris",
-        "Asia/Tokyo",
-        "Asia/Dubai",
-        "Australia/Sydney",
-      ];
-    }
-    return list.map((tz) => ({
-      value: tz,
-      label: tz,
-    }));
+    return getTimezoneSelectOptions();
   }, []);
 
   if (loading) {
@@ -296,7 +277,7 @@ export default function DemoClassDetailPage({
                   timeZone: booking.timeZone,
                   dateStyle: "medium",
                   timeStyle: "short",
-                })}
+                })} ({getTimezoneDisplay(booking.timeZone)})
               </p>
             </div>
           </div>
@@ -313,7 +294,7 @@ export default function DemoClassDetailPage({
             <Globe className="h-5 w-5 text-blue-400" />
             <div>
               <p className="text-gray-400">Time Zone</p>
-              <p className="font-normal text-white">{booking.timeZone || "Not Set"}</p>
+              <p className="font-normal text-white">{booking.timeZone ? getTimezoneDisplay(booking.timeZone, true) : "Not Set"}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">

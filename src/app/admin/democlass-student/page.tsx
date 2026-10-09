@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
+import { getTimezoneDisplay } from "@/lib/timezone"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AdminDataTable } from "@/components/admin/DataTable"
@@ -133,7 +134,7 @@ export default function DemoClassStudentTable() {
             <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
                <Clock size={12} className="text-slate-400" />
                {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-               {timeZone && <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 rounded text-[8px] uppercase">{timeZone}</span>}
+               {timeZone && <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-1.5 rounded text-[8px] uppercase font-bold">{getTimezoneDisplay(timeZone)}</span>}
             </div>
           </div>
         );

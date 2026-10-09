@@ -70,7 +70,7 @@ export default function StudentDataTable() {
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
-          className="border-gray-500 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 rounded-none"
+          className="border-muted-foreground data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 rounded-md"
         />
       ),
       cell: ({ row }) => (
@@ -78,7 +78,7 @@ export default function StudentDataTable() {
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
-          className="border-gray-500 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 rounded-none"
+          className="border-muted-foreground data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 rounded-md"
         />
       ),
       enableSorting: false,
@@ -91,7 +91,7 @@ export default function StudentDataTable() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-white/5 text-gray-300 rounded-none"
+            className="hover:bg-accent text-foreground font-semibold"
           >
             Course Name
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -100,10 +100,10 @@ export default function StudentDataTable() {
       },
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
-          <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#818cf8', fontSize: '0.875rem', borderRadius: 0 }}>
+          <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5', fontSize: '0.875rem', borderRadius: 2 }}>
             <BookOpen size={16} />
           </Avatar>
-          <span className="font-semibold text-white">{row.getValue("courseName")}</span>
+          <span className="font-semibold text-foreground">{row.getValue("courseName")}</span>
         </div>
       ),
     },
@@ -114,7 +114,7 @@ export default function StudentDataTable() {
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-white/5 text-gray-300 rounded-none"
+            className="hover:bg-accent text-foreground font-semibold"
           >
             Student Name
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -122,8 +122,8 @@ export default function StudentDataTable() {
         )
       },
       cell: ({ row }) => (
-        <div className="flex items-center gap-2 text-gray-300">
-          <User size={14} className="text-indigo-400" />
+        <div className="flex items-center gap-2 text-foreground">
+          <User size={14} className="text-indigo-500" />
           {row.getValue("studentName")}
         </div>
       ),
@@ -139,9 +139,9 @@ export default function StudentDataTable() {
             size="small" 
             sx={{ 
               bgcolor: classes < 5 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-              color: classes < 5 ? '#f87171' : '#34d399',
+              color: classes < 5 ? '#ef4444' : '#10b981',
               fontWeight: 600,
-              borderRadius: 0
+              borderRadius: 1.5
             }} 
           />
         )
@@ -151,7 +151,7 @@ export default function StudentDataTable() {
       accessorKey: "grade",
       header: "Grade",
       cell: ({ row }) => (
-        <div className="flex items-center gap-2 text-gray-400">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <GraduationCap size={14} />
           {row.getValue("grade")}
         </div>
@@ -166,23 +166,23 @@ export default function StudentDataTable() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-white/10 text-gray-400 rounded-none">
+              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-accent text-muted-foreground">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800 text-white backdrop-blur-md rounded-none">
+            <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground shadow-md rounded-xl">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(course.id)}
-                className="cursor-pointer hover:bg-white/5"
+                className="cursor-pointer hover:bg-accent"
               >
                 Copy Course ID
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-gray-800" />
+              <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem
                 onClick={() => router.push(`/teacher/courses/${course.id}`)}
-                className="cursor-pointer text-indigo-400 hover:bg-indigo-400/10 focus:text-indigo-400 focus:bg-indigo-400/10"
+                className="cursor-pointer text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
               >
                 View details
               </DropdownMenuItem>
@@ -241,48 +241,49 @@ export default function StudentDataTable() {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.4 }}
     >
       <Box
         sx={{ 
           p: { xs: 2, md: 4 }, 
-          borderRadius: 0, 
-          bgcolor: 'rgba(255, 255, 255, 0.02)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(10px)',
+          borderRadius: 4, 
+          bgcolor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
         }}
       >
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight="bold" sx={{ color: 'white', mb: 1 }}>
+          <Typography variant="h4" fontWeight="bold" sx={{ color: 'text.primary', mb: 1 }}>
             My Courses
           </Typography>
-          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
             Manage your active courses and track student progress.
           </Typography>
         </Box>
 
         <div className="flex items-center py-4">
           <div className="relative w-full max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search students..."
               value={(table.getColumn("studentName")?.getFilterValue() as string) ?? ""}
               onChange={(event) =>
                 table.getColumn("studentName")?.setFilterValue(event.target.value)
               }
-              className="pl-10 bg-white/5 text-white border-white/10 focus:border-indigo-500/50 focus:ring-indigo-500/20 placeholder:text-gray-500 rounded-none"
+              className="pl-10 bg-background border-border text-foreground focus:ring-1 focus:ring-indigo-500 rounded-lg"
             />
           </div>
         </div>
 
-        <div className="rounded-none border border-white/5 overflow-hidden bg-white/[0.01]">
+        <div className="rounded-xl border border-border overflow-hidden bg-card">
           <Table>
-            <TableHeader className="bg-white/[0.02]">
+            <TableHeader className="bg-muted/50">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="border-white/5 hover:bg-transparent">
+                <TableRow key={headerGroup.id} className="border-border hover:bg-transparent">
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id} className="text-gray-400 font-medium py-4">
+                      <TableHead key={header.id} className="text-muted-foreground font-semibold py-4">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -300,14 +301,14 @@ export default function StudentDataTable() {
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-32 text-center">
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                      <CircularProgress size={24} sx={{ color: '#6366f1' }} />
-                      <span className="text-gray-500">Loading your courses...</span>
+                      <CircularProgress size={24} sx={{ color: 'primary.main' }} />
+                      <span className="text-muted-foreground">Loading your courses...</span>
                     </Box>
                   </TableCell>
                 </TableRow>
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-32 text-center text-red-400">
+                  <TableCell colSpan={columns.length} className="h-32 text-center text-destructive">
                     {error}
                   </TableCell>
                 </TableRow>
@@ -316,7 +317,7 @@ export default function StudentDataTable() {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="border-white/5 hover:bg-white/[0.02] transition-colors"
+                    className="border-border hover:bg-muted/40 transition-colors"
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="py-4">
@@ -332,7 +333,7 @@ export default function StudentDataTable() {
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-32 text-center text-gray-500"
+                    className="h-32 text-center text-muted-foreground"
                   >
                     No courses found matching your search.
                   </TableCell>
@@ -343,7 +344,7 @@ export default function StudentDataTable() {
         </div>
 
         <div className="flex items-center justify-between py-6">
-          <div className="text-sm text-gray-500 font-medium">
+          <div className="text-sm text-muted-foreground font-medium">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}
             {table.getFilteredRowModel().rows.length} row(s) selected.
           </div>
@@ -353,7 +354,7 @@ export default function StudentDataTable() {
               size="sm"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white disabled:opacity-30 rounded-none"
+              className="rounded-lg"
             >
               Previous
             </Button>
@@ -362,7 +363,7 @@ export default function StudentDataTable() {
               size="sm"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white disabled:opacity-30 rounded-none"
+              className="rounded-lg"
             >
               Next
             </Button>
