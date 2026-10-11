@@ -15,7 +15,8 @@ import {
   ShieldCheck,
   ShieldAlert,
   Clock,
-  BookOpen
+  BookOpen,
+  Pencil
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -84,9 +85,11 @@ export default function TeacherDataTable() {
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-4">
-          <Avatar className="h-12 w-12 border border-slate-200 dark:border-slate-800 shadow-lg ring-2 ring-emerald-500/10">
-            <AvatarImage src={row.original.profileImage} />
-            <AvatarFallback className="bg-emerald-600 text-sm text-white font-black">{row.original.name.charAt(0)}</AvatarFallback>
+          <Avatar className="h-12 w-12 border border-slate-200 dark:border-slate-800 shadow-lg ring-2 ring-emerald-500/10 shrink-0">
+            <AvatarImage src={row.original.profileImage} alt={row.original.name} className="object-cover" />
+            <AvatarFallback className="bg-emerald-600 text-sm text-white font-black">
+              {row.original.name ? row.original.name.charAt(0).toUpperCase() : "T"}
+            </AvatarFallback>
           </Avatar>
           <div className="flex flex-col">
              <span className="font-black text-base text-slate-900 dark:text-white tracking-tight">{row.original.name}</span>
@@ -153,6 +156,10 @@ export default function TeacherDataTable() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#111827] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl shadow-2xl p-2">
                   <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-black px-3 py-2">Account Control</DropdownMenuLabel>
+                  <DropdownMenuItem className="rounded-xl focus:bg-indigo-50 dark:focus:bg-indigo-500/10 focus:text-indigo-600 dark:focus:text-indigo-400 cursor-pointer py-2.5" onClick={() => router.push(`/admin/teachers/${teacher.id}?edit=true`)}>
+                    <Pencil size={16} className="mr-3 text-indigo-500" /> Edit Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 my-1" />
                   <DropdownMenuItem className="rounded-xl focus:bg-emerald-50 dark:focus:bg-emerald-500/10 focus:text-emerald-600 dark:focus:text-emerald-400 cursor-pointer py-2.5" onClick={() => handleStatusUpdate(teacher.id, 'approved')}>
                     <ShieldCheck size={16} className="mr-3" /> Approve Account
                   </DropdownMenuItem>

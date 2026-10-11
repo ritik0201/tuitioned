@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
       mobile: teacher.mobile || 'N/A', // Provide a fallback for optional fields
       listOfSubjects: teacher.listOfSubjects || [],
       teacherStatus: teacher.teacherStatus || 'pending',
+      profileImage: teacher.profileImage || (teacher as any).image || undefined,
     }));
 
     return NextResponse.json(teachers, {

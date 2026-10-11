@@ -21,6 +21,7 @@ export interface IUser extends Document {
   // messages?: [string];
   qualification?: string;
   experiance?: string;
+  experience?: string;
   listOfSubjects?: string[];
   joinLink?: string;
   profileImage?: string;
@@ -45,6 +46,7 @@ const UserSchema: Schema<IUser> = new Schema({
   },
   qualification: { type: String },
   experiance: { type: String },
+  experience: { type: String },
   listOfSubjects: { type: [String] },
   role: {
     type: String,

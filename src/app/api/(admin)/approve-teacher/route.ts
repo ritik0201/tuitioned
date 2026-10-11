@@ -18,6 +18,7 @@ export async function GET() {
       mobile: teacher.mobile || 'N/A',
       listOfSubjects: teacher.listOfSubjects || [],
       teacherStatus: teacher.teacherStatus,
+      profileImage: teacher.profileImage || (teacher as any).image || undefined,
     }));
 
     return NextResponse.json(teachers, {
