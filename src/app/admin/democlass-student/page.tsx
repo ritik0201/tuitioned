@@ -16,7 +16,8 @@ import {
   Timer,
   BookOpen,
   MapPin,
-  ExternalLink
+  ExternalLink,
+  CalendarPlus
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -32,6 +33,7 @@ import { getTimezoneDisplay } from "@/lib/timezone"
 import { toast } from "sonner"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AdminDataTable } from "@/components/admin/DataTable"
+import { AddDemoClassModal } from "@/components/admin/AddDemoClassModal"
 
 export type DemoClassBooking = {
   _id: string
@@ -41,12 +43,27 @@ export type DemoClassBooking = {
     email: string
     fullName?: string
     profileImage?: string
+    mobile?: string
+    address?: {
+      city?: string
+      country?: string
+    }
   }
+  fatherName?: string
+  grade?: string
+  city?: string
+  country?: string
   topic: string
   subject: string
   bookingDateAndTime: string
   status: "pending" | "confirmed" | "completed" | "cancelled"
-  timeZone?: string;
+  timeZone?: string
+  teacherId?: {
+    _id: string
+    fullName: string
+    email: string
+  }
+  joinLink?: string
 }
 
 export default function DemoClassStudentTable() {
@@ -54,6 +71,8 @@ export default function DemoClassStudentTable() {
   const [data, setData] = React.useState<DemoClassBooking[]>([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+  const [selectedBookingForNewDemo, setSelectedBookingForNewDemo] = React.useState<DemoClassBooking | null>(null)
+  const [isAddDemoModalOpen, setIsAddDemoModalOpen] = React.useState(false)
 
   const handleStatusUpdate = async (id: string, newStatus: DemoClassBooking['status']) => {
     try {
@@ -171,7 +190,7 @@ export default function DemoClassStudentTable() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10"><MoreHorizontal size={18} /></Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
+              <DropdownMenuContent align="end" className="w-60 bg-[#111827] border-white/10 text-white rounded-2xl shadow-2xl p-2">
                 <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-gray-500 font-black px-3 py-2">Lifecycle</DropdownMenuLabel>
                 {booking.status === 'pending' && (
                   <DropdownMenuItem onClick={() => handleStatusUpdate(booking._id, 'confirmed')} className="rounded-xl focus:bg-emerald-500/10 focus:text-emerald-400 cursor-pointer py-2.5">
@@ -187,6 +206,15 @@ export default function DemoClassStudentTable() {
                   <XCircle size={16} className="mr-3" /> Cancel Session
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="bg-white/5 my-1" />
+                <DropdownMenuItem 
+                  onClick={() => {
+                    setSelectedBookingForNewDemo(booking);
+                    setIsAddDemoModalOpen(true);
+                  }} 
+                  className="rounded-xl focus:bg-indigo-500/20 focus:text-indigo-300 text-indigo-400 hover:text-indigo-300 cursor-pointer py-2.5 font-semibold"
+                >
+                  <CalendarPlus size={16} className="mr-3 text-indigo-400" /> Add Another Demo Class
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push(`/admin/democlass-student/${booking._id}`)} className="rounded-xl focus:bg-white/5 focus:text-indigo-400 cursor-pointer py-2.5">
                   <Eye size={16} className="mr-3" /> Details
                 </DropdownMenuItem>
@@ -202,22 +230,23 @@ export default function DemoClassStudentTable() {
     },
   ]
 
-  React.useEffect(() => {
-    const fetchDemoBookings = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch('/api/demoClass')
-        if (!response.ok) throw new Error('Inbound request failure');
-        const bookings = await response.json()
-        setData(bookings)
-      } catch (err: any) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
+  const fetchDemoBookings = React.useCallback(async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/demoClass')
+      if (!response.ok) throw new Error('Inbound request failure');
+      const bookings = await response.json()
+      setData(bookings)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
     }
-    fetchDemoBookings()
   }, [])
+
+  React.useEffect(() => {
+    fetchDemoBookings()
+  }, [fetchDemoBookings])
 
   return (
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto">
@@ -232,6 +261,16 @@ export default function DemoClassStudentTable() {
         loading={loading}
         error={error}
         mobileHiddenColumns={["bookingDateAndTime"]}
+      />
+
+      <AddDemoClassModal
+        isOpen={isAddDemoModalOpen}
+        onClose={() => {
+          setIsAddDemoModalOpen(false);
+          setSelectedBookingForNewDemo(null);
+        }}
+        booking={selectedBookingForNewDemo}
+        onSuccess={fetchDemoBookings}
       />
     </div>
   )

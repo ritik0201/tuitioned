@@ -103,18 +103,13 @@ export function SearchableSelect({
           !selectedOption && "text-gray-400"
         )}
       >
-        <span className="truncate text-left font-normal">
+        <span className="truncate text-left font-normal flex-1">
           {selectedOption ? (
-            <span className="flex items-center gap-2 truncate">
-              <span className="text-white truncate">{selectedOption.label}</span>
-              {selectedOption.sublabel && (
-                <span className="text-xs text-gray-400 truncate hidden sm:inline">
-                  ({selectedOption.sublabel})
-                </span>
-              )}
+            <span className="text-white font-medium truncate block">
+              {selectedOption.label}
             </span>
           ) : (
-            placeholder
+            <span className="text-gray-400 font-normal">{placeholder}</span>
           )}
         </span>
         <ChevronDown
