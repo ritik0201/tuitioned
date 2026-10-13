@@ -205,6 +205,7 @@ export function AddDemoClassModal({
           studentId,
           studentName,
           email: studentEmail,
+          mobile: booking?.studentId?.mobile || (booking as any)?.mobile || undefined,
           fatherName: fatherName.trim() || studentName,
           grade: grade.trim() || "General",
           subject: subject.trim(),

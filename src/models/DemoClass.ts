@@ -3,6 +3,8 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
 export interface IDemoClass extends Document {
   studentId: Types.ObjectId;
   teacherId?: Types.ObjectId;
+  studentName?: string;
+  mobile?: string;
   joinLink?: string;
   fatherName: string;
   subject: string;
@@ -20,6 +22,8 @@ export interface IDemoClass extends Document {
 const DemoClassSchema: Schema = new Schema({
   studentId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   teacherId: { type: Schema.Types.ObjectId, ref: 'User' },
+  studentName: { type: String },
+  mobile: { type: String },
   joinLink: { type: String },
   fatherName: { type: String , required: true },
   grade: { type: String, required: true },

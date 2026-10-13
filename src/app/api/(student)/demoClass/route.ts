@@ -60,6 +60,7 @@ export async function POST(request: Request) {
     let targetStudentId: any = session.user.id;
     let targetStudentName = session.user.fullName;
     let targetStudentEmail = body.email;
+    let targetStudentMobile = body.mobile || session.user.mobile || '';
 
     if (isAdmin && body.studentId) {
       const student = await User.findById(body.studentId);
@@ -72,6 +73,19 @@ export async function POST(request: Request) {
       targetStudentId = student._id;
       targetStudentName = student.fullName || body.studentName || 'Student';
       targetStudentEmail = student.email || body.email;
+      targetStudentMobile = body.mobile || student.mobile || targetStudentMobile;
+    } else {
+      const student = await User.findById(targetStudentId);
+      if (student) {
+        targetStudentName = student.fullName || targetStudentName || body.studentName || body.fullName || 'Student';
+        targetStudentEmail = student.email || targetStudentEmail || body.email;
+        targetStudentMobile = body.mobile || student.mobile || targetStudentMobile;
+
+        if (body.mobile && !student.mobile) {
+          student.mobile = body.mobile;
+          await student.save();
+        }
+      }
     }
 
     const { fatherName, grade, subject, topic, city, country, bookingDateAndTime } = body;
@@ -130,6 +144,10 @@ export async function POST(request: Request) {
       status: (isAdmin && body.status) ? body.status : 'pending',
     };
 
+    if (targetStudentMobile) {
+      demoClassPayload.mobile = targetStudentMobile;
+    }
+
     if (body.timeZone) {
       demoClassPayload.timeZone = body.timeZone;
     }
@@ -169,6 +187,7 @@ export async function POST(request: Request) {
       `Grade/Class: ${grade || "N/A"}\n` +
       `Subject: ${resolvedSubject}\n` +
       (topic ? `Topic: ${topic}\n` : "") +
+      (targetStudentMobile ? `Mobile: ${targetStudentMobile}\n` : "") +
       `\nWe look forward to having you in class!`
     );
     const calLocation = encodeURIComponent(body.joinLink || "Tuitioned Online Classroom (https://tuitioned.com)");
@@ -202,6 +221,7 @@ export async function POST(request: Request) {
                 <div style="background-color: #f0f9ff; border-left: 5px solid #0EA5E9; padding: 15px; margin: 20px 0;">
                   <p style="margin: 5px 0; font-size: 16px;"><strong>Subject:</strong> ${resolvedSubject}</p>
                   <p style="margin: 5px 0; font-size: 16px;"><strong>Date:</strong> ${dateObj.toDateString()}</p>
+                  ${targetStudentMobile ? `<p style="margin: 5px 0; font-size: 16px;"><strong>Contact Number:</strong> ${targetStudentMobile}</p>` : ''}
                   ${body.joinLink ? `<p style="margin: 5px 0; font-size: 16px;"><strong>Class Link:</strong> <a href="${body.joinLink}">${body.joinLink}</a></p>` : ''}
                 </div>
                 <div style="text-align: center; margin: 25px 0;">
@@ -245,26 +265,32 @@ export async function POST(request: Request) {
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${targetStudentEmail}</td>
                   </tr>
                   <tr style="background-color: #f8fafc;">
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Mobile Number</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">
+                      ${targetStudentMobile ? `<a href="tel:${targetStudentMobile.replace(/\s+/g, '')}" style="color: #2563EB; text-decoration: none; font-weight: 600;">${targetStudentMobile}</a>` : '<span style="color: #94a3b8;">Not provided</span>'}
+                    </td>
+                  </tr>
+                  <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Grade</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${grade || 'N/A'}</td>
                   </tr>
-                  <tr>
+                  <tr style="background-color: #f8fafc;">
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Subject</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${resolvedSubject}</td>
                   </tr>
-                  <tr style="background-color: #f8fafc;">
+                  <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Topic</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${topic || 'Not provided'}</td>
                   </tr>
-                  <tr>
+                  <tr style="background-color: #f8fafc;">
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Preferred Date</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${dateObj.toDateString()}</td>
                   </tr>
-                  <tr style="background-color: #f8fafc;">
+                  <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">City</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.city || 'Online'}</td>
                   </tr>
-                  <tr>
+                  <tr style="background-color: #f8fafc;">
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Country</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.country || 'Online'}</td>
                   </tr>

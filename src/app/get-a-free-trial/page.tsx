@@ -219,11 +219,12 @@ export default function FreeTrialPage() {
         ...prev,
         fullName: session.user.fullName || "",
         email: session.user.email || "",
-        mobile: session.user.mobile || "",
+        mobile: session.user.mobile || prev.mobile || "",
       }));
 
-      const userMobile = session.user.mobile;
-      if (userMobile) {
+      const syncMobile = (userMobile: string) => {
+        if (!userMobile) return;
+        setFormData((prev) => ({ ...prev, mobile: userMobile }));
         const sortedCodes = [...countryCodes].sort((a, b) => b.code.length - a.code.length);
         const matched = sortedCodes.find((c) => userMobile.startsWith(c.code));
         if (matched) {
@@ -238,6 +239,19 @@ export default function FreeTrialPage() {
             setMobileNumber(userMobile);
           }
         }
+      };
+
+      if (session.user.mobile) {
+        syncMobile(session.user.mobile);
+      } else {
+        fetch("/api/student-profile")
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.success && data?.profile?.mobile) {
+              syncMobile(data.profile.mobile);
+            }
+          })
+          .catch(() => {});
       }
     }
   }, [session]);
@@ -367,6 +381,10 @@ export default function FreeTrialPage() {
       }
       if (!formData.bookingDateAndTime) {
         toast.error("Please select a preferred date");
+        return;
+      }
+      if (!formData.mobile || formData.mobile.trim() === "") {
+        toast.error("Please provide your mobile number");
         return;
       }
     }
@@ -817,6 +835,27 @@ export default function FreeTrialPage() {
                 </div>
               </div>
             </div>
+
+            {/* Mobile Number if not already captured */}
+            {(!formData.mobile || formData.mobile.trim() === "") && (
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+                  Mobile Number <span className="text-indigo-500 dark:text-indigo-400">*</span>
+                </label>
+                <div className="relative group">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
+                  <input
+                    name="mobile"
+                    type="tel"
+                    placeholder="e.g. +1 555-0199 or +91 9876543210"
+                    required
+                    value={formData.mobile || ""}
+                    onChange={handleChange}
+                    className="w-full bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-lg py-2 pl-9 pr-3 focus:outline-none focus:border-indigo-500 transition-all text-xs font-medium placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Date Selection */}
             <div className="space-y-1.5">
