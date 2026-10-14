@@ -17,6 +17,7 @@ import {
   Search, 
   ChevronLeft, 
   ChevronRight,
+  Download,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input" 
@@ -31,6 +32,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { motion, AnimatePresence } from "framer-motion"
 import { Box, Typography } from "@mui/material"
+import { exportToCsv } from "@/lib/exportCsv"
+import { toast } from "sonner"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -43,6 +46,11 @@ interface DataTableProps<TData, TValue> {
   loading?: boolean
   error?: string | null
   mobileHiddenColumns?: string[] // Columns to hide on small screens
+  exportFileName?: string
+  exportFormatter?: (item: TData, index: number) => Record<string, any>
+  enableExport?: boolean
+  headerActions?: React.ReactNode
+  onCustomExport?: (data: TData[]) => void
 }
 
 export function AdminDataTable<TData, TValue>({
@@ -55,7 +63,12 @@ export function AdminDataTable<TData, TValue>({
   filterPlaceholder = "Search...",
   loading,
   error,
-  mobileHiddenColumns = []
+  mobileHiddenColumns = [],
+  exportFileName,
+  exportFormatter,
+  enableExport = true,
+  headerActions,
+  onCustomExport,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
@@ -127,6 +140,48 @@ export function AdminDataTable<TData, TValue>({
     },
   })
 
+  const isFiltered = React.useMemo(() => {
+    return columnFilters.length > 0 && table.getFilteredRowModel().rows.length !== sortedData.length;
+  }, [columnFilters, table, sortedData.length]);
+
+  const filteredCount = table.getFilteredRowModel().rows.length;
+
+  const handleExport = React.useCallback((exportAll: boolean = false) => {
+    try {
+      if (onCustomExport) {
+        const records = exportAll
+          ? sortedData
+          : table.getFilteredRowModel().rows.map((r) => r.original);
+        onCustomExport(records);
+        return;
+      }
+
+      const recordsToExport = exportAll
+        ? sortedData
+        : (table.getFilteredRowModel().rows.map((r) => r.original) || sortedData);
+
+      if (!recordsToExport || recordsToExport.length === 0) {
+        toast.error("No records available to export.");
+        return;
+      }
+
+      const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+      const todayStr = new Date().toISOString().split('T')[0];
+      const targetFileName = exportFileName || `${cleanTitle}_${todayStr}`;
+
+      const count = exportToCsv({
+        data: recordsToExport,
+        filename: targetFileName,
+        formatter: exportFormatter,
+      });
+
+      toast.success(`Exported ${count} record${count === 1 ? '' : 's'} to CSV successfully!`);
+    } catch (err: any) {
+      console.error("Export CSV Error:", err);
+      toast.error(err.message || "Failed to export data to CSV.");
+    }
+  }, [onCustomExport, sortedData, table, title, exportFileName, exportFormatter]);
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="w-full">
       {/* Integrated Header */}
@@ -155,17 +210,55 @@ export function AdminDataTable<TData, TValue>({
           </Box>
         </Box>
         
-        {filterColumn && (
-          <div className="relative group w-full md:w-80">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-colors" size={18} />
-            <Input
-              placeholder={filterPlaceholder}
-              value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
-              onChange={(event) => table.getColumn(filterColumn)?.setFilterValue(event.target.value)}
-              className="pl-12 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-2xl h-14 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-base placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-sm"
-            />
-          </div>
-        )}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          {filterColumn && (
+            <div className="relative group w-full md:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-indigo-500 transition-colors" size={18} />
+              <Input
+                placeholder={filterPlaceholder}
+                value={(table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""}
+                onChange={(event) => table.getColumn(filterColumn)?.setFilterValue(event.target.value)}
+                className="pl-12 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 rounded-2xl h-14 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-base placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-sm"
+              />
+            </div>
+          )}
+
+          {headerActions}
+
+          {enableExport && (
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleExport(false)}
+                disabled={loading || data.length === 0}
+                className="h-14 px-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-800 font-bold transition-all shadow-sm flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+                title={isFiltered ? `Export ${filteredCount} filtered records to CSV` : `Export all ${data.length} records to CSV`}
+              >
+                <Download size={18} className="text-indigo-500" />
+                <span>Export CSV</span>
+                {isFiltered && (
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+                    {filteredCount}
+                  </span>
+                )}
+              </Button>
+
+              {isFiltered && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => handleExport(true)}
+                  disabled={loading || data.length === 0}
+                  className="h-14 px-3 rounded-2xl text-xs font-semibold text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  title={`Export all ${data.length} records ignoring active filter`}
+                >
+                  Export All ({data.length})
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       </Box>
 
       {/* Modern Integrated Table */}

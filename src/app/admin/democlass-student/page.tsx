@@ -38,6 +38,7 @@ import { AddDemoClassModal } from "@/components/admin/AddDemoClassModal"
 export type DemoClassBooking = {
   _id: string
   studentName?: string
+  mobile?: string
   studentId: {
     _id: string
     email: string
@@ -62,6 +63,7 @@ export type DemoClassBooking = {
     _id: string
     fullName: string
     email: string
+    mobile?: string
   }
   joinLink?: string
 }
@@ -119,7 +121,15 @@ export default function DemoClassStudentTable() {
           </Avatar>
           <div className="flex flex-col">
              <span className="font-bold text-sm text-slate-900 dark:text-white">{row.getValue("studentName") || "Unknown Student"}</span>
-             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium uppercase tracking-wider">{row.original.studentId?.email}</span>
+             <div className="flex items-center gap-2 text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+               <span>{row.original.studentId?.email}</span>
+               {(row.original.mobile || row.original.studentId?.mobile) && (
+                 <>
+                   <span>•</span>
+                   <span>{row.original.mobile || row.original.studentId?.mobile}</span>
+                 </>
+               )}
+             </div>
           </div>
         </div>
       ),
@@ -261,6 +271,26 @@ export default function DemoClassStudentTable() {
         loading={loading}
         error={error}
         mobileHiddenColumns={["bookingDateAndTime"]}
+        exportFileName="demo_class_sessions"
+        exportFormatter={(item: DemoClassBooking) => ({
+          "Booking ID": item._id,
+          "Student Name": item.studentName || item.studentId?.fullName || "N/A",
+          "Mobile Number": item.mobile || item.studentId?.mobile || "N/A",
+          "Student Email": item.studentId?.email || "N/A",
+          "Grade / Class": item.grade || "N/A",
+          "Subject": item.subject || "N/A",
+          "Topic": item.topic || "N/A",
+          "Father Name": item.fatherName || "N/A",
+          "City": item.city || item.studentId?.address?.city || "N/A",
+          "Country": item.country || item.studentId?.address?.country || "N/A",
+          "Booking Date & Time": item.bookingDateAndTime ? new Date(item.bookingDateAndTime).toLocaleString() : "N/A",
+          "Time Zone": item.timeZone || "N/A",
+          "Status": (item.status || "pending").toUpperCase(),
+          "Assigned Teacher": item.teacherId?.fullName || "Not Assigned",
+          "Teacher Mobile": item.teacherId?.mobile || "N/A",
+          "Teacher Email": item.teacherId?.email || "N/A",
+          "Meeting Link": item.joinLink || "N/A",
+        })}
       />
 
       <AddDemoClassModal

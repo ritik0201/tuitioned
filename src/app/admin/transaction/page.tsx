@@ -141,6 +141,15 @@ export default function TransactionDataTable() {
         loading={loading}
         error={error}
         mobileHiddenColumns={["paymentId", "date"]}
+        exportFileName="transactions_ledger"
+        exportFormatter={(tx: Transaction) => ({
+          "Transaction ID": tx.id,
+          "Reference / Payment ID": tx.paymentId,
+          "Payer Name": tx.studentName,
+          "Amount (INR)": tx.amount,
+          "Payment Status": (tx.status || "pending").toUpperCase(),
+          "Transaction Date": tx.date ? new Date(tx.date).toLocaleString() : "N/A",
+        })}
       />
     </div>
   )

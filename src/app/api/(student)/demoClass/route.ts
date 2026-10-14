@@ -304,6 +304,33 @@ export async function POST(request: Request) {
       }
     }
 
+    // Sync demo class booking to Google Sheets via Google Apps Script Webhook
+    if (process.env.GOOGLE_SHEET_DEMO_CLASS_WEBHOOK_URL) {
+      try {
+        fetch(process.env.GOOGLE_SHEET_DEMO_CLASS_WEBHOOK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bookingId: newDemoClass._id.toString(),
+            studentName: targetStudentName,
+            mobileNumber: targetStudentMobile,
+            studentEmail: targetStudentEmail,
+            grade: grade || demoClassPayload.grade || "",
+            subject: resolvedSubject,
+            topic: topic || "",
+            fatherName: fatherName || demoClassPayload.fatherName || "",
+            city: body.city || demoClassPayload.city || "Online",
+            country: body.country || demoClassPayload.country || "Online",
+            bookingDate: dateObj.toISOString(),
+          }),
+        }).catch((err) => {
+          console.error("[Google Sheet Sync Error]:", err);
+        });
+      } catch (sheetErr) {
+        console.error("[Google Sheet Sync Error]:", sheetErr);
+      }
+    }
+
     const populatedResult = await DemoClass.findById(newDemoClass._id)
       .populate({ path: 'studentId', model: User, select: 'email fullName profileImage mobile address' })
       .populate({ path: 'teacherId', model: User, select: 'fullName email mobile' });

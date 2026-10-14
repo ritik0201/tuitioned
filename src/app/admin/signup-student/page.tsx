@@ -237,6 +237,14 @@ export default function SignupStudentDataTable() {
         loading={loading}
         error={error}
         mobileHiddenColumns={["email"]}
+        exportFileName="signup_students_directory"
+        exportFormatter={(student: Student) => ({
+          "Student ID": student.id,
+          "Full Name": student.name,
+          "Email Address": student.email,
+          "Contact Number": student.mobile || "N/A",
+          "Account Status": (student.studentStatus || "pending").toUpperCase(),
+        })}
       />
     </div>
   )

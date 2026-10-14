@@ -215,6 +215,15 @@ export default function TeacherDataTable() {
         loading={loading}
         error={error}
         mobileHiddenColumns={["listOfSubjects"]}
+        exportFileName="teachers_directory"
+        exportFormatter={(teacher: Teacher) => ({
+          "Teacher ID": teacher.id,
+          "Full Name": teacher.name,
+          "Email Address": teacher.email,
+          "Contact Number": teacher.mobile || "N/A",
+          "Subjects": Array.isArray(teacher.listOfSubjects) && teacher.listOfSubjects.length > 0 ? teacher.listOfSubjects.join(", ") : "N/A",
+          "Status": (teacher.teacherStatus || "pending").toUpperCase(),
+        })}
       />
     </div>
   )

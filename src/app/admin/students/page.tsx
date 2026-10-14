@@ -155,6 +155,13 @@ export default function StudentDataTable() {
         loading={loading}
         error={error}
         mobileHiddenColumns={["email"]}
+        exportFileName="students_directory"
+        exportFormatter={(student: Student) => ({
+          "Student ID": student.id,
+          "Full Name": student.name,
+          "Email Address": student.email,
+          "Contact Number": student.mobile || "N/A",
+        })}
       />
     </div>
   )

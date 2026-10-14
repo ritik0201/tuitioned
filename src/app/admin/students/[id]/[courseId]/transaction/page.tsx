@@ -15,9 +15,11 @@ import {
   Paper,
   Chip,
 } from "@mui/material";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft, CreditCard, Download } from "lucide-react";
 import { ITransaction } from "@/models/Transaction";
 import Link from "next/link";
+import { exportToCsv } from "@/lib/exportCsv";
+import { toast } from "sonner";
 
 export default function TransactionHistoryPage() {
   const params = useParams();
@@ -53,6 +55,29 @@ export default function TransactionHistoryPage() {
     fetchTransactions();
   }, [courseId]);
 
+  const handleExport = () => {
+    try {
+      if (transactions.length === 0) {
+        toast.error("No transactions to export.");
+        return;
+      }
+      const count = exportToCsv({
+        data: transactions,
+        filename: `course_${courseId}_transactions_${new Date().toISOString().split('T')[0]}`,
+        formatter: (tx: ITransaction) => ({
+          "Transaction ID": tx.transactionId,
+          "Classes Added": tx.numberOfClasses,
+          "Amount (INR)": tx.amount,
+          "Payment Status": (tx.paymentStatus || "pending").toUpperCase(),
+          "Created Date": tx.createdAt ? new Date(tx.createdAt).toLocaleString() : "N/A",
+        }),
+      });
+      toast.success(`Exported ${count} transaction records to CSV!`);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to export transactions.");
+    }
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "80vh" }}>
@@ -77,7 +102,22 @@ export default function TransactionHistoryPage() {
       </Button>
 
       <Card variant="outlined" sx={{ borderRadius: 3 }}>
-        <CardHeader title="Full Transaction History" subheader={`All transactions for this course enrollment.`} />
+        <CardHeader 
+          title="Full Transaction History" 
+          subheader="All transactions for this course enrollment."
+          action={
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<Download size={16} />}
+              onClick={handleExport}
+              disabled={transactions.length === 0}
+              sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 'bold' }}
+            >
+              Export CSV
+            </Button>
+          }
+        />
         <Divider />
         <CardContent>
           {transactions.length > 0 ? (
