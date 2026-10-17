@@ -90,6 +90,17 @@ export async function POST(request: Request) {
 
     const { fatherName, grade, subject, topic, city, country, bookingDateAndTime } = body;
 
+    let targetFatherName = fatherName || body.parentName || '';
+    if (!targetFatherName && targetStudentId) {
+      const prevDemo = await DemoClass.findOne({
+        studentId: targetStudentId,
+        fatherName: { $exists: true, $ne: '' }
+      }).sort({ createdAt: -1 });
+      if (prevDemo?.fatherName) {
+        targetFatherName = prevDemo.fatherName;
+      }
+    }
+
     if (!isAdmin) {
       const requiredFields = {
         fatherName: "Father's name is required.",
@@ -134,7 +145,7 @@ export async function POST(request: Request) {
     const demoClassPayload: any = {
       studentId: targetStudentId,
       studentName: targetStudentName,
-      fatherName: fatherName || (isAdmin ? (body.studentName || targetStudentName || 'Parent/Guardian') : ''),
+      fatherName: targetFatherName || fatherName || (isAdmin ? (body.studentName || targetStudentName || 'Parent/Guardian') : ''),
       grade: grade || (isAdmin ? 'General' : ''),
       city: city || (isAdmin ? 'Online' : ''),
       country: country || (isAdmin ? 'Online' : ''),
@@ -184,6 +195,7 @@ export async function POST(request: Request) {
     const calDetails = encodeURIComponent(
       `Tuitioned Live 1-on-1 Demo Class Session.\n\n` +
       `Student Name: ${targetStudentName}\n` +
+      (targetFatherName ? `Father's Name: ${targetFatherName}\n` : "") +
       `Grade/Class: ${grade || "N/A"}\n` +
       `Subject: ${resolvedSubject}\n` +
       (topic ? `Topic: ${topic}\n` : "") +
@@ -240,6 +252,8 @@ export async function POST(request: Request) {
           `,
         });
 
+        const displayFatherName = targetFatherName || demoClassPayload.fatherName || 'Not provided';
+
         // Send notification email to admin
         await transporter.sendMail({
           from: `"Tuitioned" <${process.env.EMAIL_USER}>`,
@@ -261,36 +275,40 @@ export async function POST(request: Request) {
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${targetStudentName}</td>
                   </tr>
                   <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Father's Name</td>
+                    <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${displayFatherName}</td>
+                  </tr>
+                  <tr style="background-color: #f8fafc;">
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Email</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${targetStudentEmail}</td>
                   </tr>
-                  <tr style="background-color: #f8fafc;">
+                  <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Mobile Number</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">
                       ${targetStudentMobile ? `<a href="tel:${targetStudentMobile.replace(/\s+/g, '')}" style="color: #2563EB; text-decoration: none; font-weight: 600;">${targetStudentMobile}</a>` : '<span style="color: #94a3b8;">Not provided</span>'}
                     </td>
                   </tr>
-                  <tr>
+                  <tr style="background-color: #f8fafc;">
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Grade</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${grade || 'N/A'}</td>
                   </tr>
-                  <tr style="background-color: #f8fafc;">
+                  <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Subject</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${resolvedSubject}</td>
                   </tr>
-                  <tr>
+                  <tr style="background-color: #f8fafc;">
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Topic</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${topic || 'Not provided'}</td>
                   </tr>
-                  <tr style="background-color: #f8fafc;">
+                  <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Preferred Date</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${dateObj.toDateString()}</td>
                   </tr>
-                  <tr>
+                  <tr style="background-color: #f8fafc;">
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">City</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.city || 'Online'}</td>
                   </tr>
-                  <tr style="background-color: #f8fafc;">
+                  <tr>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #64748b; font-weight: 600;">Country</td>
                     <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #334155;">${body.country || 'Online'}</td>
                   </tr>
@@ -318,7 +336,7 @@ export async function POST(request: Request) {
             grade: grade || demoClassPayload.grade || "",
             subject: resolvedSubject,
             topic: topic || "",
-            fatherName: fatherName || demoClassPayload.fatherName || "",
+            fatherName: targetFatherName || demoClassPayload.fatherName || "",
             city: body.city || demoClassPayload.city || "Online",
             country: body.country || demoClassPayload.country || "Online",
             bookingDate: dateObj.toISOString(),
