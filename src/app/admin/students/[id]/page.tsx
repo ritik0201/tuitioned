@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/dialog";
 import CreateCourseForm from "@/components/admin/CreateCourseForm";
 import { ICourse } from "@/models/Course";
+import { getCurrencySymbol } from "@/lib/currency";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -279,17 +280,17 @@ export default function StudentDetailPage({
                     New Enrollment
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-2xl p-0 gap-0 overflow-hidden z-[1200] max-h-[90vh] flex flex-col rounded-[2rem]">
-                  <DialogHeader className="p-8 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0 text-left">
-                    <DialogTitle className="text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
+                <DialogContent className="sm:max-w-4xl lg:max-w-5xl w-[95vw] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-2xl p-0 gap-0 overflow-hidden z-[1200] max-h-[92vh] flex flex-col rounded-[2rem]">
+                  <DialogHeader className="px-8 py-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0 text-left">
+                    <DialogTitle className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-3">
                        <Sparkles className="text-amber-500" />
                        Create New Course
                     </DialogTitle>
-                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1, fontWeight: 500 }}>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontWeight: 500 }}>
                       Configure specialized curriculum for <span className="text-slate-900 dark:text-white font-black">{student.name}</span>
                     </Typography>
                   </DialogHeader>
-                  <div className="p-8 overflow-y-auto scrollbar-hide">
+                  <div className="overflow-hidden flex-1 flex flex-col min-h-0">
                     <CreateCourseForm
                       studentId={student._id}
                       onCourseCreated={() => setIsDialogOpen(false)}
@@ -331,10 +332,14 @@ export default function StudentDetailPage({
                           </Box>
                           <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
                             <Chip
-                              label={course.noOfClasses > 0 ? "LIVE" : "COMPLETED"}
+                              label={course.noOfClasses > 0 ? "LIVE" : (course.paymentStatus === 'completed' ? "COMPLETED" : "0 SESSIONS / PENDING")}
                               sx={{ 
-                                bgcolor: course.noOfClasses > 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)', 
-                                color: course.noOfClasses > 0 ? '#10b981' : '#f59e0b',
+                                bgcolor: course.noOfClasses > 0 
+                                  ? 'rgba(16, 185, 129, 0.1)' 
+                                  : (course.paymentStatus === 'completed' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(99, 102, 241, 0.1)'), 
+                                color: course.noOfClasses > 0 
+                                  ? '#10b981' 
+                                  : (course.paymentStatus === 'completed' ? '#f59e0b' : '#6366f1'),
                                 fontWeight: 900,
                                 fontSize: '0.6rem',
                                 height: 24
@@ -364,7 +369,7 @@ export default function StudentDetailPage({
                           </Box>
                           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                              <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>Tuition Rate</Typography>
-                             <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800 }}>₹{course.perClassPrice}/session</Typography>
+                             <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 800 }}>{getCurrencySymbol(course.currency)}{course.perClassPrice}/session</Typography>
                           </Box>
                         </Stack>
                       </Box>

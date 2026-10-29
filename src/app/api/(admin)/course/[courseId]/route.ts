@@ -159,12 +159,15 @@ export async function PUT(
       classDays,
       noOfClasses,
       perClassPrice,
+      currency,
       joinLink,
       classroomLink,
       teacherId,
       teacherPerClassPrice,
       noOfclassTeacher,
       paymentStatus,
+      schedules,
+      teacherClassTime,
     } = body;
 
     const updateData: Record<string, any> = {};
@@ -173,10 +176,13 @@ export async function PUT(
     if (title) updateData.title = title;
     if (description) updateData.description = description;
     if (grade) updateData.grade = grade;
-    if (classTime) updateData.classTime = classTime;
-    if (classDays) updateData.classDays = classDays;
+    if (classTime !== undefined) updateData.classTime = classTime;
+    if (teacherClassTime !== undefined) updateData.teacherClassTime = teacherClassTime;
+    if (classDays !== undefined) updateData.classDays = classDays;
+    if (schedules !== undefined) updateData.schedules = schedules;
     if (noOfClasses !== undefined) updateData.noOfClasses = noOfClasses;
     if (perClassPrice !== undefined) updateData.perClassPrice = perClassPrice;
+    if (currency !== undefined) updateData.currency = currency.toUpperCase();
     if (joinLink) updateData.joinLink = joinLink;
     if (classroomLink !== undefined) updateData.classroomLink = classroomLink;
     if (teacherPerClassPrice !== undefined) updateData.teacherPerClassPrice = teacherPerClassPrice;

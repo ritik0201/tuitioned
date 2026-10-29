@@ -26,6 +26,7 @@ import {
   CreditCard,
   GraduationCap,
   Hash,
+  Coins,
   IndianRupee,
   Calendar,
   Clock,
@@ -43,6 +44,7 @@ import { CourseDetails } from "@/types/admin";
 import { ITransaction } from "@/models/Transaction";
 import AdminCourseEditModal from "@/components/AdminCourseEditModal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getCurrencySymbol } from "@/lib/currency";
 import { motion } from "framer-motion";
 
 interface CompletedClass {
@@ -246,9 +248,35 @@ export default function AdminCourseDetailPage() {
                 <SectionHeader title="Metrics" icon={<TrendingUp size={24} />} subtitle="Operational course data" />
                 <Stack spacing={3}>
                    <MetricItem label="AVAILABLE SESSIONS" value={course.noOfClasses.toString()} icon={<Hash size={18} />} />
-                   <MetricItem label="SESSION PRICE" value={`₹${course.perClassPrice}`} icon={<IndianRupee size={18} />} />
+                   <MetricItem label="SESSION PRICE" value={`${getCurrencySymbol(course.currency)}${course.perClassPrice}`} icon={<Coins size={18} />} />
                    <MetricItem label="SCHEDULE TIME" value={course.classTime || "Flexible"} icon={<Clock size={18} />} />
                    <MetricItem label="RECURRENCE" value={course.classDays?.join(', ') || "Not set"} icon={<Calendar size={18} />} />
+                   {course.schedules && course.schedules.length > 0 && (
+                     <Box sx={{ mt: 2, pt: 2, borderTop: '1px dashed', borderColor: 'divider' }}>
+                       <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
+                         Schedule Slots
+                       </Typography>
+                       <Stack spacing={1}>
+                         {course.schedules.map((s, i) => (
+                           <Box key={i} sx={{ p: 1.5, borderRadius: 2, bgcolor: 'action.hover' }}>
+                             <Typography variant="caption" fontWeight="800" sx={{ color: 'primary.main', display: 'block', mb: 0.5 }}>
+                               Class #{i + 1}
+                             </Typography>
+                             {s.studentSchedule && (
+                               <Typography variant="caption" sx={{ display: 'block', color: 'text.primary', fontWeight: 600 }}>
+                                 Student: {s.studentSchedule}
+                               </Typography>
+                             )}
+                             {s.teacherSchedule && (
+                               <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontWeight: 500 }}>
+                                 Teacher: {s.teacherSchedule}
+                               </Typography>
+                             )}
+                           </Box>
+                         ))}
+                       </Stack>
+                     </Box>
+                   )}
                 </Stack>
               </Box>
            </motion.div>

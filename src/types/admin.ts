@@ -8,6 +8,15 @@ export interface UserInfo {
   mobile?: string;
 }
 
+export interface ScheduleItem {
+  studentSchedule?: string;
+  teacherSchedule?: string;
+  studentDay?: string;
+  studentTime?: string;
+  teacherDay?: string;
+  teacherTime?: string;
+}
+
 /**
  * Represents the detailed structure of a course, including populated user info.
  */
@@ -18,8 +27,11 @@ export interface CourseDetails {
   grade: string;
   noOfClasses: number;
   perClassPrice: number;
+  currency?: string;
   classTime?: string;
+  teacherClassTime?: string;
   classDays?: string[];
+  schedules?: ScheduleItem[];
   paymentStatus?: "pending" | "completed" | "failed";
   teacherId: UserInfo;
   studentId: UserInfo;

@@ -22,6 +22,7 @@ import {
   Clock,
   Edit,
   GraduationCap,
+  Coins,
   IndianRupee,
   Mail,
   Save,
@@ -29,6 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { getCurrencySymbol } from "@/lib/currency";
 
 interface Student {
   _id: string;
@@ -43,6 +45,7 @@ interface CourseDetails {
   grade: string;
   noOfClasses: number;
   perClassPrice: number;
+  currency?: string;
   noOfclassTeacher?: number;
   teacherPerClassPrice?: number;
   studentId: Student;
@@ -238,7 +241,7 @@ export default function TeacherCourseDetailPage() {
             <InfoItem icon={<BookOpen size={20} />} label="Classes Left" value={String(course.noOfClasses)} />
             <InfoItem icon={<Clock size={20} />} label="Class Time" value={course.classTime} />
             <InfoItem icon={<Calendar size={20} />} label="Class Days" value={course.classDays} />
-            <InfoItem icon={<IndianRupee size={20} />} label="Price Per Class" value={`₹${course.perClassPrice.toFixed(2)}`} />
+            <InfoItem icon={<Coins size={20} />} label="Price Per Class" value={`${getCurrencySymbol(course.currency)}${course.perClassPrice.toFixed(2)}`} />
             <Divider sx={{ my: 2, borderColor: 'divider' }} />
             <Typography variant="h6" fontWeight="bold" color="text.primary" gutterBottom>Payment Status</Typography>
             <Paper elevation={0} sx={{ p: 2.5, bgcolor: 'action.hover', borderRadius: 3, textAlign: 'center' }}>

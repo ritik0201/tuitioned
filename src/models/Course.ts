@@ -1,5 +1,14 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
+export interface IScheduleItem {
+  studentSchedule: string;
+  teacherSchedule: string;
+  studentDay?: string;
+  studentTime?: string;
+  teacherDay?: string;
+  teacherTime?: string;
+}
+
 export interface ICourse extends Document {
   _id: Types.ObjectId;
   studentId: Types.ObjectId;
@@ -7,9 +16,12 @@ export interface ICourse extends Document {
   description: string;
   grade: string;
   classTime: string;
+  teacherClassTime?: string;
   classDays:  string[];
+  schedules?: IScheduleItem[];
   noOfClasses: number;
   perClassPrice: number;
+  currency?: string;
   noOfclassTeacher?: number;
   teacherPerClassPrice?: number;
   joinLink: string;
@@ -25,10 +37,22 @@ const CourseSchema: Schema = new Schema({
   description: { type: String, default: '' },
   grade: { type: String, required: true },
   classTime: { type: String },
+  teacherClassTime: { type: String, default: '' },
   classDays: { type: [String] },
+  schedules: [
+    {
+      studentSchedule: { type: String, default: '' },
+      teacherSchedule: { type: String, default: '' },
+      studentDay: { type: String, default: '' },
+      studentTime: { type: String, default: '' },
+      teacherDay: { type: String, default: '' },
+      teacherTime: { type: String, default: '' },
+    }
+  ],
   noOfClasses: { type: Number, default: 0},
   noOfclassTeacher: { type: Number, default: 0 },
   perClassPrice: { type: Number, required: true },
+  currency: { type: String, default: 'INR' },
   teacherPerClassPrice: { type: Number, default: 0 },
   joinLink: { type: String },
   classroomLink: { type: String },
@@ -37,5 +61,10 @@ const CourseSchema: Schema = new Schema({
   paymentStatus: { type: String, enum: ['pending', 'completed', 'failed'], default: 'pending' },
 }, { timestamps: true });
 
-// Check if model already exists to avoid OverwriteModelError in development
+// Check if model already exists to avoid OverwriteModelError in development,
+// but invalidate if schema was loaded before the currency field was added.
+if (mongoose.models && mongoose.models.Course && !mongoose.models.Course.schema.path('currency')) {
+  delete mongoose.models.Course;
+}
+
 export default mongoose.models.Course || mongoose.model<ICourse>('Course', CourseSchema);

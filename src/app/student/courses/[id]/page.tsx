@@ -40,6 +40,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { getCurrencySymbol } from "@/lib/currency";
 
 interface ICourse {
   _id: string;
@@ -49,8 +50,10 @@ interface ICourse {
   grade: string;
   classTime?: string;
   classDays?: string[];
+  schedules?: { studentSchedule?: string; teacherSchedule?: string }[];
   noOfClasses: number;
   perClassPrice: number;
+  currency?: string;
   joinLink?: string;
   classroomLink?: string;
   paymentStatus?: "pending" | "completed" | "failed";
@@ -181,6 +184,7 @@ export default function CourseDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: totalPrice,
+          currency: course.currency || 'INR',
           receipt: `rec_${course._id}_${Date.now() % 10000000}`,
         }),
       });
@@ -194,7 +198,7 @@ export default function CourseDetailPage() {
           courseId: course._id,
           amount: totalPrice,
           numberOfClasses: classesToAdd,
-          currency: order.currency,
+          currency: order.currency || course.currency || 'INR',
           transactionId: order.id,
           paymentGateway: 'Razorpay',
         }),
@@ -264,6 +268,7 @@ export default function CourseDetailPage() {
   if (error) return <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex p-8"><Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert></div>;
   if (!course) return notFound();
 
+  const currencySymbol = getCurrencySymbol(course.currency);
   const totalPrice = classesToAdd * course.perClassPrice;
   const completedDays = completedClasses.map(c => new Date(c.completedAt));
   const completedClassesCount = completedClasses.length;
@@ -346,11 +351,11 @@ export default function CourseDetailPage() {
                   <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-none border border-slate-200 dark:border-slate-800 flex justify-between items-center">
                     <div>
                       <p className="text-[10px] font-black text-slate-500 uppercase">Price per class</p>
-                      <p className="text-xs font-bold text-slate-800 dark:text-slate-300">₹{course.perClassPrice.toLocaleString()}</p>
+                      <p className="text-xs font-bold text-slate-800 dark:text-slate-300">{currencySymbol}{course.perClassPrice.toLocaleString()}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase">Total</p>
-                      <p className="text-xl font-black text-slate-900 dark:text-white">₹{totalPrice.toLocaleString()}</p>
+                      <p className="text-xl font-black text-slate-900 dark:text-white">{currencySymbol}{totalPrice.toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
@@ -388,15 +393,30 @@ export default function CourseDetailPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-none border border-slate-200 dark:border-slate-800">
                   <p className="text-[10px] font-black uppercase text-slate-500">Pricing</p>
-                  <p className="text-base font-black text-slate-900 dark:text-white">₹{course.perClassPrice} / Class</p>
+                  <p className="text-base font-black text-slate-900 dark:text-white">{currencySymbol}{course.perClassPrice} / Class</p>
                 </div>
                 <div className="p-4 bg-slate-100 dark:bg-slate-950 rounded-none border border-slate-200 dark:border-slate-800">
-                  <p className="text-[10px] font-black uppercase text-slate-500 mb-1">Days</p>
-                  <div className="flex flex-wrap gap-1">
-                    {course.classDays?.map(day => (
-                      <span key={day} className="text-[10px] font-black uppercase text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950 px-2 py-0.5 border border-purple-200 dark:border-purple-800">{day}</span>
-                    ))}
-                  </div>
+                  <p className="text-[10px] font-black uppercase text-slate-500 mb-1">
+                    {course.schedules && course.schedules.length > 0 ? "Class Schedule" : "Days"}
+                  </p>
+                  {course.schedules && course.schedules.length > 0 ? (
+                    <div className="flex flex-col gap-1.5">
+                      {course.schedules.map((s, idx) => (
+                        <span key={idx} className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                          <span className="text-[10px] uppercase font-black px-1.5 py-0.5 bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                            Class #{idx + 1}
+                          </span>
+                          {s.studentSchedule || s.teacherSchedule}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      {course.classDays?.map(day => (
+                        <span key={day} className="text-[10px] font-black uppercase text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950 px-2 py-0.5 border border-purple-200 dark:border-purple-800">{day}</span>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

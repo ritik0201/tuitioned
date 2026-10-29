@@ -10,8 +10,10 @@ import {
   CircularProgress,
   Alert,
   Autocomplete,
+  MenuItem,
 } from "@mui/material";
 import { CourseDetails } from "@/types/admin";
+import { SUPPORTED_CURRENCIES } from "@/lib/currency";
 
 interface Teacher {
   id: string;
@@ -55,6 +57,7 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
     classDays: course.classDays?.join(", ") || "", // Convert array to comma-separated string
     noOfClasses: course.noOfClasses,
     perClassPrice: course.perClassPrice,
+    currency: course.currency || "INR",
     joinLink: course.joinLink || "",
     classroomLink: course.classroomLink || "",
     teacherId: course.teacherId?._id || "", // Store as string ID from populated object
@@ -97,6 +100,7 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
         classDays: course.classDays?.join(", ") || "",
         noOfClasses: course.noOfClasses,
         perClassPrice: course.perClassPrice,
+        currency: course.currency || "INR",
         joinLink: course.joinLink || "",
         classroomLink: course.classroomLink || "",
         teacherId: course.teacherId?._id || "",
@@ -120,8 +124,10 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
     try {
       const payload = {
         ...formData,
+        schedules: (course as any).schedules,
         noOfClasses: Number(formData.noOfClasses),
         perClassPrice: Number(formData.perClassPrice),
+        currency: (formData.currency || "INR").toUpperCase(),
         teacherPerClassPrice: Number(formData.teacherPerClassPrice),
         noOfclassTeacher: Number(formData.noOfclassTeacher),
         classDays: formData.classDays.split(",").map((day) => day.trim()).filter(Boolean), // Convert back to array
@@ -214,7 +220,22 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
           inputProps={{ min: 0 }}
         />
         <TextField
-          label="Price Per Class"
+          select
+          label="Currency"
+          name="currency"
+          value={formData.currency}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        >
+          {SUPPORTED_CURRENCIES.map((option) => (
+            <MenuItem key={option.code} value={option.code}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          label={`Price Per Class (${formData.currency || 'INR'})`}
           name="perClassPrice"
           type="number"
           value={formData.perClassPrice}
@@ -243,7 +264,7 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
         />
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
-            label="Expert Pay (Teacher Price)"
+            label="Expert Pay (Teacher Price in ₹)"
             name="teacherPerClassPrice"
             type="number"
             value={formData.teacherPerClassPrice}

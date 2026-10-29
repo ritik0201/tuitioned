@@ -56,7 +56,9 @@ interface CourseDetails {
   teacherPerClassPrice?: number;
   classroomLink?: string;
   classTime?: string;
+  teacherClassTime?: string;
   classDays?: string[];
+  schedules?: { studentSchedule?: string; teacherSchedule?: string }[];
 }
 
 interface CompletedClass {
@@ -286,17 +288,35 @@ export default function CourseDetailsPage() {
                   <User size={20} />
                   <Typography>{course.studentId.fullName}</Typography>
                 </Box>
-                {course.classTime && (
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Clock size={20} />
-                    <Typography>{course.classTime}</Typography>
+                {course.schedules && course.schedules.length > 0 ? (
+                  <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: "text.secondary", textTransform: "uppercase" }}>
+                      My Class Schedule
+                    </Typography>
+                    {course.schedules.map((s, idx) => (
+                      <Box key={idx} sx={{ display: "flex", alignItems: "center", gap: 1.5, p: 1, bgcolor: "action.hover", borderRadius: 1.5 }}>
+                        <Clock size={16} className="text-emerald-500 shrink-0" />
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {s.teacherSchedule || s.studentSchedule}
+                        </Typography>
+                      </Box>
+                    ))}
                   </Box>
-                )}
-                {course.classDays && course.classDays.length > 0 && (
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Calendar size={20} />
-                    <Typography>{course.classDays.join(", ")}</Typography>
-                  </Box>
+                ) : (
+                  <>
+                    {(course.teacherClassTime || course.classTime) && (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Clock size={20} />
+                        <Typography>{course.teacherClassTime || course.classTime}</Typography>
+                      </Box>
+                    )}
+                    {course.classDays && course.classDays.length > 0 && (
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        <Calendar size={20} />
+                        <Typography>{course.classDays.join(", ")}</Typography>
+                      </Box>
+                    )}
+                  </>
                 )}
                 <Button
                   fullWidth

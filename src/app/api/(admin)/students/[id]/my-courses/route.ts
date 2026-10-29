@@ -57,10 +57,13 @@ export async function POST(
       grade,
       noOfClasses,
       perClassPrice,
+      currency,
       teacherPerClassPrice,
       classTime,
+      teacherClassTime,
       teacherId,
       classDays,
+      schedules,
       joinLink,
       classroomLink,
     } = body;
@@ -69,6 +72,8 @@ export async function POST(
       !title ||
       !grade ||
       noOfClasses === undefined ||
+      noOfClasses === null ||
+      noOfClasses === '' ||
       !perClassPrice ||
       !teacherId ||
       !joinLink) {
@@ -90,16 +95,20 @@ export async function POST(
       return NextResponse.json({ message: 'Teacher not found' }, { status: 404 });
     }
 
+    const parsedNoOfClasses = Number(noOfClasses);
     const newCourse = new Course({
       title,
       description: description || '',
       grade,
-      noOfClasses,
+      noOfClasses: !isNaN(parsedNoOfClasses) && parsedNoOfClasses >= 0 ? parsedNoOfClasses : 0,
       noOfclassTeacher: 0, // Explicitly set to 0 on creation
       perClassPrice,
+      currency: (currency || 'INR').toUpperCase(),
       teacherPerClassPrice: teacherPerClassPrice || 0,
-      classTime,
-      classDays,
+      classTime: classTime || '',
+      teacherClassTime: teacherClassTime || '',
+      classDays: classDays || [],
+      schedules: schedules || [],
       joinLink,
       classroomLink,
       studentId: student._id,
@@ -112,6 +121,10 @@ export async function POST(
     const courseUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/student/courses/${newCourse._id}`;
 
     // 1. Email to the student
+    const studentScheduleHtml = newCourse.schedules && newCourse.schedules.length > 0
+      ? `<li><strong>Class Timings:</strong><ul style="padding-left: 20px; margin-top: 5px;">${newCourse.schedules.map((s: any) => `<li>${s.studentSchedule || s.teacherSchedule}</li>`).join('')}</ul></li>`
+      : (newCourse.classTime ? `<li><strong>Class Time:</strong> ${newCourse.classTime}</li>` : '');
+
     await sendEmail({
       to: student.email,
       subject: `New Course Assigned: ${newCourse.title} 🎉`,
@@ -145,6 +158,7 @@ export async function POST(
               <li><strong>Title:</strong> ${newCourse.title}</li>
               <li><strong>Grade:</strong> ${newCourse.grade}</li>
               <li><strong>Teacher:</strong> ${teacher.fullName}</li>
+              ${studentScheduleHtml}
             </ul>
             <p>You can view your new course in your student dashboard by clicking the button below:</p>
             <p style="text-align: center; margin-top: 25px;"><a href="${courseUrl}" class="button">View My Course</a></p>
@@ -159,6 +173,10 @@ export async function POST(
     });
 
     // 2. Email to the teacher
+    const teacherScheduleHtml = newCourse.schedules && newCourse.schedules.length > 0
+      ? `<p><strong>Class Timings (Your Schedule):</strong></p><ul style="list-style: none; padding: 0; margin: 15px 0;">${newCourse.schedules.map((s: any) => `<li style="background-color: #f9f9f9; padding: 10px; border-radius: 4px; margin-bottom: 8px;">${s.teacherSchedule || s.studentSchedule}</li>`).join('')}</ul>`
+      : (newCourse.teacherClassTime ? `<p><strong>Class Time:</strong> ${newCourse.teacherClassTime}</p>` : (newCourse.classTime ? `<p><strong>Class Time:</strong> ${newCourse.classTime}</p>` : ''));
+
     await sendEmail({
       to: teacher.email,
       subject: `You have a new course assignment: ${newCourse.title} 🚀`,
@@ -185,6 +203,7 @@ export async function POST(
             <p>Hi ${teacher.fullName},</p>
             <p>You have been assigned a new course for the student <strong>${student.fullName}</strong>.</p>
             <p><strong>Course:</strong> ${newCourse.title}</p>
+            ${teacherScheduleHtml}
             <p>Please check your dashboard for more details.</p>
         </div>
         <div class="footer">
