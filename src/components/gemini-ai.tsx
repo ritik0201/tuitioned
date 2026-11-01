@@ -230,7 +230,7 @@ const GeminiAI: React.FC = () => {
                             <div className="flex items-center justify-center gap-1.5 mt-3 opacity-50 group-hover:opacity-100 transition-opacity">
                                 <Sparkles size={10} className="text-zinc-500" />
                                 <p className="text-[9px] text-zinc-500 font-medium uppercase tracking-widest text-center">
-                                    TuitionEd AI Assistant
+                                    Tuitioned AI Assistant
                                 </p>
                             </div>
                         </div>

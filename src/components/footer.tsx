@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   Instagram, 
   Linkedin, 
@@ -129,8 +130,15 @@ const Footer = () => {
           {/* Brand Column */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-3">
-              <Link href="/" className="inline-block text-2xl font-extrabold tracking-tight text-foreground">
-                Tuition<span className="text-primary">-ed</span>
+              <Link href="/" className="inline-flex items-center gap-2.5 text-2xl font-black tracking-tight text-foreground group">
+                <Image
+                  src="/logo.png"
+                  alt="Tuitioned Logo"
+                  width={36}
+                  height={36}
+                  className="object-contain"
+                />
+                <span>Tuitioned</span>
               </Link>
               <p className="text-muted-foreground text-sm leading-relaxed max-w-md">
                 Empowering students worldwide through interactive 1-on-1 online tutoring, K-12 academic excellence, and custom skill development.
@@ -231,7 +239,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>
-            &copy; {new Date().getFullYear()} TuitionEd. All rights reserved.
+            &copy; {new Date().getFullYear()} Tuitioned. All rights reserved.
           </p>
 
           <div className="flex items-center gap-6">

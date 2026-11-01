@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
     Button,
 } from '@mui/material';
@@ -18,8 +19,20 @@ import { useUI } from '@/provider/UIProvider';
 import ThemeToggle from './ThemeToggle';
 
 const Logo = () => (
-    <Link href="/" className="font-bold text-xl tracking-tight text-foreground">
-        Tuition-ed
+    <Link href="/" className="flex items-center gap-2.5 group">
+        <div className="relative flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 overflow-hidden transition-transform duration-200 group-hover:scale-105">
+            <Image
+                src="/logo.png"
+                alt="Tuitioned Logo"
+                width={36}
+                height={36}
+                priority
+                className="object-contain w-full h-full"
+            />
+        </div>
+        <span className="font-black text-xl sm:text-2xl tracking-tight text-foreground group-hover:text-primary transition-colors">
+            Tuitioned
+        </span>
     </Link>
 );
 

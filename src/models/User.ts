@@ -27,6 +27,8 @@ export interface IUser extends Document {
   profileImage?: string;
   cvUrl?: string;
   aboutTeacher?: string;
+  grade?: string;
+  fatherName?: string;
   teacherStatus?: 'pending' | 'approved' | 'rejected';
   studentStatus?: 'pending' | 'approved' | 'rejected';
   createdAt: Date;
@@ -38,6 +40,8 @@ const UserSchema: Schema<IUser> = new Schema({
   email: { type: String, required: true, unique: true },
   mobile: { type: String },
   dateOfBirth: { type: Date },
+  grade: { type: String },
+  fatherName: { type: String },
   address: {
     street: String,
     city: String,

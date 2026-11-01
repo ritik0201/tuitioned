@@ -14,14 +14,14 @@ export async function sendOtpEmail(email: string, otp: string) {
   const mailOptions = {
     from: `"Tuitioned Team" <${process.env.EMAIL_USER}>`,
     to: email,
-    subject: "Your One-Time Password for TuitionEd",
+    subject: "Your One-Time Password for Tuitioned",
     html: `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <h2 style="color: #0056b3;">Your One-Time Password</h2>
-        <p>Please use the following One-Time Password (OTP) for your TuitionEd account.</p>
+        <p>Please use the following One-Time Password (OTP) for your Tuitioned account.</p>
         <p style="font-size: 24px; font-weight: bold; text-align: center; background: #f2f2f2; padding: 10px; border-radius: 5px;">${otp}</p>
         <p>This code is valid for a short period. If you did not request this code, please disregard this email.</p>
-        <p>Best regards,<br><strong>The TuitionEd Team</strong></p>
+        <p>Best regards,<br><strong>The Tuitioned Team</strong></p>
       </div>
     `,
   };

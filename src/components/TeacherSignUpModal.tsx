@@ -297,7 +297,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
             <Box sx={{ bgcolor: 'white', p: 1.5, borderRadius: 3, display: 'inline-flex', boxShadow: '0 4px 14px rgba(0,0,0,0.15)', mb: 1 }}>
               <Image
                 src="/logo.png"
-                alt="Tuition-ed Logo"
+                alt="Tuitioned Logo"
                 width={width && width < 600 ? 50 : 80}
                 height={width && width < 600 ? 50 : 80}
                 style={{ objectFit: 'contain' }}

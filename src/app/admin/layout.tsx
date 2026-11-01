@@ -17,6 +17,7 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import { LayoutDashboard, Users, School, LogOut, Menu, Sparkles, Receipt, UserCheck, Mail } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import UserProfileMenu from '@/components/UserProfileMenu';
@@ -60,9 +61,16 @@ export default function AdminLayout({
   const drawerContent = (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
-        <Link href="/" style={{ textDecoration: 'none' }}>
-          <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-            TuitionEd
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Image
+            src="/logo.png"
+            alt="Tuitioned Logo"
+            width={32}
+            height={32}
+            style={{ objectFit: 'contain' }}
+          />
+          <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '-0.02em' }}>
+            Tuitioned
           </Typography>
         </Link>
       </Toolbar>

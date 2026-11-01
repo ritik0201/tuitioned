@@ -37,7 +37,7 @@ export default function PayButton({ amount, bookingId }: { amount: number; booki
       key: process.env.NEXT_PUBLIC_RP_KEY_ID ?? "", // only public key here
       amount: order.amount,
       currency: order.currency,
-      name: "TuitionEd",
+      name: "Tuitioned",
       description: `Payment for your course booking #${bookingId}`,
       order_id: order.id,
       handler: async function (response: RazorpayResponse) {

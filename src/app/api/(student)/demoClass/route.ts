@@ -245,7 +245,7 @@ export async function POST(request: Request) {
                 <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />
                 <p style="font-size: 14px; color: #888; text-align: center;">
                   Best regards,<br/>
-                  <strong>The Tuition-ed Team</strong>
+                  <strong>The Tuitioned Team</strong>
                 </p>
               </div>
             </div>

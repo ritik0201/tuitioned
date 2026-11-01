@@ -152,7 +152,7 @@ export async function POST(
         </div>
         <div class="content">
             <p>Hi ${student.fullName},</p>
-            <p>A new course, "<strong>${newCourse.title}</strong>", has been successfully created and assigned to you by the TuitionEd Team.</p>
+            <p>A new course, "<strong>${newCourse.title}</strong>", has been successfully created and assigned to you by the Tuitioned Team.</p>
             <p><strong>Course Details:</strong></p>
             <ul>
               <li><strong>Title:</strong> ${newCourse.title}</li>
@@ -165,7 +165,7 @@ export async function POST(
             <p>We wish you the best in your learning journey!</p>
         </div>
         <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} TuitionEd. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Tuitioned. All rights reserved.</p>
         </div>
     </div>
 </body>
@@ -207,7 +207,7 @@ export async function POST(
             <p>Please check your dashboard for more details.</p>
         </div>
         <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} TuitionEd. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Tuitioned. All rights reserved.</p>
         </div>
     </div>
 </body>

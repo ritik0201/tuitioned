@@ -93,7 +93,7 @@ export async function POST(request: Request) {
             <p style="text-align: center; margin-top: 25px;"><a href="${process.env.NEXT_PUBLIC_BASE_URL}/student/courses/${course._id}" class="button">View My Course</a></p>
         </div>
         <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} TuitionEd. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Tuitioned. All rights reserved.</p>
         </div>
     </div>
 </body>

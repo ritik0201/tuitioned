@@ -27,7 +27,8 @@ import {
   Calendar,
   Layers,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Pencil,
 } from "lucide-react";
 import {
   Dialog,
@@ -37,6 +38,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import CreateCourseForm from "@/components/admin/CreateCourseForm";
+import EditStudentModal from "@/components/admin/EditStudentModal";
 import { ICourse } from "@/models/Course";
 import { getCurrencySymbol } from "@/lib/currency";
 import Link from "next/link";
@@ -59,6 +61,7 @@ export type StudentFromAPI = {
   grade?: string;
   fatherName?: string;
   country?: string;
+  studentStatus?: "pending" | "approved" | "rejected";
 };
 
 function StudentDetailSkeleton() {
@@ -115,6 +118,7 @@ export default function StudentDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -138,6 +142,16 @@ export default function StudentDetailPage({
     };
     fetchData();
   }, [params, isDialogOpen]);
+
+  // Check if URL has ?edit=true parameter
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get("edit") === "true") {
+        setIsEditModalOpen(true);
+      }
+    }
+  }, []);
 
   const handleDeleteCourse = async (courseId: string) => {
     if (!confirm("Are you sure you want to delete this course? This action cannot be undone.")) return;
@@ -180,14 +194,36 @@ export default function StudentDetailPage({
   return (
     <Box sx={{ p: { xs: 2, md: 6 }, maxWidth: 1600, mx: 'auto' }}>
       <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-        <Button
-          component={Link}
-          href="/admin/students"
-          startIcon={<ArrowLeft size={18} />}
-          sx={{ mb: 6, color: 'text.secondary', '&:hover': { color: 'text.primary', bgcolor: 'transparent' }, fontWeight: 800, textTransform: 'none' }}
-        >
-          Back to Student Directory
-        </Button>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6, flexWrap: 'wrap', gap: 2 }}>
+          <Button
+            component={Link}
+            href="/admin/students"
+            startIcon={<ArrowLeft size={18} />}
+            sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary', bgcolor: 'transparent' }, fontWeight: 800, textTransform: 'none' }}
+          >
+            Back to Student Directory
+          </Button>
+
+          <Button
+            variant="contained"
+            onClick={() => setIsEditModalOpen(true)}
+            startIcon={<Pencil size={16} />}
+            sx={{
+              borderRadius: 3.5,
+              px: 3.5,
+              py: 1.25,
+              bgcolor: '#4f46e5',
+              '&:hover': { bgcolor: '#4338ca' },
+              fontWeight: 800,
+              textTransform: 'none',
+              fontSize: '0.875rem',
+              boxShadow: '0 4px 14px rgba(79, 70, 229, 0.25)',
+              transition: 'all 0.2s',
+            }}
+          >
+            Edit Profile
+          </Button>
+        </Box>
       </motion.div>
 
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 8 }}>
@@ -227,8 +263,18 @@ export default function StudentDetailPage({
                 <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
                   {student.email}
                 </Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
-                   <Chip label="ACTIVE STUDENT" sx={{ bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#10b981', fontWeight: 900, fontSize: '0.6rem', border: '1px solid rgba(16, 185, 129, 0.2)' }} />
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3, flexWrap: 'wrap' }}>
+                   <Chip 
+                     label={student.studentStatus === 'rejected' ? 'REJECTED' : student.studentStatus === 'pending' ? 'PENDING' : 'ACTIVE STUDENT'} 
+                     sx={{ 
+                       bgcolor: student.studentStatus === 'rejected' ? 'rgba(244, 63, 94, 0.1)' : student.studentStatus === 'pending' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)', 
+                       color: student.studentStatus === 'rejected' ? '#f43f5e' : student.studentStatus === 'pending' ? '#f59e0b' : '#10b981', 
+                       fontWeight: 900, 
+                       fontSize: '0.6rem', 
+                       border: '1px solid',
+                       borderColor: student.studentStatus === 'rejected' ? 'rgba(244, 63, 94, 0.2)' : student.studentStatus === 'pending' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)' 
+                     }} 
+                   />
                    <Chip label={`GRADE ${student.grade || 'N/A'}`} sx={{ bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#818cf8', fontWeight: 900, fontSize: '0.6rem', border: '1px solid rgba(99, 102, 241, 0.2)' }} />
                 </Box>
               </Box>
@@ -242,6 +288,26 @@ export default function StudentDetailPage({
                 <InfoItem icon={<Globe size={18} />} label="RESIDENCE COUNTRY" value={student.country} />
                 <InfoItem icon={<MapPin size={18} />} label="MAILING ADDRESS" value={`${student.address?.street || ''} ${student.address?.city || ''} ${student.address?.state || ''}`.trim() || 'N/A'} />
               </Stack>
+
+              <Button
+                variant="outlined"
+                fullWidth
+                onClick={() => setIsEditModalOpen(true)}
+                startIcon={<Pencil size={16} />}
+                sx={{
+                  mt: 4,
+                  borderRadius: 3.5,
+                  py: 1.25,
+                  borderColor: 'divider',
+                  color: 'text.primary',
+                  fontWeight: 800,
+                  textTransform: 'none',
+                  '&:hover': { bgcolor: 'action.hover', borderColor: '#4f46e5' },
+                  transition: 'all 0.2s',
+                }}
+              >
+                Edit Profile
+              </Button>
             </Box>
           </motion.div>
         </Box>
@@ -415,6 +481,18 @@ export default function StudentDetailPage({
           </motion.div>
         </Box>
       </Box>
+
+      {/* Edit Student Modal */}
+      {student && (
+        <EditStudentModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          student={student}
+          onSuccess={(updatedStudent) => {
+            setStudent(updatedStudent);
+          }}
+        />
+      )}
     </Box>
   );
 }

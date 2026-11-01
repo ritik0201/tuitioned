@@ -13,6 +13,7 @@ import {
   Gamepad2
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { signOut, useSession } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import UserProfileMenu from '@/components/UserProfileMenu';
@@ -50,9 +51,19 @@ export default function StudentLayout({
       {/* Top Header - Full Width and Topmost */}
       <header className="fixed top-0 left-0 right-0 z-50 flex h-20 items-center justify-between px-6 md:px-10 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 transition-colors duration-200">
         <div className="flex items-center gap-8">
-          <Link href="/" className="inline-block">
-            <span className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-              TuitionEd
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 overflow-hidden transition-transform duration-200 group-hover:scale-105">
+              <Image
+                src="/logo.png"
+                alt="Tuitioned Logo"
+                width={36}
+                height={36}
+                priority
+                className="object-contain w-full h-full"
+              />
+            </div>
+            <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              Tuitioned
             </span>
           </Link>
         </div>

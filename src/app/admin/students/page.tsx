@@ -11,7 +11,8 @@ import {
   Copy,
   GraduationCap,
   Mail,
-  Phone
+  Phone,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -110,6 +111,9 @@ export default function StudentDataTable() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-[#111827] border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-2xl shadow-2xl p-2">
                   <DropdownMenuLabel className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500 font-black px-3 py-2">Quick Actions</DropdownMenuLabel>
+                  <DropdownMenuItem className="rounded-xl focus:bg-indigo-50 dark:focus:bg-indigo-500/10 focus:text-indigo-600 dark:focus:text-indigo-400 cursor-pointer py-2.5" onClick={() => router.push(`/admin/students/${student.id}?edit=true`)}>
+                    <Pencil size={16} className="mr-3 text-indigo-500" /> Edit Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="rounded-xl focus:bg-slate-100 dark:focus:bg-slate-800 focus:text-blue-600 dark:focus:text-blue-400 cursor-pointer py-2.5" onClick={() => navigator.clipboard.writeText(student.id)}>
                     <Copy size={16} className="mr-3 text-slate-400" /> Copy System ID
                   </DropdownMenuItem>

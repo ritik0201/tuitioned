@@ -153,7 +153,7 @@ export async function PUT(request: NextRequest) {
             <p style="text-align: center; margin-top: 25px;"><a href="${paymentUrl}" class="button">Retry Payment</a></p>
         </div>
         <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} TuitionEd. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Tuitioned. All rights reserved.</p>
         </div>
     </div>
 </body>

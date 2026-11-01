@@ -14,8 +14,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
   ),
   title: {
-    default: "TuitionEd - Online Tutoring",
-    template: `%s | TuitionEd - Online Tutoring`,
+    default: "Tuitioned - Online Tutoring",
+    template: `%s | Tuitioned - Online Tutoring`,
   },
   description:
     "Expert Online Tutoring for personal and academic growth.",
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
     icon: "/logo.png",
   },
   openGraph: {
-    title: "TuitionEd",
+    title: "Tuitioned",
     description:
       "Expert Online Tutoring for personal and academic growth.",
     url:
       process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000",
-    siteName: "TuitionEd",
+    siteName: "Tuitioned",
     images: [
       {
         url: "/logo.png",
@@ -59,7 +59,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "TuitionEd",
+              name: "Tuitioned",
               url:
                 process.env.NEXT_PUBLIC_BASE_URL ||
                 "http://localhost:3000",

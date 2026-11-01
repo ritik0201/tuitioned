@@ -34,6 +34,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Box, Typography } from "@mui/material"
 import { exportToCsv } from "@/lib/exportCsv"
 import { toast } from "sonner"
+import UserProfilePreviewModal, { UserPreviewData, extractPreviewFromRow } from "./UserProfilePreviewModal"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -51,6 +52,9 @@ interface DataTableProps<TData, TValue> {
   enableExport?: boolean
   headerActions?: React.ReactNode
   onCustomExport?: (data: TData[]) => void
+  onRowClick?: (item: TData) => void
+  getRowPreview?: (item: TData) => UserPreviewData | null
+  enableRowPreview?: boolean
 }
 
 export function AdminDataTable<TData, TValue>({
@@ -69,10 +73,42 @@ export function AdminDataTable<TData, TValue>({
   enableExport = true,
   headerActions,
   onCustomExport,
+  onRowClick,
+  getRowPreview,
+  enableRowPreview = true,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+  const [previewUser, setPreviewUser] = React.useState<UserPreviewData | null>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = React.useState(false)
+
+  const handleRowClick = (e: React.MouseEvent, item: TData) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest('button') ||
+      target.closest('a') ||
+      target.closest('input') ||
+      target.closest('[role="button"]') ||
+      target.closest('[role="menuitem"]') ||
+      target.closest('[data-no-row-click="true"]') ||
+      target.closest('.no-row-click')
+    ) {
+      return;
+    }
+
+    if (onRowClick) {
+      onRowClick(item);
+    }
+
+    if (enableRowPreview !== false) {
+      const preview = getRowPreview ? getRowPreview(item) : extractPreviewFromRow(item);
+      if (preview) {
+        setPreviewUser(preview);
+        setIsPreviewOpen(true);
+      }
+    }
+  };
 
   // Handle mobile responsiveness for columns
   React.useEffect(() => {
@@ -306,7 +342,12 @@ export function AdminDataTable<TData, TValue>({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 10 }}
                       transition={{ delay: idx * 0.01 }}
-                      className="border-b border-slate-100 dark:border-slate-800/60 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all group"
+                      onClick={(e) => handleRowClick(e, row.original)}
+                      className={`border-b border-slate-100 dark:border-slate-800/60 transition-all group ${
+                        enableRowPreview !== false || onRowClick
+                          ? "cursor-pointer hover:bg-indigo-50/50 dark:hover:bg-indigo-950/30 hover:border-indigo-200 dark:hover:border-indigo-800/50"
+                          : "hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                      }`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id} className="py-4 px-4 md:px-6">
@@ -357,6 +398,15 @@ export function AdminDataTable<TData, TValue>({
           </div>
         </div>
       </div>
+
+      {/* Profile Information Preview Modal with Big Picture View */}
+      {enableRowPreview !== false && (
+        <UserProfilePreviewModal
+          isOpen={isPreviewOpen}
+          onClose={() => setIsPreviewOpen(false)}
+          data={previewUser}
+        />
+      )}
     </motion.div>
   )
 }
