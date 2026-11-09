@@ -128,7 +128,7 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
         noOfClasses: Number(formData.noOfClasses),
         perClassPrice: Number(formData.perClassPrice),
         currency: (formData.currency || "INR").toUpperCase(),
-        teacherPerClassPrice: Number(formData.teacherPerClassPrice),
+        teacherPerClassPrice: Number(formData.teacherPerClassPrice || 0),
         noOfclassTeacher: Number(formData.noOfclassTeacher),
         classDays: formData.classDays.split(",").map((day) => day.trim()).filter(Boolean), // Convert back to array
       };
@@ -264,7 +264,7 @@ const AdminCourseEditModal: React.FC<AdminCourseEditModalProps> = ({
         />
         <Box sx={{ display: "flex", gap: 2 }}>
           <TextField
-            label="Expert Pay (Teacher Price in ₹)"
+            label="Expert Pay (Teacher Price in ₹) (Optional)"
             name="teacherPerClassPrice"
             type="number"
             value={formData.teacherPerClassPrice}

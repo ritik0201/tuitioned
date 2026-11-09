@@ -451,7 +451,7 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
         perClassPrice: Number(data.perClassPrice),
         currency: (data.currency || 'INR').toUpperCase(),
         noOfclassTeacher: isNaN(Number(data.noOfclassTeacher)) ? (isNaN(Number(data.noOfClasses)) ? 0 : Number(data.noOfClasses)) : Number(data.noOfclassTeacher),
-        teacherPerClassPrice: Number(data.teacherPerClassPrice || 0),
+        teacherPerClassPrice: data.teacherPerClassPrice !== undefined && data.teacherPerClassPrice !== '' ? Number(data.teacherPerClassPrice) : 0,
       };
 
       const response = await fetch(`/api/students/${studentId}/my-courses`, {
@@ -919,7 +919,7 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                       <FormField control={form.control} name="teacherPerClassPrice" render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase ml-1">
-                            Expert Pay (₹)
+                            Expert Pay (₹) (Optional)
                           </FormLabel>
                           <FormControl>
                             <div className="relative">
@@ -929,7 +929,7 @@ export default function CreateCourseForm({ studentId, onCourseCreated }: CreateC
                               <Input 
                                 type="number" 
                                 min="0"
-                                placeholder="e.g. 300" 
+                                placeholder="Optional (e.g. 300)" 
                                 {...field} 
                                 className="bg-slate-100 dark:bg-slate-900 border-emerald-500/30 text-slate-900 dark:text-slate-100 h-11 pl-8 rounded-lg text-sm font-bold" 
                               />

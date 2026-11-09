@@ -1,7 +1,8 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { getChatbotApiKey, checkHigherClassTopic, parseGrade } from "@/lib/aiConfig";
 
-const systemPrompt = `You are "Ed", a fun and friendly AI learning buddy for the Tuitioned platform, designed to talk to children and their parents.
+const baseSystemPrompt = `You are "Ed", a fun and friendly AI learning buddy for the Tuitioned platform, designed to talk to children and their parents.
 
 Your personality is:
 - Super cheerful, encouraging, and a little bit silly.
@@ -44,90 +45,122 @@ Your Goals:
 - Explain technical steps (like logging in or finding classes) in a super simple, step-by-step, fun way.
 - Use simple words and short sentences.
 
-Keep your answers short, fun, and always about Tuitioned. If a user asks about something else, giggle and say something like "Oopsie! That's a grown-up question. Let's talk about our awesome classes instead! 🚀".
-If the user's message is very short (e.g., one or two words), keep your response extra short and playful. For example, if they just say "Hi", you can say "Heya! 👋 What's on your mind, friend?".`;
+CRITICAL ACADEMIC RESTRICTION:
+- You must strictly enforce grade-appropriateness.
+- Under NO circumstances are students allowed to ask or receive answers to advanced higher-class academic questions when in lower grades (e.g. asking for 10th/12th grade calculus, organic reaction mechanisms, complex physics/chemistry when in elementary or middle school).
+- If the user asks a question from a higher class or beyond their level, warmly and playfully say:
+  "Whoa there, smarty-pants! 🚀 That question is from a higher class! In our grade, let's explore cool things we are learning right now. What would you like to explore from your class topics? ✨"
+- Keep your answers short, fun, and always about Tuitioned or age-appropriate learning. If a user asks about non-educational adult topics, giggle and say something like "Oopsie! That's a grown-up question. Let's talk about our awesome classes instead! 🚀".
+If the user's message is very short (e.g., one or two words), keep your response extra short and playful.`;
 
 let lastWorkingModel = "gemini-1.5-flash";
 
 export async function POST(req: Request) {
-    try {
-        const { message, history } = await req.json();
+  try {
+    const { message, history, userGrade } = await req.json();
 
-        // Try to get the API key from multiple possible environment variables
-        const apiKey = process.env.GEMINI_API_KEY || 
-                       process.env.GOOGLE_API_KEY || 
-                       process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-
-        if (!apiKey) {
-            console.error(">>> Chatbot API Error: No API key found in GEMINI_API_KEY, GOOGLE_API_KEY, or NEXT_PUBLIC_GOOGLE_API_KEY");
-            return NextResponse.json(
-                { error: "AI configuration error: API key is missing." },
-                { status: 500 }
-            );
-        }
-
-        const genAI = new GoogleGenerativeAI(apiKey);
-
-        // Priority list: Put the fasted model (1.5-flash) and the last working one at the top
-        const modelNames = Array.from(new Set([lastWorkingModel, "gemini-1.5-flash", "gemini-2.0-flash", "gemini-flash-latest"]));
-        let lastError = null;
-
-        for (const modelName of modelNames) {
-            try {
-                console.log(`>>> Attemping AI response with: ${modelName}`);
-                const model = genAI.getGenerativeModel({ model: modelName });
-
-                const chat = model.startChat({
-                    history: [
-                        {
-                            role: "user",
-                            parts: [{ text: systemPrompt }],
-                        },
-                        {
-                            role: "model",
-                            parts: [{ text: "Got it! I'm Ed, your super fun learning buddy! What adventure shall we go on today? ✨" }],
-                        },
-                        // Limit history to last 10 messages for maximum speed
-                        ...(history || []).slice(-10).map((msg: any) => ({
-                            role: msg.role === "user" ? "user" : "model",
-                            parts: [{ text: msg.content || "" }],
-                        })).filter((msg: any) => msg.parts[0].text !== ""),
-                    ],
-                });
-
-                const result = await chat.sendMessage(message);
-                const response = await result.response;
-                
-                // Robust check for response text
-                if (!response.candidates || response.candidates.length === 0) {
-                    throw new Error("No response candidates returned from AI.");
-                }
-
-                const candidate = response.candidates[0];
-                if (candidate.finishReason === 'SAFETY' || candidate.finishReason === 'OTHER') {
-                    throw new Error(`AI response blocked: ${candidate.finishReason}`);
-                }
-
-                const text = response.text();
-
-                if (text) {
-                    console.log(`>>> Success with model: ${modelName}`);
-                    lastWorkingModel = modelName; // Save for next time
-                    return NextResponse.json({ text });
-                }
-            } catch (err: any) {
-                console.warn(`>>> Model ${modelName} failed:`, err.message);
-                lastError = err;
-                continue;
-            }
-        }
-
-        throw lastError || new Error("All AI models failed to respond. Please check your API key.");
-    } catch (error: any) {
-        console.error("AI Chatbot API Final Error:", error);
-        return NextResponse.json(
-            { error: error.message || "Failed to get response from AI." },
-            { status: 500 }
-        );
+    if (!message) {
+      return NextResponse.json({ error: "Message is required." }, { status: 400 });
     }
+
+    // Check guardrails: If student grade is known and asks a higher class question
+    if (userGrade) {
+      const studentGrade = parseGrade(userGrade);
+      const guardrail = checkHigherClassTopic(studentGrade, message);
+      if (!guardrail.allowed) {
+        return NextResponse.json({
+          text: `Whoa there, smarty-pants! 🚀 ${guardrail.matchedKeyword || "That topic"} is taught in higher classes (Grade ${guardrail.minAllowedGrade || "higher"}+)! In Grade ${studentGrade}, let's master what we're learning right now. Would you like to practice some awesome Grade ${studentGrade} questions together? ✨`,
+        });
+      }
+    }
+
+    // Existing API key used EXCLUSIVELY for the chat bot
+    const apiKey = getChatbotApiKey();
+
+    if (!apiKey) {
+      console.error(">>> Chatbot API Error: No API key found for Chatbot.");
+      return NextResponse.json(
+        { error: "AI configuration error: Chatbot API key is missing." },
+        { status: 500 }
+      );
+    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const activeSystemPrompt = userGrade
+      ? `${baseSystemPrompt}\n\nNOTE: The current student is in Grade ${userGrade}. Do NOT provide answers to questions meant for higher grades.`
+      : baseSystemPrompt;
+
+    const modelNames = Array.from(
+      new Set([
+        lastWorkingModel,
+        "gemini-1.5-flash",
+        "gemini-2.0-flash",
+        "gemini-flash-latest",
+        "gemini-2.5-flash",
+        "gemini-3.8-flash",
+      ])
+    );
+    let lastError = null;
+
+    for (const modelName of modelNames) {
+      try {
+        console.log(`>>> Attempting Chatbot response with: ${modelName}`);
+        const model = genAI.getGenerativeModel({ model: modelName });
+
+        const chat = model.startChat({
+          history: [
+            {
+              role: "user",
+              parts: [{ text: activeSystemPrompt }],
+            },
+            {
+              role: "model",
+              parts: [
+                {
+                  text: "Got it! I'm Ed, your super fun learning buddy! What adventure shall we go on today? ✨",
+                },
+              ],
+            },
+            ...(history || []).slice(-10).map((msg: any) => ({
+              role: msg.role === "user" ? "user" : "model",
+              parts: [{ text: msg.content || "" }],
+            })).filter((msg: any) => msg.parts[0].text !== ""),
+          ],
+        });
+
+        const result = await chat.sendMessage(message);
+        const response = await result.response;
+
+        if (!response.candidates || response.candidates.length === 0) {
+          throw new Error("No response candidates returned from AI.");
+        }
+
+        const candidate = response.candidates[0];
+        if (candidate.finishReason === "SAFETY" || candidate.finishReason === "OTHER") {
+          throw new Error(`AI response blocked: ${candidate.finishReason}`);
+        }
+
+        const text = response.text();
+
+        if (text) {
+          console.log(`>>> Chatbot success with model: ${modelName}`);
+          lastWorkingModel = modelName;
+          return NextResponse.json({ text });
+        }
+      } catch (err: any) {
+        console.warn(`>>> Chatbot model ${modelName} failed:`, err.message);
+        lastError = err;
+        continue;
+      }
+    }
+
+    throw lastError || new Error("All AI models failed to respond. Please check your API key.");
+  } catch (error: any) {
+    console.error("AI Chatbot API Final Error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to get response from AI." },
+      { status: 500 }
+    );
+  }
 }

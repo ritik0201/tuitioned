@@ -20,6 +20,20 @@ const GeminiAI: React.FC = () => {
     ]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [userGrade, setUserGrade] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (session?.user?.id) {
+            fetch('/api/student-profile')
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data?.success && data?.profile?.grade) {
+                        setUserGrade(data.profile.grade);
+                    }
+                })
+                .catch(() => {});
+        }
+    }, [session?.user?.id]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -44,6 +58,7 @@ const GeminiAI: React.FC = () => {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     message: userMessage,
+                    userGrade: userGrade,
                     history: messages.map((m) => ({
                         role: m.role === "user" ? "user" : "model",
                         content: m.content,
