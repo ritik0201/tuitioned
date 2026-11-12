@@ -1,18 +1,27 @@
 import nodemailer from 'nodemailer';
- 
+
 export async function sendOtpEmail(email: string, otp: string) {
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+
+  if (!emailUser || !emailPass) {
+    console.error("Missing EMAIL_USER or EMAIL_PASS in environment variables.");
+    console.log(`[DEV OTP BACKUP] OTP for ${email} is: ${otp}`);
+    return;
+  }
+
   const transporter = nodemailer.createTransport({
     host: "smtp.hostinger.com",
     port: 465,
     secure: true,
     auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
+      user: emailUser,
+      pass: emailPass,
     },
   });
 
   const mailOptions = {
-    from: `"Tuitioned Team" <${process.env.EMAIL_USER}>`,
+    from: `"Tuitioned Team" <${emailUser}>`,
     to: email,
     subject: "Your One-Time Password for Tuitioned",
     html: `
@@ -26,5 +35,12 @@ export async function sendOtpEmail(email: string, otp: string) {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (err: any) {
+    console.error("Failed to send OTP email:", err.message);
+    // Helpful log in terminal so dev/testing can proceed even if SMTP fails
+    console.log(`[DEV OTP BACKUP] OTP for ${email} is: ${otp}`);
+    throw err;
+  }
 }

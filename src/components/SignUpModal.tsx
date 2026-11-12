@@ -213,13 +213,58 @@ const SignUpModal = ({ open, onClose }: SignUpModalProps) => {
                             {error && <Typography color="error" variant="body2">{error}</Typography>}
                             <TextField label="Full Name" variant="outlined" fullWidth required value={fullName} onChange={(e) => setFullName(e.target.value)} sx={textFieldStyles} />
                             <TextField label="Email ID" variant="outlined" fullWidth required type="email" value={email} onChange={(e) => setEmail(e.target.value)} sx={textFieldStyles} />
-                            <PhoneInput
-                                placeholder="Mobile Number"
-                                value={mobile}
-                                onChange={handlePhoneChange}
-                                international
-                                className="phone-input-container"
-                            />
+                            <Box sx={{
+                                '& .phone-input-container': {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    height: '56px',
+                                    boxSizing: 'border-box',
+                                    padding: '0 14px',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: '4px',
+                                    transition: 'all 0.2s ease',
+                                    bgcolor: 'transparent',
+                                    width: '100%',
+                                    '&:hover': {
+                                        borderColor: '#3b82f6',
+                                    },
+                                    '&:focus-within': {
+                                        borderColor: '#3b82f6',
+                                        borderWidth: '2px',
+                                        padding: '0 13px',
+                                    },
+                                    '& input': {
+                                        background: 'transparent !important',
+                                        border: 'none !important',
+                                        outline: 'none !important',
+                                        color: 'text.primary !important',
+                                        fontSize: '1rem !important',
+                                        width: '100% !important',
+                                        paddingLeft: '8px !important',
+                                        '&::placeholder': {
+                                            color: 'text.secondary !important',
+                                            opacity: 0.85,
+                                        },
+                                    },
+                                    '& .PhoneInputCountry': {
+                                        marginRight: '8px',
+                                        color: 'text.primary',
+                                    },
+                                    '& .PhoneInputCountrySelectArrow': {
+                                        color: 'text.secondary',
+                                        borderTopColor: 'currentColor !important',
+                                    },
+                                },
+                            }}>
+                                <PhoneInput
+                                    placeholder="Mobile Number"
+                                    value={mobile}
+                                    onChange={handlePhoneChange}
+                                    international
+                                    className="phone-input-container"
+                                />
+                            </Box>
                             <Box sx={{ 
                                 display: 'flex', 
                                 justifyContent: 'center', 

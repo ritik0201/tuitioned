@@ -531,13 +531,13 @@ export default function EditTeacherModal({
 
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                    <FileText size={14} className="text-amber-500" /> CV / Resume Link
+                    <FileText size={14} className="text-amber-500" /> Google Drive CV Link (Optional)
                   </Label>
                   <Input
                     type="url"
                     value={cvUrl}
                     onChange={(e) => setCvUrl(e.target.value)}
-                    placeholder="https://drive.google.com/... or Cloudinary URL"
+                    placeholder="https://drive.google.com/... (Optional)"
                     className="bg-slate-50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 focus-visible:ring-indigo-500 rounded-xl"
                   />
                 </div>

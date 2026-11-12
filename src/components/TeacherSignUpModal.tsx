@@ -184,17 +184,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
       return;
     }
 
-    if (cvUrl.trim() && !cvUrl.includes('drive.google.com')) {
-      setError('Please provide a valid Google Drive link for your CV.');
-      setLoading(false);
-      return;
-    }
-
-    if (!aboutTeacher.trim()) {
-      setError('Please write a short description about yourself.');
-      setLoading(false);
-      return;
-    }
+    // CV URL and Bio are optional
 
     try {
       const roleCheckRes = await fetch('/api/auth/check-role', {
@@ -341,7 +331,50 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                 <Box>
                   <TextField label="Email ID" variant="outlined" fullWidth required type="email" value={email} onChange={(e) => setEmail(e.target.value)} sx={textFieldStyles} />
                 </Box>
-                <Box>
+                <Box sx={{
+                  '& .phone-input-container': {
+                    display: 'flex',
+                    alignItems: 'center',
+                    height: '56px',
+                    boxSizing: 'border-box',
+                    padding: '0 14px',
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: '4px',
+                    transition: 'all 0.2s ease',
+                    bgcolor: 'transparent',
+                    width: '100%',
+                    '&:hover': {
+                      borderColor: '#3b82f6',
+                    },
+                    '&:focus-within': {
+                      borderColor: '#3b82f6',
+                      borderWidth: '2px',
+                      padding: '0 13px',
+                    },
+                    '& input': {
+                      background: 'transparent !important',
+                      border: 'none !important',
+                      outline: 'none !important',
+                      color: 'text.primary !important',
+                      fontSize: '1rem !important',
+                      width: '100% !important',
+                      paddingLeft: '8px !important',
+                      '&::placeholder': {
+                        color: 'text.secondary !important',
+                        opacity: 0.85,
+                      },
+                    },
+                    '& .PhoneInputCountry': {
+                      marginRight: '8px',
+                      color: 'text.primary',
+                    },
+                    '& .PhoneInputCountrySelectArrow': {
+                      color: 'text.secondary',
+                      borderTopColor: 'currentColor !important',
+                    },
+                  },
+                }}>
                   <PhoneInput
                     placeholder="Mobile Number"
                     value={mobile}
@@ -364,7 +397,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                   <TextField label="Default Meeting Link (e.g. G-Meet)" placeholder="https://meet.google.com/..." variant="outlined" fullWidth value={joinLink} onChange={(e) => setJoinLink(e.target.value)} sx={textFieldStyles} />
                 </Box>
                 <Box>
-                  <TextField label="Google Drive CV Link (Optional)" placeholder="Paste CV link" variant="outlined" fullWidth value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
+                  <TextField label="Google Drive CV Link (Optional)" placeholder="Paste your Google Drive CV link (Optional)" required={false} variant="outlined" fullWidth value={cvUrl} onChange={(e) => setCvUrl(e.target.value)} sx={textFieldStyles} />
                 </Box>
 
                 {/* Subjects You Teach */}
@@ -472,7 +505,7 @@ const TeacherSignUpModal: React.FC<TeacherSignUpModalProps> = ({ open, onClose }
                     onClick={() => setIsAboutModalOpen(true)}
                     sx={{ mt: 1, textTransform: 'none', fontSize: '0.8rem', borderColor: 'divider', color: 'text.primary', '&:hover': { borderColor: 'primary.main' } }}
                   >
-                    {aboutTeacher ? "Edit Bio" : "Write Bio"}
+                    {aboutTeacher ? "Edit Bio" : "Write Bio (Optional)"}
                   </Button>
                 </Box>
               </Box>

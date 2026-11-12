@@ -3,21 +3,34 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    width: 100%;
 }
 
-/* Input itself */
+/* Base Input styling - Light Mode default */
 .PhoneInputInput {
     background: transparent !important;
-    color: #f1f5f9 !important; /* slate-100 */
+    color: #0f172a !important;
     border: none !important;
     outline: none !important;
     width: 100% !important;
     font-family: inherit !important;
-    font-size: 0.875rem !important; /* text-sm */
+    font-size: 1rem !important;
 }
 
 .PhoneInputInput::placeholder {
-    color: #475569 !important; /* slate-500 or slate-600 to match */
+    color: #64748b !important;
+    opacity: 0.85;
+}
+
+/* Dark Mode Input */
+.dark .PhoneInputInput,
+html.dark .PhoneInputInput {
+    color: #f8fafc !important;
+}
+
+.dark .PhoneInputInput::placeholder,
+html.dark .PhoneInputInput::placeholder {
+    color: #94a3b8 !important;
 }
 
 /* Country selector / flag area */
@@ -25,6 +38,12 @@
     display: flex !important;
     align-items: center !important;
     gap: 0.25rem !important;
+    color: #0f172a !important;
+}
+
+.dark .PhoneInputCountry,
+html.dark .PhoneInputCountry {
+    color: #f8fafc !important;
 }
 
 .PhoneInputCountrySelect {
@@ -32,52 +51,77 @@
 }
 
 .PhoneInputCountryIcon {
-    width: 20px !important;
+    width: 22px !important;
     height: auto !important;
     border-radius: 2px !important;
     overflow: hidden !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
 }
 
 .PhoneInputCountrySelectArrow {
     display: block !important;
-    opacity: 0.5 !important;
+    opacity: 0.7 !important;
     border-left: 5px solid transparent !important;
     border-right: 5px solid transparent !important;
-    border-top: 5px solid currentColor !important;
+    border-top: 5px solid #64748b !important;
 }
 
-/* Dropdown menu styling */
+.dark .PhoneInputCountrySelectArrow,
+html.dark .PhoneInputCountrySelectArrow {
+    border-top-color: #94a3b8 !important;
+}
+
+/* Dropdown menu styling - Light Mode */
 .PhoneInputCountrySelectSelect {
-    background-color: #020617 !important; /* slate-950 */
-    color: #f1f5f9 !important;
-    border: 1px solid #1e293b !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
 }
 
 .PhoneInputCountrySelectSelect option {
-    background-color: #1f2937 !important; /* Matches modal background */
-    color: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #0f172a !important;
 }
 
-/* Ensure the select itself has white text for the selected value */
-.PhoneInputCountrySelectSelect {
-    color: #ffffff !important;
-}
-
-/* When using the library's built-in dropdown */
-.react-phone-number-input__country-select-dropdown {
-    background-color: #0f172a !important; /* slate-900 */
-    border: 1px solid #1e293b !important;
+/* Dropdown menu styling - Dark Mode */
+.dark .PhoneInputCountrySelectSelect,
+html.dark .PhoneInputCountrySelectSelect {
+    background-color: #0f172a !important;
     color: #f1f5f9 !important;
+    border: 1px solid #1e293b !important;
+}
+
+.dark .PhoneInputCountrySelectSelect option,
+html.dark .PhoneInputCountrySelectSelect option {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+}
+
+/* Library built-in dropdown */
+.react-phone-number-input__country-select-dropdown {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
     padding: 0.5rem !important;
     border-radius: 0.5rem !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
+.dark .react-phone-number-input__country-select-dropdown,
+html.dark .react-phone-number-input__country-select-dropdown {
+    background-color: #0f172a !important;
+    border: 1px solid #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+/* Phone input container - Light Mode default (matches MUI Outlined TextField: 56px height, rounded 4px) */
 .phone-input-container {
     display: flex;
     align-items: center;
-    padding: 12px 14px; /* Slightly smaller padding to match other fields */
-    border: 1px solid rgba(255, 255, 255, 0.23);
+    height: 56px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
     border-radius: 4px;
     transition: all 0.2s ease;
     background: transparent;
@@ -85,23 +129,54 @@
 }
 
 .phone-input-container:hover {
-    border-color: #fff;
+    border-color: #3b82f6;
 }
 
 .phone-input-container:focus-within {
-    border-color: #fff;
+    border-color: #3b82f6;
     border-width: 2px;
-    padding: 11px 13px; /* Adjust padding for 2px border */
+    padding: 0 13px;
 }
 
 .phone-input-container input {
     background: transparent !important;
     border: none !important;
     outline: none !important;
-    color: #fff !important;
+    color: #0f172a !important;
     font-size: 1rem !important;
     width: 100% !important;
-    padding-left: 10px !important;
+    padding-left: 8px !important;
+}
+
+.phone-input-container input::placeholder {
+    color: #64748b !important;
+    opacity: 0.85;
+}
+
+/* Phone input container - Dark Mode overrides */
+.dark .phone-input-container,
+html.dark .phone-input-container {
+    border: 1px solid rgba(255, 255, 255, 0.23);
+}
+
+.dark .phone-input-container:hover,
+html.dark .phone-input-container:hover {
+    border-color: #3b82f6;
+}
+
+.dark .phone-input-container:focus-within,
+html.dark .phone-input-container:focus-within {
+    border-color: #3b82f6;
+}
+
+.dark .phone-input-container input,
+html.dark .phone-input-container input {
+    color: #f8fafc !important;
+}
+
+.dark .phone-input-container input::placeholder,
+html.dark .phone-input-container input::placeholder {
+    color: #94a3b8 !important;
 }
 
 .phone-input-container .PhoneInputCountry {
