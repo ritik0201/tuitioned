@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Box,
   Paper,
@@ -29,9 +29,13 @@ import {
   Clock,
   Pencil,
   ExternalLink,
+  ChevronLeft,
+  ChevronRight,
+  BookOpen,
 } from "lucide-react";
 import { ICourse } from "@/models/Course";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import EditTeacherModal from "@/components/admin/EditTeacherModal";
 
 export type TeacherFromAPI = {
@@ -57,9 +61,645 @@ export type TeacherFromAPI = {
   profileImage?: string;
 };
 
+export interface WeeklyStudentClass {
+  studentId: string;
+  studentName: string;
+  studentImage?: string;
+  studentEmail?: string;
+  courseId: string;
+  courseTitle: string;
+  grade?: string;
+  time: string;
+  joinLink?: string;
+  noOfClasses?: number;
+  isDemo?: boolean;
+}
+
+export interface WeeklyScheduleDay {
+  dayName: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+  shortName: 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
+  dayIndex: number;
+  students: WeeklyStudentClass[];
+}
+
+const AVATAR_COLORS = [
+  '#4f46e5',
+  '#059669',
+  '#d97706',
+  '#db2777',
+  '#7c3aed',
+  '#0284c7',
+  '#ea580c',
+  '#0d9488',
+];
+
+function getAvatarColor(name: string = ''): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[index];
+}
+
+function getInitials(name: string = ''): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+const DEFAULT_DAYS: WeeklyScheduleDay[] = [
+  { dayName: 'Monday', shortName: 'Mon', dayIndex: 1, students: [] },
+  { dayName: 'Tuesday', shortName: 'Tue', dayIndex: 2, students: [] },
+  { dayName: 'Wednesday', shortName: 'Wed', dayIndex: 3, students: [] },
+  { dayName: 'Thursday', shortName: 'Thu', dayIndex: 4, students: [] },
+  { dayName: 'Friday', shortName: 'Fri', dayIndex: 5, students: [] },
+  { dayName: 'Saturday', shortName: 'Sat', dayIndex: 6, students: [] },
+  { dayName: 'Sunday', shortName: 'Sun', dayIndex: 0, students: [] },
+];
+
+function buildWeeklySchedule(courses: ICourse[] = []): WeeklyScheduleDay[] {
+  const scheduleMap: Record<string, WeeklyStudentClass[]> = {
+    Monday: [],
+    Tuesday: [],
+    Wednesday: [],
+    Thursday: [],
+    Friday: [],
+    Saturday: [],
+    Sunday: [],
+  };
+
+  const addStudent = (day: string, item: WeeklyStudentClass) => {
+    if (!scheduleMap[day]) return;
+    const exists = scheduleMap[day].some(
+      x => x.courseId === item.courseId && x.studentId === item.studentId && (x.time === item.time || (!x.time && !item.time))
+    );
+    if (!exists) {
+      scheduleMap[day].push(item);
+    }
+  };
+
+  for (const course of courses) {
+    if (!course) continue;
+    const student = course.studentId as any;
+    const studentId = student?._id ? student._id.toString() : '';
+    const studentName = student?.fullName || 'Student';
+    const studentImage = student?.profileImage || '';
+    const studentEmail = student?.email || '';
+    const courseId = course._id ? course._id.toString() : '';
+    const courseTitle = course.title || 'Course';
+    const grade = course.grade || '';
+    const defaultTime = course.teacherClassTime || course.classTime || '';
+    const joinLink = course.joinLink || '';
+    const noOfClasses = course.noOfClasses ?? 0;
+
+    let matched = false;
+    if (course.schedules && course.schedules.length > 0) {
+      for (const s of course.schedules) {
+        const d = s.teacherDay || s.studentDay || '';
+        const dayStr = (d || s.teacherSchedule || s.studentSchedule || '').toLowerCase();
+        const matchedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].filter(dayName =>
+          dayStr.includes(dayName.toLowerCase().substring(0, 3))
+        );
+        const timeFound = s.teacherTime || s.studentTime || defaultTime;
+        for (const md of matchedDays) {
+          matched = true;
+          addStudent(md, {
+            studentId,
+            studentName,
+            studentImage,
+            studentEmail,
+            courseId,
+            courseTitle,
+            grade,
+            time: timeFound,
+            joinLink,
+            noOfClasses,
+          });
+        }
+      }
+    }
+
+    if (course.classDays) {
+      const daysArr = Array.isArray(course.classDays) ? course.classDays : String(course.classDays).split(',');
+      for (const cd of daysArr) {
+        const lower = String(cd).toLowerCase();
+        const matchedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].filter(dayName =>
+          lower.includes(dayName.toLowerCase().substring(0, 3))
+        );
+        for (const md of matchedDays) {
+          matched = true;
+          addStudent(md, {
+            studentId,
+            studentName,
+            studentImage,
+            studentEmail,
+            courseId,
+            courseTitle,
+            grade,
+            time: defaultTime,
+            joinLink,
+            noOfClasses,
+          });
+        }
+      }
+    }
+
+    if (!matched && defaultTime) {
+      const lower = defaultTime.toLowerCase();
+      const matchedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].filter(dayName =>
+        lower.includes(dayName.toLowerCase().substring(0, 3))
+      );
+      for (const md of matchedDays) {
+        addStudent(md, {
+          studentId,
+          studentName,
+          studentImage,
+          studentEmail,
+          courseId,
+          courseTitle,
+          grade,
+          time: defaultTime,
+          joinLink,
+          noOfClasses,
+        });
+      }
+    }
+  }
+
+  const DAYS_ORDER: { dayName: WeeklyScheduleDay['dayName']; shortName: WeeklyScheduleDay['shortName']; dayIndex: number }[] = [
+    { dayName: 'Monday', shortName: 'Mon', dayIndex: 1 },
+    { dayName: 'Tuesday', shortName: 'Tue', dayIndex: 2 },
+    { dayName: 'Wednesday', shortName: 'Wed', dayIndex: 3 },
+    { dayName: 'Thursday', shortName: 'Thu', dayIndex: 4 },
+    { dayName: 'Friday', shortName: 'Fri', dayIndex: 5 },
+    { dayName: 'Saturday', shortName: 'Sat', dayIndex: 6 },
+    { dayName: 'Sunday', shortName: 'Sun', dayIndex: 0 },
+  ];
+
+  return DAYS_ORDER.map(({ dayName, shortName, dayIndex }) => ({
+    dayName,
+    shortName,
+    dayIndex,
+    students: scheduleMap[dayName] || [],
+  }));
+}
+
+const WeeklyScheduleSection = ({
+  weeklySchedule = [],
+  teacherId,
+}: {
+  weeklySchedule?: WeeklyScheduleDay[];
+  teacherId: string;
+}) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const currentDayIndex = new Date().getDay(); // 0 is Sunday, 1 is Monday...
+
+  const daysToRender = weeklySchedule && weeklySchedule.length === 7 ? weeklySchedule : DEFAULT_DAYS;
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = direction === 'left' ? -320 : 320;
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const totalClassesThisWeek = daysToRender.reduce((acc, day) => acc + (day.students ? day.students.length : 0), 0);
+  const todayDayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][currentDayIndex];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35 }}
+    >
+      <Paper
+        elevation={0}
+        className="border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-xl"
+        sx={{
+          mb: 4,
+          p: { xs: 2.5, sm: 3.5 },
+          borderRadius: 5,
+          bgcolor: 'background.paper',
+        }}
+      >
+        {/* Header Bar */}
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            justifyContent: 'space-between',
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: 2,
+            mb: 3,
+            pb: 2,
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+          }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar
+              sx={{
+                bgcolor: 'rgba(79, 70, 229, 0.12)',
+                color: '#4f46e5',
+                width: 44,
+                height: 44,
+                border: '1px solid rgba(79, 70, 229, 0.25)',
+              }}
+            >
+              <Calendar size={22} />
+            </Avatar>
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ color: 'text.primary', lineHeight: 1.2 }}>
+                  Weekly Class Timetable
+                </Typography>
+                <Chip
+                  label="Monday to Sunday"
+                  size="small"
+                  sx={{
+                    fontWeight: 600,
+                    fontSize: '0.72rem',
+                    bgcolor: 'action.hover',
+                    color: 'text.secondary',
+                    borderRadius: 1.5,
+                  }}
+                />
+              </Box>
+              <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5, fontSize: '0.825rem' }}>
+                Horizontal weekday overview with all scheduled student classes for this teacher
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Right actions: Today badge & scroll controls */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, alignSelf: { xs: 'stretch', sm: 'auto' }, justifyContent: 'space-between' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+              <Chip
+                label={`Today: ${todayDayName}`}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(16, 185, 129, 0.12)',
+                  color: '#10b981',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  border: '1px solid rgba(16, 185, 129, 0.3)',
+                  borderRadius: 2,
+                }}
+              />
+              <Chip
+                label={`${totalClassesThisWeek} ${totalClassesThisWeek === 1 ? 'Class' : 'Classes'}/week`}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(79, 70, 229, 0.1)',
+                  color: '#4f46e5',
+                  fontWeight: 700,
+                  fontSize: '0.75rem',
+                  borderRadius: 2,
+                }}
+              />
+            </Box>
+
+            {/* Scroll navigation arrows for smaller viewports */}
+            <Box sx={{ display: { xs: 'flex', xl: 'none' }, gap: 0.5 }}>
+              <Button
+                size="small"
+                onClick={() => scroll('left')}
+                aria-label="Scroll left"
+                sx={{
+                  minWidth: 32,
+                  width: 32,
+                  height: 32,
+                  p: 0,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  color: 'text.secondary',
+                  '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
+                }}
+              >
+                <ChevronLeft size={18} />
+              </Button>
+              <Button
+                size="small"
+                onClick={() => scroll('right')}
+                aria-label="Scroll right"
+                sx={{
+                  minWidth: 32,
+                  width: 32,
+                  height: 32,
+                  p: 0,
+                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  color: 'text.secondary',
+                  '&:hover': { bgcolor: 'action.hover', color: 'text.primary' },
+                }}
+              >
+                <ChevronRight size={18} />
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+
+        {/* Horizontal Weekday Track (Monday to Sunday) */}
+        <Box
+          ref={scrollContainerRef}
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(7, 270px)',
+              xl: 'repeat(7, minmax(0, 1fr))',
+            },
+            gap: 2,
+            overflowX: 'auto',
+            pb: 2,
+            pt: 0.5,
+            scrollSnapType: 'x mandatory',
+            '&::-webkit-scrollbar': { height: 7 },
+            '&::-webkit-scrollbar-track': { bgcolor: 'action.hover', borderRadius: 4 },
+            '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: 4, '&:hover': { bgcolor: 'text.secondary' } },
+          }}
+        >
+          {daysToRender.map((day) => {
+            const isToday = day.dayIndex === currentDayIndex;
+            const studentList = day.students || [];
+            const hasStudents = studentList.length > 0;
+
+            return (
+              <Box
+                key={day.dayName}
+                sx={{
+                  scrollSnapAlign: 'start',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  borderRadius: 3,
+                  p: 2,
+                  minHeight: 280,
+                  bgcolor: isToday ? 'rgba(79, 70, 229, 0.04)' : 'action.hover',
+                  border: isToday ? '2px solid' : '1px solid',
+                  borderColor: isToday ? '#6366f1' : 'divider',
+                  boxShadow: isToday ? '0 8px 24px -4px rgba(99, 102, 241, 0.15)' : 'none',
+                  position: 'relative',
+                  transition: 'all 0.25s ease',
+                  '&:hover': {
+                    borderColor: isToday ? '#6366f1' : 'text.disabled',
+                  },
+                }}
+              >
+                {/* Day Header */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 1.75,
+                    pb: 1.25,
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Typography
+                      variant="subtitle1"
+                      fontWeight={700}
+                      sx={{
+                        color: isToday ? 'primary.main' : 'text.primary',
+                        fontSize: '0.95rem',
+                      }}
+                    >
+                      {day.dayName}
+                    </Typography>
+                    {isToday && (
+                      <Chip
+                        label="TODAY"
+                        size="small"
+                        sx={{
+                          height: 18,
+                          fontSize: '0.625rem',
+                          fontWeight: 800,
+                          bgcolor: 'primary.main',
+                          color: '#fff',
+                          borderRadius: 1,
+                          letterSpacing: 0.5,
+                        }}
+                      />
+                    )}
+                  </Box>
+
+                  <Chip
+                    label={hasStudents ? `${studentList.length}` : '0'}
+                    size="small"
+                    sx={{
+                      height: 22,
+                      minWidth: 22,
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      borderRadius: 1.5,
+                      bgcolor: hasStudents ? (isToday ? 'primary.main' : 'rgba(79, 70, 229, 0.12)') : 'transparent',
+                      border: hasStudents ? 'none' : '1px solid',
+                      borderColor: 'divider',
+                      color: hasStudents ? (isToday ? '#fff' : 'primary.main') : 'text.disabled',
+                    }}
+                  />
+                </Box>
+
+                {/* Students Container */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, flex: 1 }}>
+                  {!hasStudents ? (
+                    <Box
+                      sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        py: 4,
+                        px: 1,
+                        borderRadius: 2,
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                        textAlign: 'center',
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                        No classes scheduled
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.68rem', mt: 0.5 }}>
+                        Rest day
+                      </Typography>
+                    </Box>
+                  ) : (
+                    studentList.map((student, idx) => {
+                      const avatarColor = getAvatarColor(student.studentName);
+                      return (
+                        <Box
+                          key={`${student.studentId}-${student.courseId}-${idx}`}
+                          component={Link}
+                          href={`/admin/teachers/${teacherId}/${student.courseId}`}
+                          sx={{
+                            p: 1.5,
+                            borderRadius: 2.5,
+                            bgcolor: 'background.paper',
+                            border: '1px solid',
+                            borderColor: 'divider',
+                            textDecoration: 'none',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1,
+                            transition: 'all 0.2s ease',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.03)',
+                            '&:hover': {
+                              transform: 'translateY(-2px)',
+                              borderColor: 'primary.main',
+                              boxShadow: '0 6px 16px -2px rgba(79, 70, 229, 0.15)',
+                            },
+                          }}
+                        >
+                          {/* Student Info Row */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                            <Avatar
+                              src={student.studentImage}
+                              sx={{
+                                width: 34,
+                                height: 34,
+                                bgcolor: avatarColor,
+                                color: '#ffffff',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                flexShrink: 0,
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                              }}
+                            >
+                              {getInitials(student.studentName)}
+                            </Avatar>
+                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                              <Typography
+                                variant="subtitle2"
+                                fontWeight={700}
+                                noWrap
+                                sx={{
+                                  color: 'text.primary',
+                                  fontSize: '0.875rem',
+                                  lineHeight: 1.25,
+                                }}
+                                title={student.studentName}
+                              >
+                                {student.studentName}
+                              </Typography>
+                              {student.grade ? (
+                                <Typography
+                                  variant="caption"
+                                  noWrap
+                                  sx={{ color: 'text.secondary', fontSize: '0.72rem', display: 'block' }}
+                                >
+                                  {student.grade}
+                                </Typography>
+                              ) : null}
+                            </Box>
+                          </Box>
+
+                          {/* Course / Subject */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
+                            <BookOpen size={13} style={{ opacity: 0.7, flexShrink: 0 }} />
+                            <Typography
+                              variant="caption"
+                              fontWeight={600}
+                              noWrap
+                              sx={{
+                                color: 'text.secondary',
+                                fontSize: '0.75rem',
+                              }}
+                              title={student.courseTitle}
+                            >
+                              {student.courseTitle}
+                            </Typography>
+                            {student.isDemo && (
+                              <Chip
+                                label="Demo"
+                                size="small"
+                                sx={{
+                                  height: 16,
+                                  fontSize: '0.625rem',
+                                  fontWeight: 700,
+                                  bgcolor: 'rgba(236, 72, 153, 0.15)',
+                                  color: '#ec4899',
+                                  borderRadius: 1,
+                                }}
+                              />
+                            )}
+                          </Box>
+
+                          {/* Footer with Time & Actions */}
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              pt: 0.75,
+                              borderTop: '1px dashed',
+                              borderColor: 'divider',
+                            }}
+                          >
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: 'primary.main' }}>
+                              <Clock size={12} />
+                              <Typography
+                                variant="caption"
+                                fontWeight={700}
+                                sx={{ fontSize: '0.725rem' }}
+                              >
+                                {student.time || 'Time not set'}
+                              </Typography>
+                            </Box>
+
+                            {student.joinLink && (
+                              <Box
+                                component="span"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  window.open(student.joinLink, '_blank', 'noopener,noreferrer');
+                                }}
+                                sx={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  px: 1,
+                                  py: 0.25,
+                                  borderRadius: 1,
+                                  bgcolor: 'primary.main',
+                                  color: '#ffffff !important',
+                                  fontSize: '0.68rem',
+                                  fontWeight: 600,
+                                  cursor: 'pointer',
+                                  transition: 'background-color 0.2s',
+                                  '&:hover': { bgcolor: 'primary.dark' },
+                                }}
+                              >
+                                <Video size={10} />
+                                Join
+                              </Box>
+                            )}
+                          </Box>
+                        </Box>
+                      );
+                    })
+                  )}
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
+      </Paper>
+    </motion.div>
+  );
+};
+
 interface ApiResponse {
   teacher: TeacherFromAPI;
   courses: ICourse[];
+  weeklySchedule?: WeeklyScheduleDay[];
 }
 
 export default function TeacherDetailPage({
@@ -70,6 +710,7 @@ export default function TeacherDetailPage({
   const { id } = React.use(params); // Unwrap the params Promise
   const [teacher, setTeacher] = useState<TeacherFromAPI | null>(null);
   const [courses, setCourses] = useState<ICourse[]>([]);
+  const [weeklySchedule, setWeeklySchedule] = useState<WeeklyScheduleDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -87,6 +728,11 @@ export default function TeacherDetailPage({
         const data: ApiResponse = await response.json();
         setTeacher(data.teacher);
         setCourses(data.courses);
+        if (data.weeklySchedule && data.weeklySchedule.length === 7) {
+          setWeeklySchedule(data.weeklySchedule);
+        } else {
+          setWeeklySchedule(buildWeeklySchedule(data.courses));
+        }
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -233,6 +879,9 @@ export default function TeacherDetailPage({
           Edit Profile
         </Button>
       </Box>
+
+      {/* Weekly Class Timetable (Monday to Sunday) */}
+      <WeeklyScheduleSection weeklySchedule={weeklySchedule} teacherId={id} />
 
       <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 4 }}>
         {/* Left Column - Teacher Details */}

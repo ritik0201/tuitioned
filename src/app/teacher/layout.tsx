@@ -15,7 +15,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
-import { LayoutDashboard, BookOpen, User, LogOut, Menu, ClipboardList, AlertCircle } from 'lucide-react';
+import Button from '@mui/material/Button';
+import { LayoutDashboard, BookOpen, User, LogOut, Menu, ClipboardList, AlertCircle, Sparkles, Gamepad2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { signOut, useSession } from 'next-auth/react';
@@ -29,6 +30,8 @@ const navItems = [
   { text: 'Dashboard', icon: <LayoutDashboard size={20} />, href: '/teacher/dashboard' },
   { text: 'Courses', icon: <BookOpen size={20} />, href: '/teacher/courses' },
   { text: 'Demo Classes', icon: <ClipboardList size={20} />, href: '/teacher/demo-classes-assigned' },
+  { text: 'AI Test Generator', icon: <Sparkles size={20} />, href: '/teacher/test' },
+  { text: 'Kids Games', icon: <Gamepad2 size={20} />, href: '/teacher/games' },
   { text: 'Profile', icon: <User size={20} />, href: '/teacher/profile' },
 ];
 
@@ -176,7 +179,54 @@ export default function TeacherLayout({
             >
               <Menu />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">Teacher Portal</Typography>
+            <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 800 }}>Teacher Portal</Typography>
+
+            {teacherStatus === 'approved' && (
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, ml: 3 }}>
+                <Button
+                  component={Link}
+                  href="/teacher/test"
+                  size="small"
+                  startIcon={<Sparkles size={16} />}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.8125rem',
+                    borderRadius: 2,
+                    px: 1.5,
+                    py: 0.6,
+                    color: pathname.startsWith('/teacher/test') ? 'primary.main' : 'text.secondary',
+                    bgcolor: pathname.startsWith('/teacher/test') ? 'action.selected' : 'transparent',
+                    border: '1px solid',
+                    borderColor: pathname.startsWith('/teacher/test') ? 'primary.main' : 'divider',
+                    '&:hover': { bgcolor: 'action.hover', color: 'text.primary' }
+                  }}
+                >
+                  AI Test Generator
+                </Button>
+                <Button
+                  component={Link}
+                  href="/teacher/games"
+                  size="small"
+                  startIcon={<Gamepad2 size={16} />}
+                  sx={{
+                    textTransform: 'none',
+                    fontWeight: 700,
+                    fontSize: '0.8125rem',
+                    borderRadius: 2,
+                    px: 1.5,
+                    py: 0.6,
+                    color: pathname.startsWith('/teacher/games') ? 'primary.main' : 'text.secondary',
+                    bgcolor: pathname.startsWith('/teacher/games') ? 'action.selected' : 'transparent',
+                    border: '1px solid',
+                    borderColor: pathname.startsWith('/teacher/games') ? 'primary.main' : 'divider',
+                    '&:hover': { bgcolor: 'action.hover', color: 'text.primary' }
+                  }}
+                >
+                  Kids Games
+                </Button>
+              </Box>
+            )}
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <ThemeToggle />

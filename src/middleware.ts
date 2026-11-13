@@ -23,8 +23,10 @@ export async function middleware(req: NextRequest) {
 
   // Protect /student routes
   if (pathname.startsWith('/student')) {
-    // Only allow 'student' and 'admin' roles
-    if (!token || (token.role !== 'student' && token.role !== 'admin')) {
+    // Allow 'student', 'teacher', and 'admin' roles for games and test
+    const isSharedFeature = pathname.startsWith('/student/games') || pathname.startsWith('/student/test');
+    const allowedRoles = isSharedFeature ? ['student', 'teacher', 'admin'] : ['student', 'admin'];
+    if (!token || !allowedRoles.includes(token.role as string)) {
       const url = req.nextUrl.clone();
       url.pathname = '/unauthorized'; // Redirect to unauthorized or login
       return NextResponse.redirect(url);
