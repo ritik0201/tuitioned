@@ -129,15 +129,40 @@ export async function GET(
 
       let matched = false;
 
-      // 1. Check schedules array
+      // 1. Check schedules array strictly prioritizing teacher day & schedule
       if (Array.isArray(c.schedules) && c.schedules.length > 0) {
+        const hasAnyTeacherInfo = c.schedules.some((s: any) => Boolean(s.teacherDay || s.teacherSchedule));
+
         for (const s of c.schedules) {
-          const dayCandidates = [s.teacherDay, s.studentDay, s.teacherSchedule, s.studentSchedule].filter(Boolean);
+          // If the course has teacher schedule information, ONLY use teacherDay / teacherSchedule
+          const dayCandidates = hasAnyTeacherInfo
+            ? [s.teacherDay, s.teacherSchedule].filter(Boolean)
+            : [s.studentDay, s.studentSchedule].filter(Boolean);
+
           const daysFound = extractDays(dayCandidates);
-          const timeFound = s.teacherTime || s.studentTime || extractTime(s.teacherSchedule) || extractTime(s.studentSchedule) || defaultTime;
 
           for (const d of daysFound) {
             matched = true;
+            let timeFound = hasAnyTeacherInfo
+              ? (s.teacherTime || extractTime(s.teacherSchedule))
+              : (s.studentTime || extractTime(s.studentSchedule));
+
+            // If time not specified directly on schedule item, check teacherClassTime for this specific day
+            if (!timeFound && c.teacherClassTime) {
+              const slots = c.teacherClassTime.split(/[,;]/);
+              for (const slot of slots) {
+                const slotDays = extractDays(slot);
+                if (slotDays.includes(d)) {
+                  timeFound = extractTime(slot);
+                  break;
+                }
+              }
+            }
+
+            if (!timeFound) {
+              timeFound = extractTime(c.teacherClassTime) || extractTime(c.classTime) || '';
+            }
+
             addStudentToDay(d, {
               studentId,
               studentName,
@@ -155,9 +180,35 @@ export async function GET(
         }
       }
 
-      // 2. Check classDays array or string
-      if (c.classDays) {
+      // 2. If schedules didn't match, check teacherClassTime slots (e.g. "10:00 AM - Tuesday, 10:30 AM - Thursday")
+      if (!matched && c.teacherClassTime) {
+        const slots = c.teacherClassTime.split(/[,;]/);
+        for (const slot of slots) {
+          const daysFound = extractDays(slot);
+          const slotTime = extractTime(slot) || extractTime(c.teacherClassTime) || '';
+          for (const d of daysFound) {
+            matched = true;
+            addStudentToDay(d, {
+              studentId,
+              studentName,
+              studentImage,
+              studentEmail,
+              courseId,
+              courseTitle,
+              grade,
+              time: slotTime,
+              joinLink,
+              noOfClasses,
+              isDemo: false,
+            });
+          }
+        }
+      }
+
+      // 3. Fallback ONLY if no teacher schedule/time was found: check classDays
+      if (!matched && c.classDays) {
         const daysFound = extractDays(c.classDays);
+        const fallbackTime = extractTime(c.teacherClassTime) || extractTime(c.classTime) || c.classTime || '';
         for (const d of daysFound) {
           matched = true;
           addStudentToDay(d, {
@@ -168,7 +219,7 @@ export async function GET(
             courseId,
             courseTitle,
             grade,
-            time: defaultTime,
+            time: fallbackTime,
             joinLink,
             noOfClasses,
             isDemo: false,
@@ -176,10 +227,11 @@ export async function GET(
         }
       }
 
-      // 3. Fallback: check defaultTime string for day mentions
-      if (!matched && defaultTime) {
-        const daysFound = extractDays(defaultTime);
-        const timeFound = extractTime(defaultTime);
+      // 4. Last fallback if still not matched: check teacherClassTime or classTime for day mentions
+      if (!matched && (c.teacherClassTime || c.classTime)) {
+        const rawTime = c.teacherClassTime || c.classTime || '';
+        const daysFound = extractDays(rawTime);
+        const timeFound = extractTime(rawTime);
         for (const d of daysFound) {
           addStudentToDay(d, {
             studentId,
@@ -189,7 +241,7 @@ export async function GET(
             courseId,
             courseTitle,
             grade,
-            time: timeFound || defaultTime,
+            time: timeFound || rawTime,
             joinLink,
             noOfClasses,
             isDemo: false,

@@ -9,14 +9,24 @@ interface PopulatedStudent {
   _id: string;
   fullName: string;
   email: string;
+  profileImage?: string;
+  mobile?: string;
 }
 
 interface PopulatedCourse {
-  _id: any; // Mongoose ObjectId can be complex, 'any' is safe here
+  _id: any;
   title: string;
   grade: string;
   studentId?: PopulatedStudent;
   noOfClasses: number;
+  noOfclassTeacher?: number;
+  joinLink?: string;
+  classroomLink?: string;
+  classTime?: string;
+  teacherClassTime?: string;
+  classDays?: string[];
+  schedules?: any[];
+  createdAt?: string | Date;
 }
 /**
  * GET handler to fetch students for a logged-in teacher.
@@ -42,7 +52,7 @@ export async function GET(request: NextRequest) {
       .populate<{ studentId: PopulatedStudent }>({
         path: 'studentId',
         model: User,
-        select: 'fullName email' // Select only the fields you need from the User model
+        select: 'fullName email profileImage mobile'
       })
       .sort({ createdAt: -1, _id: -1 })
       .lean<PopulatedCourse[]>();
@@ -56,11 +66,21 @@ export async function GET(request: NextRequest) {
     const courseData = teacherCourses.map(course => ({
       id: course._id.toString(),
       courseName: course.title,
-      studentId: course.studentId?._id.toString(),
+      studentId: course.studentId?._id?.toString(),
       studentName: course.studentId?.fullName || 'N/A',
       email: course.studentId?.email || 'N/A',
+      studentImage: course.studentId?.profileImage || '',
+      studentMobile: course.studentId?.mobile || '',
       grade: course.grade,
-      noOfClasses: course.noOfClasses,
+      noOfClasses: course.noOfClasses ?? 0,
+      noOfclassTeacher: course.noOfclassTeacher ?? 0,
+      joinLink: course.joinLink || '',
+      classroomLink: course.classroomLink || '',
+      teacherClassTime: course.teacherClassTime || '',
+      classTime: course.classTime || '',
+      classDays: course.classDays || [],
+      schedules: course.schedules || [],
+      createdAt: course.createdAt || '',
     }));
 
     // Step 4: Return the list of students.

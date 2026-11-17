@@ -20,7 +20,7 @@ import {
 const footerLinks = {
   courses: [
     { label: 'K-12 School Tuition', href: 'https://tuition-ed.com/k-12-school-time-courses/' },
-    { label: 'Mathematics & Science', href: '/get-a-free-trial' },
+    { label: 'Math Programs (K-12)', href: '/math-programs' },
     { label: 'Language & Communication', href: '/get-a-free-trial' },
     { label: 'Coding & Technology', href: '/get-a-free-trial' },
     { label: 'Exam Preparation', href: '/get-a-free-trial' },

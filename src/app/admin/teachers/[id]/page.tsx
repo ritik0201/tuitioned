@@ -119,6 +119,53 @@ const DEFAULT_DAYS: WeeklyScheduleDay[] = [
   { dayName: 'Sunday', shortName: 'Sun', dayIndex: 0, students: [] },
 ];
 
+function normalizeDayName(input: string): WeeklyScheduleDay['dayName'] | null {
+  if (!input || typeof input !== 'string') return null;
+  const str = input.trim().toLowerCase();
+  if (str.startsWith('mon')) return 'Monday';
+  if (str.startsWith('tue')) return 'Tuesday';
+  if (str.startsWith('wed')) return 'Wednesday';
+  if (str.startsWith('thu')) return 'Thursday';
+  if (str.startsWith('fri')) return 'Friday';
+  if (str.startsWith('sat')) return 'Saturday';
+  if (str.startsWith('sun')) return 'Sunday';
+  return null;
+}
+
+function extractDays(input: any): WeeklyScheduleDay['dayName'][] {
+  if (!input) return [];
+  const results: WeeklyScheduleDay['dayName'][] = [];
+  const items = Array.isArray(input) ? input : String(input).split(/[,&/|]/);
+  for (const item of items) {
+    const raw = typeof item === 'string' ? item.trim() : '';
+    if (!raw) continue;
+    const direct = normalizeDayName(raw);
+    if (direct && !results.includes(direct)) {
+      results.push(direct);
+    } else {
+      const words = raw.split(/[\s-]+/);
+      for (const w of words) {
+        const wordNorm = normalizeDayName(w);
+        if (wordNorm && !results.includes(wordNorm)) {
+          results.push(wordNorm);
+        }
+      }
+    }
+  }
+  return results;
+}
+
+function extractTime(input?: string): string {
+  if (!input || typeof input !== 'string') return '';
+  const trimmed = input.trim();
+  const match = trimmed.match(/\b\d{1,2}(?::\d{2})?\s*(?:AM|PM|am|pm)\b/i) || trimmed.match(/\b\d{1,2}:\d{2}\b/);
+  if (match) return match[0];
+  if (trimmed.length > 0 && !normalizeDayName(trimmed) && trimmed.length <= 15) {
+    return trimmed;
+  }
+  return '';
+}
+
 function buildWeeklySchedule(courses: ICourse[] = []): WeeklyScheduleDay[] {
   const scheduleMap: Record<string, WeeklyStudentClass[]> = {
     Monday: [],
@@ -155,17 +202,40 @@ function buildWeeklySchedule(courses: ICourse[] = []): WeeklyScheduleDay[] {
     const noOfClasses = course.noOfClasses ?? 0;
 
     let matched = false;
+
+    // 1. Check schedules array strictly prioritizing teacher day & schedule
     if (course.schedules && course.schedules.length > 0) {
+      const hasAnyTeacherInfo = course.schedules.some((s: any) => Boolean(s.teacherDay || s.teacherSchedule));
+
       for (const s of course.schedules) {
-        const d = s.teacherDay || s.studentDay || '';
-        const dayStr = (d || s.teacherSchedule || s.studentSchedule || '').toLowerCase();
-        const matchedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].filter(dayName =>
-          dayStr.includes(dayName.toLowerCase().substring(0, 3))
-        );
-        const timeFound = s.teacherTime || s.studentTime || defaultTime;
-        for (const md of matchedDays) {
+        const dayCandidates = hasAnyTeacherInfo
+          ? [s.teacherDay, s.teacherSchedule].filter(Boolean)
+          : [s.studentDay, s.studentSchedule].filter(Boolean);
+
+        const daysFound = extractDays(dayCandidates);
+
+        for (const d of daysFound) {
           matched = true;
-          addStudent(md, {
+          let timeFound = hasAnyTeacherInfo
+            ? (s.teacherTime || extractTime(s.teacherSchedule))
+            : (s.studentTime || extractTime(s.studentSchedule));
+
+          if (!timeFound && course.teacherClassTime) {
+            const slots = course.teacherClassTime.split(/[,;]/);
+            for (const slot of slots) {
+              const slotDays = extractDays(slot);
+              if (slotDays.includes(d)) {
+                timeFound = extractTime(slot);
+                break;
+              }
+            }
+          }
+
+          if (!timeFound) {
+            timeFound = extractTime(course.teacherClassTime) || extractTime(course.classTime) || '';
+          }
+
+          addStudent(d, {
             studentId,
             studentName,
             studentImage,
@@ -181,16 +251,15 @@ function buildWeeklySchedule(courses: ICourse[] = []): WeeklyScheduleDay[] {
       }
     }
 
-    if (course.classDays) {
-      const daysArr = Array.isArray(course.classDays) ? course.classDays : String(course.classDays).split(',');
-      for (const cd of daysArr) {
-        const lower = String(cd).toLowerCase();
-        const matchedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].filter(dayName =>
-          lower.includes(dayName.toLowerCase().substring(0, 3))
-        );
-        for (const md of matchedDays) {
+    // 2. Check teacherClassTime slots if schedules did not match
+    if (!matched && course.teacherClassTime) {
+      const slots = course.teacherClassTime.split(/[,;]/);
+      for (const slot of slots) {
+        const daysFound = extractDays(slot);
+        const slotTime = extractTime(slot) || extractTime(course.teacherClassTime) || '';
+        for (const d of daysFound) {
           matched = true;
-          addStudent(md, {
+          addStudent(d, {
             studentId,
             studentName,
             studentImage,
@@ -198,7 +267,7 @@ function buildWeeklySchedule(courses: ICourse[] = []): WeeklyScheduleDay[] {
             courseId,
             courseTitle,
             grade,
-            time: defaultTime,
+            time: slotTime,
             joinLink,
             noOfClasses,
           });
@@ -206,13 +275,13 @@ function buildWeeklySchedule(courses: ICourse[] = []): WeeklyScheduleDay[] {
       }
     }
 
-    if (!matched && defaultTime) {
-      const lower = defaultTime.toLowerCase();
-      const matchedDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].filter(dayName =>
-        lower.includes(dayName.toLowerCase().substring(0, 3))
-      );
-      for (const md of matchedDays) {
-        addStudent(md, {
+    // 3. Fallback ONLY if no teacher schedule/time was found: check classDays
+    if (!matched && course.classDays) {
+      const daysFound = extractDays(course.classDays);
+      const fallbackTime = extractTime(course.teacherClassTime) || extractTime(course.classTime) || course.classTime || '';
+      for (const d of daysFound) {
+        matched = true;
+        addStudent(d, {
           studentId,
           studentName,
           studentImage,
@@ -220,7 +289,27 @@ function buildWeeklySchedule(courses: ICourse[] = []): WeeklyScheduleDay[] {
           courseId,
           courseTitle,
           grade,
-          time: defaultTime,
+          time: fallbackTime,
+          joinLink,
+          noOfClasses,
+        });
+      }
+    }
+
+    // 4. Last fallback if still not matched: check defaultTime string for day mentions
+    if (!matched && defaultTime) {
+      const daysFound = extractDays(defaultTime);
+      const timeFound = extractTime(defaultTime);
+      for (const d of daysFound) {
+        addStudent(d, {
+          studentId,
+          studentName,
+          studentImage,
+          studentEmail,
+          courseId,
+          courseTitle,
+          grade,
+          time: timeFound || defaultTime,
           joinLink,
           noOfClasses,
         });

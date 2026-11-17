@@ -1,375 +1,352 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
+import React, { useEffect, useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, Search, BookOpen, User, GraduationCap } from "lucide-react";
+  Box,
+  Typography,
+  Chip,
+  Avatar,
+  CircularProgress,
+} from "@mui/material";
+import {
+  BookOpen,
+  GraduationCap,
+  Search,
+  Video,
+  ArrowRight,
+  FolderOpen,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,  
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input" 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Box, Typography, Chip, Avatar, CircularProgress } from "@mui/material"
-import { motion } from "framer-motion"
+import { Input } from "@/components/ui/input";
 
 export type CourseData = {
-  id: string
-  courseName: string
-  studentId?: string
-  studentName: string
-  grade: string
-  noOfClasses: number
+  id: string;
+  courseName: string;
+  studentId?: string;
+  studentName: string;
+  email?: string;
+  studentImage?: string;
+  grade: string;
+  noOfClasses: number;
+  joinLink?: string;
+};
+
+const AVATAR_COLORS = [
+  "#4f46e5",
+  "#059669",
+  "#d97706",
+  "#db2777",
+  "#7c3aed",
+  "#0284c7",
+  "#ea580c",
+  "#0d9488",
+];
+
+function getAvatarColor(name: string = ""): string {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
-export default function StudentDataTable() {
-  const router = useRouter()
-  const [data, setData] = React.useState<CourseData[]>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [loading, setLoading] = React.useState(true)
-  const [error, setError] = React.useState<string | null>(null)
+function getInitials(name: string = ""): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
-  const columns: ColumnDef<CourseData>[] = [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-          className="border-muted-foreground data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 rounded-md"
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          className="border-muted-foreground data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600 rounded-md"
-        />
-      ),
-      enableSorting: false,
-      enableHiding: false,
-    },
-    {
-      accessorKey: "courseName",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-accent text-foreground font-semibold"
-          >
-            Course Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (
-        <div className="flex items-center gap-3">
-          <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5', fontSize: '0.875rem', borderRadius: 2 }}>
-            <BookOpen size={16} />
-          </Avatar>
-          <span className="font-semibold text-foreground">{row.getValue("courseName")}</span>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "studentName",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-accent text-foreground font-semibold"
-          >
-            Student Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2 text-foreground">
-          <User size={14} className="text-indigo-500" />
-          {row.getValue("studentName")}
-        </div>
-      ),
-    },
-    {
-      accessorKey: "noOfClasses",
-      header: "Classes Left",
-      cell: ({ row }) => {
-        const classes = row.getValue("noOfClasses") as number
-        return (
-          <Chip 
-            label={`${classes ?? 0} Classes`} 
-            size="small" 
-            sx={{ 
-              bgcolor: classes < 5 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-              color: classes < 5 ? '#ef4444' : '#10b981',
-              fontWeight: 600,
-              borderRadius: 1.5
-            }} 
-          />
-        )
-      },
-    },
-    {
-      accessorKey: "grade",
-      header: "Grade",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <GraduationCap size={14} />
-          {row.getValue("grade")}
-        </div>
-      ),
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: ({ row }) => {
-        const course = row.original
-  
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-accent text-muted-foreground">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover border-border text-popover-foreground shadow-md rounded-xl">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(course.id)}
-                className="cursor-pointer hover:bg-accent"
-              >
-                Copy Course ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-border" />
-              <DropdownMenuItem
-                onClick={() => router.push(`/teacher/courses/${course.id}`)}
-                className="cursor-pointer text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50"
-              >
-                View details
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )
-      },
-    },
-  ]
+export default function TeacherCoursesPage() {
+  const router = useRouter();
+  const [courses, setCourses] = useState<CourseData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  React.useEffect(() => {
-    const fetchStudents = async () => {
+  useEffect(() => {
+    const fetchCourses = async () => {
       try {
-        setLoading(true)
-        const response = await fetch('/api/teachers-student')
+        setLoading(true);
+        const response = await fetch("/api/teachers-student");
+        const contentType = response.headers.get("content-type");
 
-        const contentType = response.headers.get('content-type');
         if (!response.ok) {
-          if (contentType && contentType.includes('application/json')) {
+          if (contentType && contentType.includes("application/json")) {
             const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to fetch students');
+            throw new Error(errorData.message || "Failed to fetch courses");
           }
-          throw new Error('Your session may have expired. Please log in again.');
+          throw new Error("Your session may have expired. Please log in again.");
         }
-        const students = await response.json()
-        setData(students)
-      } catch (err: any) {
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchStudents()
-  }, [])
 
-  const table = useReactTable({
-    data,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
-  })
+        const data = await response.json();
+        setCourses(Array.isArray(data) ? data : []);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
+  const filteredCourses = useMemo(() => {
+    if (!searchQuery.trim()) return courses;
+    const q = searchQuery.toLowerCase().trim();
+    return courses.filter(
+      (c) =>
+        c.courseName?.toLowerCase().includes(q) ||
+        c.studentName?.toLowerCase().includes(q) ||
+        c.grade?.toLowerCase().includes(q)
+    );
+  }, [courses, searchQuery]);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6 pb-12"
     >
+      {/* Header & Simple Search */}
       <Box
-        sx={{ 
-          p: { xs: 2, md: 4 }, 
-          borderRadius: 4, 
-          bgcolor: 'background.paper',
-          border: '1px solid',
-          borderColor: 'divider',
-          boxShadow: '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          alignItems: { xs: "stretch", sm: "center" },
+          justifyContent: "space-between",
+          gap: 2,
         }}
       >
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h4" fontWeight="bold" sx={{ color: 'text.primary', mb: 1 }}>
-            My Courses
-          </Typography>
-          <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-            Manage your active courses and track student progress.
+        <Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Typography variant="h5" fontWeight="800" sx={{ color: "text.primary" }}>
+              My Courses
+            </Typography>
+            <Chip
+              label={`${courses.length}`}
+              size="small"
+              sx={{
+                bgcolor: "rgba(99, 102, 241, 0.12)",
+                color: "#4f46e5",
+                fontWeight: 700,
+                fontSize: "0.75rem",
+                borderRadius: 2,
+              }}
+            />
+          </Box>
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+            All your assigned student courses in one place.
           </Typography>
         </Box>
 
-        <div className="flex items-center py-4">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search students..."
-              value={(table.getColumn("studentName")?.getFilterValue() as string) ?? ""}
-              onChange={(event) =>
-                table.getColumn("studentName")?.setFilterValue(event.target.value)
-              }
-              className="pl-10 bg-background border-border text-foreground focus:ring-1 focus:ring-indigo-500 rounded-lg"
-            />
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-border overflow-hidden bg-card">
-          <Table>
-            <TableHeader className="bg-muted/50">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="border-border hover:bg-transparent">
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className="text-muted-foreground font-semibold py-4">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    )
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-32 text-center">
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                      <CircularProgress size={24} sx={{ color: 'primary.main' }} />
-                      <span className="text-muted-foreground">Loading your courses...</span>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ) : error ? (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-32 text-center text-destructive">
-                    {error}
-                  </TableCell>
-                </TableRow>
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                    className="border-border hover:bg-muted/40 transition-colors"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-4">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-32 text-center text-muted-foreground"
-                  >
-                    No courses found matching your search.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="flex items-center justify-between py-6">
-          <div className="text-sm text-muted-foreground font-medium">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-              className="rounded-lg"
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-              className="rounded-lg"
-            >
-              Next
-            </Button>
-          </div>
+        {/* Simple Search Input */}
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search courses or students..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 h-10 bg-background border-border text-foreground rounded-xl"
+          />
         </div>
       </Box>
+
+      {/* Content */}
+      {loading ? (
+        <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 10, gap: 2 }}>
+          <CircularProgress size={32} sx={{ color: "primary.main" }} />
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+            Loading courses...
+          </Typography>
+        </Box>
+      ) : error ? (
+        <Box sx={{ p: 4, textAlign: "center", borderRadius: 3, border: "1px solid", borderColor: "error.light" }}>
+          <Typography color="error" fontWeight="600">
+            {error}
+          </Typography>
+        </Box>
+      ) : filteredCourses.length === 0 ? (
+        <Box
+          sx={{
+            py: 8,
+            px: 2,
+            textAlign: "center",
+            borderRadius: 3,
+            border: "2px dashed",
+            borderColor: "divider",
+          }}
+        >
+          <FolderOpen size={40} className="mx-auto text-muted-foreground opacity-50 mb-2" />
+          <Typography variant="body1" fontWeight="600" sx={{ color: "text.primary" }}>
+            No courses found
+          </Typography>
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+            {searchQuery ? `No courses matching "${searchQuery}"` : "You have no assigned courses yet."}
+          </Typography>
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(3, 1fr)" },
+            gap: 2.5,
+          }}
+        >
+          {filteredCourses.map((course) => {
+            const avatarColor = getAvatarColor(course.studentName);
+            const classesLeft = course.noOfClasses ?? 0;
+
+            return (
+              <Box
+                key={course.id}
+                sx={{
+                  p: 2.5,
+                  borderRadius: 3.5,
+                  bgcolor: "background.paper",
+                  border: "1px solid",
+                  borderColor: "divider",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  gap: 2,
+                  transition: "all 0.2s ease",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.03)",
+                  "&:hover": {
+                    transform: "translateY(-3px)",
+                    borderColor: "primary.main",
+                    boxShadow: "0 8px 20px -4px rgba(79, 70, 229, 0.12)",
+                  },
+                }}
+              >
+                {/* Course Name & Classes Left */}
+                <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, minWidth: 0 }}>
+                    <Avatar
+                      sx={{
+                        width: 38,
+                        height: 38,
+                        bgcolor: "rgba(99, 102, 241, 0.1)",
+                        color: "#4f46e5",
+                        borderRadius: 2,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <BookOpen size={18} />
+                    </Avatar>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="700"
+                        noWrap
+                        sx={{ color: "text.primary", lineHeight: 1.25 }}
+                        title={course.courseName}
+                      >
+                        {course.courseName}
+                      </Typography>
+                      {course.grade && (
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, mt: 0.25 }}>
+                          <GraduationCap size={12} className="text-muted-foreground" />
+                          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 600 }}>
+                            {course.grade}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+                  </Box>
+
+                  <Chip
+                    label={`${classesLeft} ${classesLeft === 1 ? "Class" : "Classes"}`}
+                    size="small"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "0.72rem",
+                      bgcolor:
+                        classesLeft === 0
+                          ? "rgba(100, 116, 139, 0.12)"
+                          : classesLeft <= 3
+                          ? "rgba(245, 158, 11, 0.12)"
+                          : "rgba(16, 185, 129, 0.12)",
+                      color:
+                        classesLeft === 0
+                          ? "text.secondary"
+                          : classesLeft <= 3
+                          ? "#d97706"
+                          : "#059669",
+                      borderRadius: 1.5,
+                      flexShrink: 0,
+                    }}
+                  />
+                </Box>
+
+                {/* Student Info */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.25,
+                    p: 1.25,
+                    borderRadius: 2,
+                    bgcolor: "action.hover",
+                  }}
+                >
+                  <Avatar
+                    src={course.studentImage}
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      bgcolor: avatarColor,
+                      color: "#ffffff",
+                      fontSize: "0.8rem",
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {getInitials(course.studentName)}
+                  </Avatar>
+                  <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Typography variant="body2" fontWeight="600" noWrap sx={{ color: "text.primary" }}>
+                      {course.studentName}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Action Buttons */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1, pt: 0.5 }}>
+                  {course.joinLink ? (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => window.open(course.joinLink, "_blank", "noopener,noreferrer")}
+                      className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl h-8.5 text-xs flex items-center justify-center gap-1"
+                    >
+                      <Video className="h-3.5 w-3.5" />
+                      Join
+                    </Button>
+                  ) : null}
+
+                  <Button
+                    variant={course.joinLink ? "outline" : "default"}
+                    size="sm"
+                    onClick={() => router.push(`/teacher/courses/${course.id}`)}
+                    className={`font-semibold rounded-xl h-8.5 text-xs flex items-center justify-center gap-1 transition-all ${
+                      course.joinLink
+                        ? "flex-1 border-border hover:bg-muted text-foreground"
+                        : "w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                    }`}
+                  >
+                    View Course
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Button>
+                </Box>
+              </Box>
+            );
+          })}
+        </Box>
+      )}
     </motion.div>
-  )
+  );
 }
